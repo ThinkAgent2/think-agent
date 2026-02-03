@@ -90,7 +90,7 @@ export default function ChallengesPage() {
 
           <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
             {/* Sidebar filters */}
-            <aside className="lg:sticky lg:top-24 lg:h-fit">
+            <aside className="lg:sticky lg:top-24 lg:h-fit z-10">
               <ChallengeFilters filters={filters} onFiltersChange={setFilters} />
             </aside>
 
