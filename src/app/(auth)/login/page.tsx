@@ -1,24 +1,35 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Zap, ArrowLeft, Mail, Loader2 } from 'lucide-react';
+import { useAuth } from '@/lib/auth';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { user, login, isLoading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Rediriger si déjà connecté
+  useEffect(() => {
+    if (user && !authLoading) {
+      router.push('/challenges');
+    }
+  }, [user, authLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     
-    if (!email || !email.includes('@')) {
+    const trimmedEmail = email.trim().toLowerCase();
+    
+    if (!trimmedEmail || !trimmedEmail.includes('@')) {
       setError('Veuillez entrer une adresse email valide');
       return;
     }
@@ -26,20 +37,28 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // TODO: Appel API pour vérifier/créer l'utilisateur
-      // Pour l'instant, on stocke juste l'email et on redirige
-      localStorage.setItem('user_email', email);
+      const loggedInUser = await login(trimmedEmail);
       
-      // Simuler un délai
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      router.push('/challenges');
+      if (loggedInUser) {
+        router.push('/challenges');
+      } else {
+        setError('Une erreur est survenue. Veuillez réessayer.');
+      }
     } catch {
       setError('Une erreur est survenue. Veuillez réessayer.');
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Afficher un loader pendant la vérification auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-exalt-blue" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4">
@@ -85,6 +104,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 bg-background border-border focus:border-accent-cyan"
                   disabled={isLoading}
+                  autoFocus
                 />
               </div>
               {error && (

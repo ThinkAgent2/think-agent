@@ -6,15 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Zap, Calendar, User, LogOut } from 'lucide-react';
-
-interface HeaderProps {
-  user?: {
-    email: string;
-    nom: string | null;
-    niveau_actuel: string;
-    points_totaux: number;
-  } | null;
-}
+import { useAuth } from '@/lib/auth';
 
 const navItems = [
   { href: '/challenges', label: 'Challenges', icon: Zap },
@@ -22,14 +14,15 @@ const navItems = [
   { href: '/me', label: 'Ma Page', icon: User },
 ];
 
-const levelColors = {
+const levelColors: Record<string, string> = {
   Explorer: 'bg-accent-vert text-black',
   Crafter: 'bg-exalt-blue text-white',
   Architecte: 'bg-accent-rose text-white',
 };
 
-export function Header({ user }: HeaderProps) {
+export function Header() {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -67,7 +60,7 @@ export function Header({ user }: HeaderProps) {
           {user ? (
             <>
               <div className="hidden sm:flex items-center gap-2">
-                <Badge className={levelColors[user.niveau_actuel as keyof typeof levelColors]}>
+                <Badge className={levelColors[user.niveau_actuel] || levelColors.Explorer}>
                   {user.niveau_actuel}
                 </Badge>
                 <span className="text-sm text-muted-foreground">
@@ -81,6 +74,15 @@ export function Header({ user }: HeaderProps) {
                   </AvatarFallback>
                 </Avatar>
               </Link>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={logout}
+                className="text-muted-foreground hover:text-accent-rose"
+                title="Déconnexion"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
             </>
           ) : (
             <Link href="/login">

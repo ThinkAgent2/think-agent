@@ -136,6 +136,6 @@ export interface LeaderboardEntry {
   nom: string;
   niveau_actuel: UserLevel;
   points_totaux: number;
-  marque: Marque | null;
+  marque: string | null;
   rank: number;
 }

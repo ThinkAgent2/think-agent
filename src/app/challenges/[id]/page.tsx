@@ -1,0 +1,405 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { 
+  ArrowLeft, Clock, Star, Users, Zap, Target, Wrench, 
+  CheckCircle, Loader2, Lock, FileText, Send, Eye
+} from 'lucide-react';
+import { useAuth } from '@/lib/auth';
+import { 
+  getChallengeById, 
+  getParticipation, 
+  getSolution,
+  createParticipation, 
+  submitSolution,
+  markSolutionViewed
+} from '@/lib/supabase/queries';
+import type { Challenge, Participation, Solution } from '@/types/database';
+
+const levelConfig: Record<string, { color: string; bgColor: string }> = {
+  Explorer: { color: 'text-accent-vert', bgColor: 'bg-accent-vert' },
+  Crafter: { color: 'text-exalt-blue', bgColor: 'bg-exalt-blue' },
+  Architecte: { color: 'text-accent-rose', bgColor: 'bg-accent-rose' },
+};
+
+export default function ChallengeDetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const { user } = useAuth();
+  const challengeId = params.id as string;
+
+  const [challenge, setChallenge] = useState<Challenge | null>(null);
+  const [participation, setParticipation] = useState<Participation | null>(null);
+  const [solution, setSolution] = useState<Solution | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [solutionText, setSolutionText] = useState('');
+  const [showReference, setShowReference] = useState(false);
+
+  // Charger les données
+  useEffect(() => {
+    async function loadData() {
+      setIsLoading(true);
+      
+      const challengeData = await getChallengeById(challengeId);
+      setChallenge(challengeData);
+
+      if (user && challengeData) {
+        const [participationData, solutionData] = await Promise.all([
+          getParticipation(user.id, challengeId),
+          getSolution(user.id, challengeId),
+        ]);
+        setParticipation(participationData);
+        setSolution(solutionData);
+      }
+
+      setIsLoading(false);
+    }
+    loadData();
+  }, [challengeId, user]);
+
+  // Participer au challenge
+  const handleParticipate = async () => {
+    if (!user || !challenge) return;
+
+    setIsSubmitting(true);
+    const newParticipation = await createParticipation(user.id, challenge.id);
+    if (newParticipation) {
+      setParticipation(newParticipation);
+    }
+    setIsSubmitting(false);
+  };
+
+  // Soumettre une solution
+  const handleSubmit = async () => {
+    if (!user || !challenge || !solutionText.trim()) return;
+
+    setIsSubmitting(true);
+    const newSolution = await submitSolution(user.id, challenge.id, solutionText);
+    if (newSolution) {
+      setSolution(newSolution);
+      setParticipation(prev => prev ? { ...prev, statut: 'Terminé' } : null);
+    }
+    setIsSubmitting(false);
+  };
+
+  // Voir la solution de référence
+  const handleViewReference = async () => {
+    if (!user || !challenge) return;
+    
+    setShowReference(true);
+    await markSolutionViewed(user.id, challenge.id);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-exalt-blue" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!challenge) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <Header />
+        <main className="flex-1 flex flex-col items-center justify-center gap-4">
+          <p className="text-xl text-muted-foreground">Challenge non trouvé</p>
+          <Link href="/challenges">
+            <Button variant="outline">Retour au catalogue</Button>
+          </Link>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  const config = levelConfig[challenge.niveau_associe] || levelConfig.Explorer;
+  const isParticipating = !!participation;
+  const hasSubmitted = !!solution;
+  const isCompleted = participation?.statut === 'Terminé';
+
+  return (
+    <div className="flex min-h-screen flex-col">
+      <Header />
+
+      <main className="flex-1 py-8">
+        <div className="container mx-auto px-4 max-w-4xl">
+          {/* Back link */}
+          <Link
+            href="/challenges"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent-cyan transition-colors mb-6"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Retour au catalogue
+          </Link>
+
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+              <Badge className={`${config.bgColor} text-white`}>
+                {challenge.niveau_associe}
+              </Badge>
+              {challenge.marque !== 'Tous' && (
+                <Badge variant="outline">{challenge.marque}</Badge>
+              )}
+              {isCompleted && (
+                <Badge className="bg-accent-vert text-black">
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  Complété
+                </Badge>
+              )}
+            </div>
+
+            <h1 className="text-3xl md:text-4xl font-bold mb-4">{challenge.titre}</h1>
+
+            {/* Meta */}
+            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`h-4 w-4 ${i < challenge.difficulte ? 'fill-accent-jaune text-accent-jaune' : 'text-muted'}`}
+                  />
+                ))}
+              </div>
+              <div className="flex items-center gap-1">
+                <Clock className="h-4 w-4" />
+                {challenge.duree_estimee}
+              </div>
+              <div className="flex items-center gap-1">
+                <Users className="h-4 w-4" />
+                {challenge.participants}
+              </div>
+              <div className="flex items-center gap-1 text-accent-jaune font-semibold">
+                <Zap className="h-4 w-4" />
+                {challenge.xp} XP
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+            {/* Main content */}
+            <div className="space-y-8">
+              {/* Description */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Description
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground whitespace-pre-wrap">
+                    {challenge.description}
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Critères d'évaluation */}
+              {challenge.criteres_evaluation && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Target className="h-5 w-5" />
+                      Critères d&apos;évaluation
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground whitespace-pre-wrap">
+                      {challenge.criteres_evaluation}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Zone de soumission */}
+              {user && isParticipating && !hasSubmitted && (
+                <Card className="border-accent-cyan">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Send className="h-5 w-5" />
+                      Soumettre ta solution
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <textarea
+                      placeholder="Décris ta solution, ton approche, colle tes prompts..."
+                      value={solutionText}
+                      onChange={(e) => setSolutionText(e.target.value)}
+                      className="w-full h-48 p-4 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none resize-none"
+                    />
+                    <Button
+                      onClick={handleSubmit}
+                      disabled={isSubmitting || !solutionText.trim()}
+                      className="bg-accent-jaune hover:bg-accent-jaune/80 text-black font-semibold"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Envoi...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="h-4 w-4 mr-2" />
+                          Soumettre
+                        </>
+                      )}
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Solution soumise */}
+              {hasSubmitted && (
+                <Card className="border-accent-vert">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-accent-vert">
+                      <CheckCircle className="h-5 w-5" />
+                      Solution soumise
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="p-4 rounded-lg bg-card border border-border">
+                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                        {solution?.contenu_texte}
+                      </p>
+                    </div>
+                    
+                    {/* Bouton solution de référence */}
+                    {challenge.solution_reference && (
+                      <div className="pt-4 border-t border-border">
+                        {!showReference ? (
+                          <Button
+                            onClick={handleViewReference}
+                            variant="outline"
+                            className="border-accent-cyan text-accent-cyan hover:bg-accent-cyan hover:text-black"
+                          >
+                            <Eye className="h-4 w-4 mr-2" />
+                            🔓 Voir la solution de référence
+                          </Button>
+                        ) : (
+                          <div className="space-y-2">
+                            <h4 className="font-semibold text-accent-cyan">Solution de référence</h4>
+                            <div className="p-4 rounded-lg bg-accent-cyan/10 border border-accent-cyan/30">
+                              <p className="text-sm whitespace-pre-wrap">
+                                {challenge.solution_reference}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
+              {/* Actions */}
+              <Card>
+                <CardContent className="pt-6">
+                  {!user ? (
+                    <div className="text-center space-y-4">
+                      <p className="text-sm text-muted-foreground">
+                        Connecte-toi pour participer
+                      </p>
+                      <Link href="/login">
+                        <Button className="w-full bg-accent-jaune hover:bg-accent-jaune/80 text-black font-semibold">
+                          Se connecter
+                        </Button>
+                      </Link>
+                    </div>
+                  ) : !isParticipating ? (
+                    <Button
+                      onClick={handleParticipate}
+                      disabled={isSubmitting}
+                      className="w-full bg-accent-jaune hover:bg-accent-jaune/80 text-black font-semibold"
+                    >
+                      {isSubmitting ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        'Participer'
+                      )}
+                    </Button>
+                  ) : isCompleted ? (
+                    <div className="text-center space-y-2">
+                      <CheckCircle className="h-12 w-12 mx-auto text-accent-vert" />
+                      <p className="font-semibold text-accent-vert">Challenge complété !</p>
+                      <p className="text-sm text-muted-foreground">+{challenge.xp} XP</p>
+                    </div>
+                  ) : (
+                    <div className="text-center space-y-2">
+                      <div className="h-12 w-12 mx-auto rounded-full bg-accent-cyan/20 flex items-center justify-center">
+                        <Clock className="h-6 w-6 text-accent-cyan" />
+                      </div>
+                      <p className="font-semibold text-accent-cyan">En cours</p>
+                      <p className="text-sm text-muted-foreground">Soumets ta solution ci-dessous</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Outils recommandés */}
+              {challenge.outils_recommandes && challenge.outils_recommandes.length > 0 && (
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Wrench className="h-5 w-5" />
+                      Outils recommandés
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {(challenge.outils_recommandes as string[]).map((outil, index) => (
+                        <Badge key={index} variant="secondary">
+                          {outil}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Livrables */}
+              {challenge.livrables && (challenge.livrables as string[]).length > 0 && (
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <FileText className="h-5 w-5" />
+                      Livrables attendus
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {(challenge.livrables as string[]).map((livrable, index) => (
+                        <li key={index} className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <span className="h-1.5 w-1.5 rounded-full bg-accent-cyan" />
+                          {livrable}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
