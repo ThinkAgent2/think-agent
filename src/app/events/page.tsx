@@ -94,10 +94,10 @@ function EventCard({ event }: { event: DojoEvent }) {
             </span>
           </div>
 
-          {/* Capacité (info statique pour le mock) */}
+          {/* Capacité */}
           <div className="flex items-center gap-3 text-sm text-muted-foreground">
             <Users className="h-4 w-4" />
-            <span>Max 10 personnes par atelier • Jusqu&apos;à 200 participants</span>
+            <span>10-15 participants</span>
           </div>
 
           {/* Lieu si présentiel */}
@@ -169,27 +169,6 @@ export default function EventsPage() {
               Ateliers pratiques pour progresser ensemble. Inscription via 360 Learning.
             </p>
           </div>
-
-          {/* Format info */}
-          <Card className="mb-8 border-exalt-blue/30 bg-exalt-blue/5">
-            <CardContent className="py-4">
-              <div className="flex flex-col md:flex-row md:items-center gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-exalt-blue" />
-                  <span><strong>Format :</strong> 2h30 (2 créneaux d&apos;1h)</span>
-                </div>
-                <div className="hidden md:block h-4 w-px bg-border" />
-                <div className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-exalt-blue" />
-                  <span><strong>10 ateliers</strong> en parallèle</span>
-                </div>
-                <div className="hidden md:block h-4 w-px bg-border" />
-                <div className="flex items-center gap-2">
-                  <span>🎯 <strong>Tronc commun</strong> : 7 ateliers à chaque événement</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
           {isLoading ? (
             <div className="flex items-center justify-center py-12">

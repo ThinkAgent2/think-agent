@@ -425,26 +425,26 @@ INSERT INTO challenges (titre, description, niveau_associe, type, difficulte, du
 
 INSERT INTO evenements_dojo (titre, description, date_debut, date_fin, format, lien_360learning) VALUES
 (
-  'Dojo Think Agent #1 - Découverte',
-  'Premier événement Think Agent ! 10 ateliers en parallèle pour découvrir les challenges Explorer et Crafter. Parfait pour débuter ton parcours IA.',
-  '2025-02-15 09:00:00+00',
-  '2025-02-15 11:30:00+00',
+  'Dojo Think Agent #1 - Les Basiques du Prompting',
+  'Atelier pratique pour maîtriser les fondamentaux du prompting : zero-shot, few-shot, chain-of-thought. Parfait pour débuter ton parcours IA.',
+  '2025-02-15 10:00:00+00',
+  '2025-02-15 11:00:00+00',
   'En_Ligne',
   'https://360learning.com/exalt/dojo-1'
 ),
 (
-  'Dojo Think Agent #2 - Crafter Session',
-  'Session intensive sur les challenges Crafter. Crée ton premier assistant métier avec l''accompagnement des mentors eXalt.',
+  'Dojo Think Agent #2 - Crée ton premier assistant',
+  'Atelier hands-on : crée ton premier assistant métier avec un prompt système structuré. Accompagnement par les mentors eXalt.',
   '2025-02-28 14:00:00+00',
-  '2025-02-28 16:30:00+00',
+  '2025-02-28 15:00:00+00',
   'En_Ligne',
   'https://360learning.com/exalt/dojo-2'
 ),
 (
   'Dojo Think Agent #3 - Présentiel Paris',
-  'Événement spécial en présentiel dans les locaux eXalt Paris. Networking, ateliers pratiques et keynote sur l''avenir du travail avec l''IA.',
-  '2025-03-15 09:00:00+00',
-  '2025-03-15 12:00:00+00',
+  'Atelier en présentiel dans les locaux eXalt Paris. Networking et pratique sur les challenges Crafter.',
+  '2025-03-15 10:00:00+00',
+  '2025-03-15 11:00:00+00',
   'Présentiel',
   'https://360learning.com/exalt/dojo-3'
 );
