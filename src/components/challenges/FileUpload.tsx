@@ -73,12 +73,19 @@ export function FileUpload({
     // Upload
     setIsUploading(true);
     const newFiles: UploadedFile[] = [];
+    const errors: string[] = [];
 
     for (const file of files) {
-      const result = await uploadSolutionFile(userId, challengeId, file);
-      if (result) {
-        newFiles.push(result);
+      const { file: uploaded, error: uploadError } = await uploadSolutionFile(userId, challengeId, file);
+      if (uploaded) {
+        newFiles.push(uploaded);
+      } else if (uploadError) {
+        errors.push(`${file.name}: ${uploadError}`);
       }
+    }
+
+    if (errors.length > 0) {
+      setError(errors.join('\n'));
     }
 
     const allFiles = [...uploadedFiles, ...newFiles];

@@ -18,7 +18,7 @@ export async function uploadSolutionFile(
   userId: string,
   challengeId: string,
   file: File
-): Promise<UploadedFile | null> {
+): Promise<{ file: UploadedFile | null; error: string | null }> {
   // Générer un nom unique pour éviter les collisions
   const timestamp = Date.now();
   const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
@@ -33,19 +33,22 @@ export async function uploadSolutionFile(
 
   if (error) {
     console.error('Error uploading file:', error);
-    return null;
+    return { file: null, error: error.message };
   }
 
-  // Générer l'URL signée (valide 1 an)
-  const { data: urlData } = await supabase.storage
+  // URL publique (bucket est public)
+  const { data: urlData } = supabase.storage
     .from(BUCKET_NAME)
-    .createSignedUrl(path, 60 * 60 * 24 * 365); // 1 an
+    .getPublicUrl(data.path);
 
   return {
-    path: data.path,
-    url: urlData?.signedUrl || '',
-    name: file.name,
-    size: file.size,
+    file: {
+      path: data.path,
+      url: urlData.publicUrl,
+      name: file.name,
+      size: file.size,
+    },
+    error: null,
   };
 }
 
