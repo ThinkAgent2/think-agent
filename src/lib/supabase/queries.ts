@@ -146,6 +146,15 @@ export async function getParticipation(userId: string, challengeId: string): Pro
 }
 
 export async function createParticipation(userId: string, challengeId: string): Promise<Participation | null> {
+  // D'abord vérifier s'il existe une participation abandonnée
+  const existing = await getParticipation(userId, challengeId);
+  
+  if (existing && existing.statut === 'Abandonné') {
+    // Réactiver la participation
+    return updateParticipation(userId, challengeId, { statut: 'En_cours' });
+  }
+
+  // Sinon créer une nouvelle participation
   const { data, error } = await supabase
     .from('participations')
     .insert({ user_id: userId, challenge_id: challengeId })
@@ -177,6 +186,20 @@ export async function updateParticipation(
     return null;
   }
   return data;
+}
+
+export async function abandonParticipation(userId: string, challengeId: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('participations')
+    .update({ statut: 'Abandonné' })
+    .eq('user_id', userId)
+    .eq('challenge_id', challengeId);
+
+  if (error) {
+    console.error('Error abandoning participation:', error);
+    return false;
+  }
+  return true;
 }
 
 // ==========================================

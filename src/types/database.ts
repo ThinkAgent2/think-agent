@@ -6,7 +6,7 @@ export type ChallengeType = 'Quiz' | 'Exercice' | 'Projet' | 'Use_Case';
 export type EvaluationType = 'Manuelle' | 'Automatique' | 'Hybride';
 export type ChallengeStatus = 'Actif' | 'Archivé';
 export type SolutionStatus = 'Soumise' | 'Évaluée';
-export type ParticipationStatus = 'En_cours' | 'Terminé';
+export type ParticipationStatus = 'En_cours' | 'Terminé' | 'Abandonné';
 export type EventFormat = 'En_Ligne' | 'Présentiel';
 
 // Marques eXalt

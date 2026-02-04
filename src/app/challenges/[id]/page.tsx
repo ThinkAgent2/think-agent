@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   ArrowLeft, Clock, Star, Users, Zap, Target, Wrench, 
-  CheckCircle, Loader2, FileText, Send, Eye, Paperclip
+  CheckCircle, Loader2, FileText, Send, Eye, Paperclip, XCircle
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { FileUpload } from '@/components/challenges/FileUpload';
@@ -21,7 +21,8 @@ import {
   getSolution,
   createParticipation, 
   submitSolution,
-  markSolutionViewed
+  markSolutionViewed,
+  abandonParticipation
 } from '@/lib/supabase/queries';
 import type { Challenge, Participation, Solution } from '@/types/database';
 
@@ -102,6 +103,18 @@ export default function ChallengeDetailPage() {
     await markSolutionViewed(user.id, challenge.id);
   };
 
+  // Abandonner le challenge
+  const handleAbandon = async () => {
+    if (!user || !challenge) return;
+
+    setIsSubmitting(true);
+    const success = await abandonParticipation(user.id, challenge.id);
+    if (success) {
+      setParticipation(null);
+    }
+    setIsSubmitting(false);
+  };
+
   if (isLoading) {
     return (
       <div className="flex min-h-screen flex-col">
@@ -130,9 +143,10 @@ export default function ChallengeDetailPage() {
   }
 
   const config = levelConfig[challenge.niveau_associe] || levelConfig.Explorer;
-  const isParticipating = !!participation;
+  const isParticipating = participation?.statut === 'En_cours';
   const hasSubmitted = !!solution;
   const isCompleted = participation?.statut === 'Terminé';
+  const isAbandoned = participation?.statut === 'Abandonné';
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -393,12 +407,28 @@ export default function ChallengeDetailPage() {
                       <p className="text-sm text-muted-foreground">+{challenge.xp} XP</p>
                     </div>
                   ) : (
-                    <div className="text-center space-y-2">
-                      <div className="h-12 w-12 mx-auto rounded-full bg-accent-cyan/20 flex items-center justify-center">
-                        <Clock className="h-6 w-6 text-accent-cyan" />
+                    <div className="text-center space-y-4">
+                      <div className="space-y-2">
+                        <div className="h-12 w-12 mx-auto rounded-full bg-accent-cyan/20 flex items-center justify-center">
+                          <Clock className="h-6 w-6 text-accent-cyan" />
+                        </div>
+                        <p className="font-semibold text-accent-cyan">En cours</p>
+                        <p className="text-sm text-muted-foreground">Soumets ta solution ci-dessous</p>
                       </div>
-                      <p className="font-semibold text-accent-cyan">En cours</p>
-                      <p className="text-sm text-muted-foreground">Soumets ta solution ci-dessous</p>
+                      <Button
+                        onClick={handleAbandon}
+                        disabled={isSubmitting}
+                        variant="ghost"
+                        size="sm"
+                        className="text-muted-foreground hover:text-red-500 hover:bg-red-500/10"
+                      >
+                        {isSubmitting ? (
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        ) : (
+                          <XCircle className="h-4 w-4 mr-2" />
+                        )}
+                        Arrêter le challenge
+                      </Button>
                     </div>
                   )}
                 </CardContent>

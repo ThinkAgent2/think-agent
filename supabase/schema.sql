@@ -67,7 +67,7 @@ CREATE TYPE challenge_type AS ENUM ('Quiz', 'Exercice', 'Projet', 'Use_Case');
 CREATE TYPE evaluation_type AS ENUM ('Manuelle', 'Automatique', 'Hybride');
 CREATE TYPE challenge_status AS ENUM ('Actif', 'Archivé');
 CREATE TYPE solution_status AS ENUM ('Soumise', 'Évaluée');
-CREATE TYPE participation_status AS ENUM ('En_cours', 'Terminé');
+CREATE TYPE participation_status AS ENUM ('En_cours', 'Terminé', 'Abandonné');
 CREATE TYPE event_format AS ENUM ('En_Ligne', 'Présentiel');
 CREATE TYPE participant_type AS ENUM ('Solo', 'Duo', 'Équipe');
 
