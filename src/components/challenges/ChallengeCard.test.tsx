@@ -17,7 +17,6 @@ const mockChallenge: Challenge = {
   criteres_evaluation: 'Score > 80%',
   xp: 50,
   statut: 'Actif',
-  prerequis: null,
   solution_reference: null,
   solution_fichiers: null,
   marque: 'Tous',
@@ -124,30 +123,6 @@ describe('ChallengeCard', () => {
     });
   });
 
-  describe('Locked state', () => {
-    it('should show lock icon when locked', () => {
-      render(<ChallengeCard challenge={mockChallenge} isLocked={true} />);
-      
-      const lockIcon = document.querySelector('svg.lucide-lock');
-      expect(lockIcon).toBeInTheDocument();
-    });
-
-    it('should show disabled button when locked', () => {
-      render(<ChallengeCard challenge={mockChallenge} isLocked={true} />);
-      
-      const button = screen.getByRole('button', { name: /prérequis requis/i });
-      expect(button).toBeDisabled();
-    });
-
-    it('should have reduced opacity when locked', () => {
-      const { container } = render(<ChallengeCard challenge={mockChallenge} isLocked={true} />);
-      
-      // The card should have opacity-60 class
-      const card = container.firstChild;
-      expect(card).toHaveClass('opacity-60');
-    });
-  });
-
   describe('Different niveaux', () => {
     it('should render Crafter badge correctly', () => {
       const crafterChallenge = { ...mockChallenge, niveau_associe: 'Crafter' as const };
@@ -185,12 +160,6 @@ describe('ChallengeCard', () => {
       
       const link = screen.getByRole('link');
       expect(link).toHaveAttribute('href', '/challenges/challenge-123');
-    });
-
-    it('should not have link when locked', () => {
-      render(<ChallengeCard challenge={mockChallenge} isLocked={true} />);
-      
-      expect(screen.queryByRole('link')).not.toBeInTheDocument();
     });
   });
 });

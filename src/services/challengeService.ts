@@ -3,60 +3,11 @@ import type { Challenge, Participation, UserLevel } from '@/types/database';
 /**
  * Service for challenge-related business logic
  * Separates business rules from UI components and data fetching
+ * 
+ * NOTE: Tous les challenges sont accessibles librement.
+ * Pas de verrouillage par prérequis ou niveau.
+ * La progression vient de l'engagement, pas de la contrainte.
  */
-
-// Prerequisites that must be completed before accessing other challenges
-const PREREQUISITE_CHALLENGES = [
-  'Les Basiques du Prompting',
-  'Le Gardien des Données',
-];
-
-/**
- * Check if a challenge is locked based on user's completed participations
- */
-export function isChallengeUnlocked(
-  challenge: Challenge,
-  participations: Participation[],
-  challenges: Challenge[]
-): boolean {
-  // Prerequisites challenges are never locked
-  if (PREREQUISITE_CHALLENGES.includes(challenge.titre)) {
-    return true;
-  }
-
-  // Get completed challenge titles
-  const completedTitles = getCompletedChallengeTitles(participations, challenges);
-
-  // Check if all prerequisites are completed
-  return PREREQUISITE_CHALLENGES.every((prereq) => completedTitles.includes(prereq));
-}
-
-/**
- * Check if a challenge is locked (inverse of unlocked for cleaner API)
- */
-export function isChallengeLocked(
-  challenge: Challenge,
-  participations: Participation[],
-  challenges: Challenge[]
-): boolean {
-  return !isChallengeUnlocked(challenge, participations, challenges);
-}
-
-/**
- * Get list of completed challenge titles
- */
-export function getCompletedChallengeTitles(
-  participations: Participation[],
-  challenges: Challenge[]
-): string[] {
-  return participations
-    .filter((p) => p.statut === 'Terminé')
-    .map((p) => {
-      const challenge = challenges.find((c) => c.id === p.challenge_id);
-      return challenge?.titre;
-    })
-    .filter((title): title is string => Boolean(title));
-}
 
 /**
  * Group challenges by level
@@ -99,6 +50,22 @@ export function isInProgress(
 ): boolean {
   const participation = getParticipationForChallenge(challengeId, participations);
   return participation?.statut === 'En_cours';
+}
+
+/**
+ * Get list of completed challenge titles
+ */
+export function getCompletedChallengeTitles(
+  participations: Participation[],
+  challenges: Challenge[]
+): string[] {
+  return participations
+    .filter((p) => p.statut === 'Terminé')
+    .map((p) => {
+      const challenge = challenges.find((c) => c.id === p.challenge_id);
+      return challenge?.titre;
+    })
+    .filter((title): title is string => Boolean(title));
 }
 
 /**

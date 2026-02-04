@@ -38,7 +38,6 @@ export interface Challenge {
   criteres_evaluation: string;
   xp: number;
   statut: ChallengeStatus;
-  prerequis: string[] | null;
   solution_reference: string | null;
   solution_fichiers: string[] | null;
   marque: Marque | 'Tous';

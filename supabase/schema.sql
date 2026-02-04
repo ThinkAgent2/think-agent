@@ -100,7 +100,6 @@ CREATE TABLE challenges (
   criteres_evaluation TEXT,
   xp INTEGER NOT NULL,
   statut challenge_status DEFAULT 'Actif',
-  prerequis JSONB DEFAULT '[]',
   solution_reference TEXT,
   solution_fichiers JSONB DEFAULT '[]',
   marque TEXT DEFAULT 'Tous',

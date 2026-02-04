@@ -25,7 +25,6 @@ import {
   getAllBadges,
   getUserBadges,
   getLeaderboard,
-  hasCompletedPrerequisites,
 } from './queries';
 
 import type { User, Challenge, Participation } from '@/types/database';
@@ -345,53 +344,4 @@ describe('queries.ts', () => {
     });
   });
 
-  // ==========================================
-  // BUSINESS LOGIC
-  // ==========================================
-
-  describe('hasCompletedPrerequisites', () => {
-    it('should return true when both prerequisites are completed', async () => {
-      const participations = [
-        {
-          ...mockParticipation,
-          statut: 'Terminé',
-          challenge: { ...mockChallenge, titre: 'Les Basiques du Prompting' },
-        },
-        {
-          ...mockParticipation,
-          challenge_id: 'challenge-456',
-          statut: 'Terminé',
-          challenge: { ...mockChallenge, id: 'challenge-456', titre: 'Le Gardien des Données' },
-        },
-      ];
-      mockSupabaseQuery.eq.mockResolvedValue({ data: participations, error: null });
-
-      const result = await hasCompletedPrerequisites('user-123');
-
-      expect(result).toBe(true);
-    });
-
-    it('should return false when prerequisites are not completed', async () => {
-      const participations = [
-        {
-          ...mockParticipation,
-          statut: 'Terminé',
-          challenge: { ...mockChallenge, titre: 'Les Basiques du Prompting' },
-        },
-      ];
-      mockSupabaseQuery.eq.mockResolvedValue({ data: participations, error: null });
-
-      const result = await hasCompletedPrerequisites('user-123');
-
-      expect(result).toBe(false);
-    });
-
-    it('should return false when no participations', async () => {
-      mockSupabaseQuery.eq.mockResolvedValue({ data: [], error: null });
-
-      const result = await hasCompletedPrerequisites('user-123');
-
-      expect(result).toBe(false);
-    });
-  });
 });

@@ -4,13 +4,12 @@ import Link from 'next/link';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, Star, Users, Zap, Lock, CheckCircle } from 'lucide-react';
+import { Clock, Star, Users, Zap, CheckCircle } from 'lucide-react';
 import type { Challenge, Participation } from '@/types/database';
 
 interface ChallengeCardProps {
   challenge: Challenge;
   participation?: Participation;
-  isLocked?: boolean;
 }
 
 const levelConfig = {
@@ -19,22 +18,17 @@ const levelConfig = {
   Architecte: { color: 'bg-accent-rose text-white', glow: 'hover:glow-rose' },
 };
 
-export function ChallengeCard({ challenge, participation, isLocked }: ChallengeCardProps) {
+export function ChallengeCard({ challenge, participation }: ChallengeCardProps) {
   const config = levelConfig[challenge.niveau_associe];
   const isCompleted = participation?.statut === 'Terminé';
   const isInProgress = participation?.statut === 'En_cours';
 
   return (
-    <Card className={`group relative overflow-hidden transition-all duration-300 bg-card border-border ${config.glow} transition-glow ${isLocked ? 'opacity-60' : ''}`}>
+    <Card className={`group relative overflow-hidden transition-all duration-300 bg-card border-border ${config.glow} transition-glow`}>
       {/* Status indicator */}
       {isCompleted && (
         <div className="absolute top-3 right-3 z-10">
           <CheckCircle className="h-6 w-6 text-accent-vert" />
-        </div>
-      )}
-      {isLocked && (
-        <div className="absolute top-3 right-3 z-10">
-          <Lock className="h-6 w-6 text-muted-foreground" />
         </div>
       )}
 
@@ -89,20 +83,13 @@ export function ChallengeCard({ challenge, participation, isLocked }: ChallengeC
       </CardContent>
 
       <CardFooter className="pt-0">
-        {isLocked ? (
-          <Button disabled variant="outline" className="w-full">
-            <Lock className="h-4 w-4 mr-2" />
-            Prérequis requis
+        <Link href={`/challenges/${challenge.id}`} className="w-full">
+          <Button
+            className={`w-full ${isInProgress ? 'bg-accent-cyan hover:bg-accent-cyan/80' : 'bg-accent-jaune hover:bg-accent-jaune/80'} text-black font-semibold`}
+          >
+            {isCompleted ? 'Revoir' : isInProgress ? 'Continuer' : 'Participer'}
           </Button>
-        ) : (
-          <Link href={`/challenges/${challenge.id}`} className="w-full">
-            <Button
-              className={`w-full ${isInProgress ? 'bg-accent-cyan hover:bg-accent-cyan/80' : 'bg-accent-jaune hover:bg-accent-jaune/80'} text-black font-semibold`}
-            >
-              {isCompleted ? 'Revoir' : isInProgress ? 'Continuer' : 'Participer'}
-            </Button>
-          </Link>
-        )}
+        </Link>
       </CardFooter>
     </Card>
   );

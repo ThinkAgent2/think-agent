@@ -1,7 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import {
-  isChallengeUnlocked,
-  isChallengeLocked,
   getCompletedChallengeTitles,
   groupChallengesByLevel,
   getParticipationForChallenge,
@@ -27,7 +25,6 @@ const mockChallenges: Challenge[] = [
     criteres_evaluation: '',
     xp: 50,
     statut: 'Actif',
-    prerequis: null,
     solution_reference: null,
     solution_fichiers: null,
     marque: 'Tous',
@@ -48,7 +45,6 @@ const mockChallenges: Challenge[] = [
     criteres_evaluation: '',
     xp: 75,
     statut: 'Actif',
-    prerequis: null,
     solution_reference: null,
     solution_fichiers: null,
     marque: 'Tous',
@@ -69,7 +65,6 @@ const mockChallenges: Challenge[] = [
     criteres_evaluation: '',
     xp: 150,
     statut: 'Actif',
-    prerequis: null,
     solution_reference: null,
     solution_fichiers: null,
     marque: 'FLOW',
@@ -90,7 +85,6 @@ const mockChallenges: Challenge[] = [
     criteres_evaluation: '',
     xp: 300,
     statut: 'Actif',
-    prerequis: null,
     solution_reference: null,
     solution_fichiers: null,
     marque: 'IT',
@@ -101,40 +95,6 @@ const mockChallenges: Challenge[] = [
 ];
 
 describe('challengeService', () => {
-  describe('isChallengeUnlocked / isChallengeLocked', () => {
-    it('should always unlock prerequisite challenges', () => {
-      const participations: Participation[] = [];
-      
-      expect(isChallengeUnlocked(mockChallenges[0], participations, mockChallenges)).toBe(true);
-      expect(isChallengeUnlocked(mockChallenges[1], participations, mockChallenges)).toBe(true);
-    });
-
-    it('should lock advanced challenges when prerequisites not completed', () => {
-      const participations: Participation[] = [];
-      
-      expect(isChallengeLocked(mockChallenges[2], participations, mockChallenges)).toBe(true);
-      expect(isChallengeLocked(mockChallenges[3], participations, mockChallenges)).toBe(true);
-    });
-
-    it('should unlock advanced challenges when prerequisites completed', () => {
-      const participations: Participation[] = [
-        { user_id: 'u1', challenge_id: 'c1', statut: 'Terminé', created_at: '' },
-        { user_id: 'u1', challenge_id: 'c2', statut: 'Terminé', created_at: '' },
-      ];
-      
-      expect(isChallengeUnlocked(mockChallenges[2], participations, mockChallenges)).toBe(true);
-      expect(isChallengeUnlocked(mockChallenges[3], participations, mockChallenges)).toBe(true);
-    });
-
-    it('should stay locked if only one prerequisite completed', () => {
-      const participations: Participation[] = [
-        { user_id: 'u1', challenge_id: 'c1', statut: 'Terminé', created_at: '' },
-      ];
-      
-      expect(isChallengeLocked(mockChallenges[2], participations, mockChallenges)).toBe(true);
-    });
-  });
-
   describe('getCompletedChallengeTitles', () => {
     it('should return empty array when no participations', () => {
       expect(getCompletedChallengeTitles([], mockChallenges)).toEqual([]);

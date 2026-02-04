@@ -364,22 +364,6 @@ export async function getMetiers() {
 // ==========================================
 
 /**
- * Vérifie si l'utilisateur a complété les prérequis obligatoires
- * (Les Basiques du Prompting + Le Gardien des Données)
- */
-export async function hasCompletedPrerequisites(userId: string): Promise<boolean> {
-  const participations = await getUserParticipations(userId);
-  const completedTitles = participations
-    .filter(p => p.statut === 'Terminé')
-    .map(p => p.challenge?.titre);
-
-  return (
-    completedTitles.includes('Les Basiques du Prompting') &&
-    completedTitles.includes('Le Gardien des Données')
-  );
-}
-
-/**
  * Met à jour les XP de l'utilisateur après validation d'un challenge
  */
 export async function addUserXP(userId: string, xp: number): Promise<void> {

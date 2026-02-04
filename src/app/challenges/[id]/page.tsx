@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   ArrowLeft, Clock, Star, Users, Zap, Target, Wrench, 
-  CheckCircle, Loader2, Lock, FileText, Send, Eye
+  CheckCircle, Loader2, FileText, Send, Eye
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { 

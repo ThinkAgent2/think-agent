@@ -44,29 +44,6 @@ export default function ChallengesPage() {
     return participations.find(p => p.challenge_id === challengeId);
   };
 
-  // Vérifier si un challenge est bloqué (prérequis non remplis)
-  const isLocked = (challenge: Challenge): boolean => {
-    // Les quiz de base ne sont jamais bloqués
-    if (challenge.titre === 'Les Basiques du Prompting' || challenge.titre === 'Le Gardien des Données') {
-      return false;
-    }
-    
-    // Pour les autres, vérifier que les prérequis obligatoires sont complétés
-    const completedTitles = participations
-      .filter(p => p.statut === 'Terminé')
-      .map(p => {
-        // Trouver le challenge correspondant
-        const c = challenges.find(ch => ch.id === p.challenge_id);
-        return c?.titre;
-      })
-      .filter(Boolean);
-
-    const hasBasics = completedTitles.includes('Les Basiques du Prompting');
-    const hasGardien = completedTitles.includes('Le Gardien des Données');
-
-    return !hasBasics || !hasGardien;
-  };
-
   // Grouper par niveau
   const challengesByLevel = {
     Explorer: challenges.filter((c) => c.niveau_associe === 'Explorer'),
@@ -115,7 +92,6 @@ export default function ChallengesPage() {
                             key={challenge.id}
                             challenge={challenge}
                             participation={getParticipation(challenge.id)}
-                            isLocked={user ? isLocked(challenge) : false}
                           />
                         ))}
                       </div>
@@ -135,7 +111,6 @@ export default function ChallengesPage() {
                             key={challenge.id}
                             challenge={challenge}
                             participation={getParticipation(challenge.id)}
-                            isLocked={user ? isLocked(challenge) : false}
                           />
                         ))}
                       </div>
@@ -155,7 +130,6 @@ export default function ChallengesPage() {
                             key={challenge.id}
                             challenge={challenge}
                             participation={getParticipation(challenge.id)}
-                            isLocked={user ? isLocked(challenge) : false}
                           />
                         ))}
                       </div>
