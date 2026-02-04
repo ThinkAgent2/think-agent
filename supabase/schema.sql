@@ -173,6 +173,7 @@ CREATE TABLE evenements_dojo (
   date_debut TIMESTAMPTZ NOT NULL,
   date_fin TIMESTAMPTZ NOT NULL,
   format event_format NOT NULL,
+  capacite INTEGER DEFAULT 15,
   lien_360learning TEXT NOT NULL,
   organisateur_id UUID REFERENCES users(id),
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -423,13 +424,14 @@ INSERT INTO challenges (titre, description, niveau_associe, type, difficulte, du
 -- DONNÉES INITIALES - ÉVÉNEMENTS
 -- ===========================================
 
-INSERT INTO evenements_dojo (titre, description, date_debut, date_fin, format, lien_360learning) VALUES
+INSERT INTO evenements_dojo (titre, description, date_debut, date_fin, format, capacite, lien_360learning) VALUES
 (
   'Dojo Think Agent #1 - Les Basiques du Prompting',
   'Atelier pratique pour maîtriser les fondamentaux du prompting : zero-shot, few-shot, chain-of-thought. Parfait pour débuter ton parcours IA.',
   '2025-02-15 10:00:00+00',
   '2025-02-15 11:00:00+00',
   'En_Ligne',
+  12,
   'https://360learning.com/exalt/dojo-1'
 ),
 (
@@ -438,6 +440,7 @@ INSERT INTO evenements_dojo (titre, description, date_debut, date_fin, format, l
   '2025-02-28 14:00:00+00',
   '2025-02-28 15:00:00+00',
   'En_Ligne',
+  10,
   'https://360learning.com/exalt/dojo-2'
 ),
 (
@@ -446,5 +449,6 @@ INSERT INTO evenements_dojo (titre, description, date_debut, date_fin, format, l
   '2025-03-15 10:00:00+00',
   '2025-03-15 11:00:00+00',
   'Présentiel',
+  15,
   'https://360learning.com/exalt/dojo-3'
 );

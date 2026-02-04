@@ -38,6 +38,25 @@ function getEventStatus(event: DojoEvent): 'upcoming' | 'ongoing' | 'past' {
   return 'past';
 }
 
+function formatDuration(dateDebut: string, dateFin: string): string {
+  const start = new Date(dateDebut);
+  const end = new Date(dateFin);
+  const diffMs = end.getTime() - start.getTime();
+  const diffMins = Math.round(diffMs / 60000);
+  
+  if (diffMins < 60) {
+    return `${diffMins} min`;
+  }
+  
+  const hours = Math.floor(diffMins / 60);
+  const mins = diffMins % 60;
+  
+  if (mins === 0) {
+    return `${hours}h`;
+  }
+  return `${hours}h${mins.toString().padStart(2, '0')}`;
+}
+
 function EventCard({ event }: { event: DojoEvent }) {
   const status = getEventStatus(event);
   const isPast = status === 'past';
@@ -86,18 +105,18 @@ function EventCard({ event }: { event: DojoEvent }) {
             <span className="capitalize">{formatDate(event.date_debut)}</span>
           </div>
 
-          {/* Horaire */}
+          {/* Horaire + Durée */}
           <div className="flex items-center gap-3 text-sm">
             <Clock className="h-4 w-4 text-accent-cyan" />
             <span>
-              {formatTime(event.date_debut)} - {formatTime(event.date_fin)}
+              {formatTime(event.date_debut)} - {formatTime(event.date_fin)} ({formatDuration(event.date_debut, event.date_fin)})
             </span>
           </div>
 
           {/* Capacité */}
           <div className="flex items-center gap-3 text-sm text-muted-foreground">
             <Users className="h-4 w-4" />
-            <span>10-15 participants</span>
+            <span>{event.capacite} participants max</span>
           </div>
 
           {/* Lieu si présentiel */}

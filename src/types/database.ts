@@ -88,6 +88,7 @@ export interface DojoEvent {
   date_debut: string;
   date_fin: string;
   format: EventFormat;
+  capacite: number;
   lien_360learning: string;
   organisateur_id: string;
   created_at: string;
