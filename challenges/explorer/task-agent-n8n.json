@@ -1,0 +1,325 @@
+{
+  "name": "Agent de Management des tâches",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [-608, 272],
+      "id": "7ebac830-d775-47af-a56c-9ff428f385d0",
+      "name": "Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "lhaKaJDh1ux8RFi7",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [-656, -32],
+      "id": "3eb00ee5-cab6-4a07-b3d5-cee733bae08d",
+      "name": "When chat message received",
+      "webhookId": "df8223bf-119c-44d5-9bbf-f74ae26828e8"
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [-496, 272],
+      "id": "5341bef1-5ba0-4898-85c2-ca8741210079",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Task Manager"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [-352, 272],
+      "id": "a1792c3e-4248-49e2-b4c2-db58c4eb1b59",
+      "name": "Get tasks",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_CREDENTIALS_ID",
+          "name": "Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Task Manager"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Task": "={{ $fromAI('Task', '', 'string') }}",
+            "Description": "={{ $fromAI('Description', '', 'string') }}",
+            "Deadline": "={{ $fromAI('Deadline', '', 'string') }}",
+            "Status": "={{ $fromAI('Status', '', 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Task",
+              "displayName": "Task",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Deadline",
+              "displayName": "Deadline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [-224, 272],
+      "id": "1ebd8dd5-13e0-4f57-bb37-a3a5d8cf4e80",
+      "name": "Create task",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_CREDENTIALS_ID",
+          "name": "Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Task Manager"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Task": "={{ $fromAI('Task', '', 'string') }}",
+            "Description": "={{ $fromAI('Description', '', 'string') }}",
+            "Deadline": "={{ $fromAI('Deadline', '', 'string') }}",
+            "Status": "={{ $fromAI('Status', '', 'string') }}",
+            "row_number": "={{ $fromAI('row_number', '', 'number') }}"
+          },
+          "matchingColumns": ["row_number"],
+          "schema": [
+            {
+              "id": "Task",
+              "displayName": "Task",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Deadline",
+              "displayName": "Deadline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [-96, 272],
+      "id": "a118d819-41ef-4323-a4d1-d83d70e41ec5",
+      "name": "Update task",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_CREDENTIALS_ID",
+          "name": "Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Task Manager"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1"
+        },
+        "startIndex": "={{ $fromAI('Start_Row_Number', '', 'number') }}",
+        "numberToDelete": "={{ $fromAI('Number_of_Rows_to_Delete', '', 'number') }}"
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [32, 272],
+      "id": "c15d7d0f-d24c-4e5a-aa3f-a23abf2f6853",
+      "name": "Delete task",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_CREDENTIALS_ID",
+          "name": "Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "# Task Management Agent\n\nTu es un assistant de gestion de tâches. Tu aides les utilisateurs à organiser leurs tâches via Google Sheets.\n\n## Capacités\n- Voir les tâches et leur statut\n- Créer de nouvelles tâches\n- Mettre à jour les tâches existantes\n- Supprimer des tâches (avec confirmation)\n\n## Structure des données\n- **Task** : Nom de la tâche (obligatoire - toujours demander si manquant)\n- **Status** : TODO, IN PROGRESS, ou DONE (défaut: TODO)\n- **Description** : Détails optionnels\n- **Deadline** : Date limite optionnelle\n\nNote: Google Sheets fournit automatiquement un champ row_number pour le tracking.\n\n## Règles importantes\n\n### Gestion des statuts\n- Les statuts valides sont uniquement : \"TODO\", \"IN PROGRESS\", \"DONE\"\n- Nouveau tâche = statut \"TODO\" par défaut\n- \"marquer comme terminé\" / \"c'est fait\" → Status = \"DONE\"\n- \"commencer\" / \"en cours\" → Status = \"IN PROGRESS\"\n\n### Création de tâches\n1. Toujours demander le nom si non fourni\n2. Proposer d'ajouter une description (optionnel)\n3. Demander la deadline si pertinent (optionnel)\n4. Statut \"TODO\" par défaut\n\n### Mise à jour\n- Demander quelle tâche modifier (par nom)\n- Confirmer les changements à effectuer\n- Utiliser row_number pour identifier la ligne\n\n### Suppression\n- **TOUJOURS demander confirmation avant de supprimer**\n- Montrer les détails de la tâche\n- Demander \"Es-tu sûr de vouloir supprimer cette tâche ?\"\n- Ne procéder qu'après confirmation explicite\n\n## Style de réponse\n- Être utile et efficace\n- Toujours confirmer les actions effectuées\n- Poser des questions de clarification si nécessaire\n- Utiliser un langage amical et professionnel\n- Montrer les détails des tâches quand pertinent"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [-384, -32],
+      "id": "e923a630-08b1-4e4d-a99c-23704085eaab",
+      "name": "Task management agent"
+    }
+  ],
+  "connections": {
+    "Model": {
+      "ai_languageModel": [
+        [{ "node": "Task management agent", "type": "ai_languageModel", "index": 0 }]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [{ "node": "Task management agent", "type": "main", "index": 0 }]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [{ "node": "Task management agent", "type": "ai_memory", "index": 0 }]
+      ]
+    },
+    "Get tasks": {
+      "ai_tool": [
+        [{ "node": "Task management agent", "type": "ai_tool", "index": 0 }]
+      ]
+    },
+    "Create task": {
+      "ai_tool": [
+        [{ "node": "Task management agent", "type": "ai_tool", "index": 0 }]
+      ]
+    },
+    "Update task": {
+      "ai_tool": [
+        [{ "node": "Task management agent", "type": "ai_tool", "index": 0 }]
+      ]
+    },
+    "Delete task": {
+      "ai_tool": [
+        [{ "node": "Task management agent", "type": "ai_tool", "index": 0 }]
+      ]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": {
+    "templateId": "task_management_agent_with_google_sheets"
+  }
+}
