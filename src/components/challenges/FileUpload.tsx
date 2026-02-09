@@ -19,6 +19,7 @@ const ALLOWED_TYPES = [
   'image/gif',
   'image/webp',
   'application/pdf',
+  'application/json',
   'text/plain',
   'text/markdown',
 ];
