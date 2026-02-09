@@ -342,18 +342,21 @@ export default function ChallengeDetailPage() {
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2">
-                      {(challenge.sources as string[]).map((url, index) => (
-                        <li key={index}>
-                          <a
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-accent-cyan hover:underline text-sm break-all"
-                          >
-                            {url}
-                          </a>
-                        </li>
-                      ))}
+                      {(challenge.sources as string[]).map((url, index) => {
+                        const fullUrl = url.startsWith('http') ? url : `https://${url}`;
+                        return (
+                          <li key={index}>
+                            <a
+                              href={fullUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-accent-cyan hover:underline text-sm break-all"
+                            >
+                              {url}
+                            </a>
+                          </li>
+                        );
+                      })}
                     </ul>
                   </CardContent>
                 </Card>
@@ -444,18 +447,21 @@ export default function ChallengeDetailPage() {
                           Fichiers joints
                         </p>
                         <div className="flex flex-wrap gap-2">
-                          {(solution.fichiers_attaches as string[]).map((url, index) => (
-                            <a
-                              key={index}
-                              href={url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border hover:border-accent-cyan transition-colors text-sm"
-                            >
-                              <FileText className="h-4 w-4" />
-                              Fichier {index + 1}
-                            </a>
-                          ))}
+                          {(solution.fichiers_attaches as string[]).map((url, index) => {
+                            const fullUrl = url.startsWith('http') ? url : `https://${url}`;
+                            return (
+                              <a
+                                key={index}
+                                href={fullUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border hover:border-accent-cyan transition-colors text-sm"
+                              >
+                                <FileText className="h-4 w-4" />
+                                Fichier {index + 1}
+                              </a>
+                            );
+                          })}
                         </div>
                       </div>
                     )}
