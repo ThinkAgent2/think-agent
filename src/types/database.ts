@@ -22,6 +22,19 @@ export type VortexStage =
   | 'sensitize'      // Tester / Test
   | 'systematize';   // Apprendre / Learn
 
+// Thématiques Challenges IA
+export type Thematique =
+  | 'knowledge'       // 📚 Knowledge & Formation
+  | 'content'         // ✍️ Création de contenu
+  | 'data'            // 📊 Data & Analyse
+  | 'automation'      // 🤖 Automatisation & Workflows
+  | 'agents'          // 💬 Agents & Assistants
+  | 'strategy'        // 💼 Stratégie & Conseil
+  | 'code'            // 🧑‍💻 Code & Développement
+  | 'design'          // 🎨 Design & UX
+  | 'research'        // 🔍 Recherche & Veille
+  | 'prompting';      // 🧠 Prompt Engineering
+
 export interface User {
   id: string;
   email: string;
@@ -51,6 +64,7 @@ export interface Challenge {
   solution_fichiers: string[] | null;
   marques: Marque[];  // [] = transverse (toutes marques)
   etape_vortex: VortexStage | null;  // Étape Innovation Vortex
+  thematiques: Thematique[];  // Thématiques IA (multi-select)
   participants: 'Solo' | 'Duo' | 'Équipe';
   livrables: string[];
   // Champs d'enrichissement

@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MultiSelectMarques } from '@/components/ui/multi-select-marques';
+import { MultiSelectThematiques } from '@/components/ui/multi-select-thematiques';
 import { Loader2, Save, X } from 'lucide-react';
 import { updateChallenge } from '@/lib/supabase/queries';
-import type { Challenge, UserLevel, ChallengeType, Marque, VortexStage } from '@/types/database';
+import type { Challenge, UserLevel, ChallengeType, Marque, VortexStage, Thematique } from '@/types/database';
 
 interface ChallengeEditFormProps {
   challenge: Challenge;
@@ -41,6 +42,7 @@ export function ChallengeEditForm({ challenge, onSave, onCancel }: ChallengeEdit
     xp: challenge.xp,
     marques: challenge.marques || [],
     etape_vortex: challenge.etape_vortex || '',
+    thematiques: challenge.thematiques || [],
     participants: challenge.participants,
     statut: challenge.statut,
     outils_recommandes: (challenge.outils_recommandes || []).join(', '),
@@ -63,6 +65,10 @@ export function ChallengeEditForm({ challenge, onSave, onCancel }: ChallengeEdit
     setFormData((prev) => ({ ...prev, marques }));
   };
 
+  const handleThematiquesChange = (thematiques: Thematique[]) => {
+    setFormData((prev) => ({ ...prev, thematiques }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -76,6 +82,7 @@ export function ChallengeEditForm({ challenge, onSave, onCancel }: ChallengeEdit
       xp: Number(formData.xp),
       marques: formData.marques,
       etape_vortex: (formData.etape_vortex || null) as VortexStage | null,
+      thematiques: formData.thematiques,
       participants: formData.participants,
       statut: formData.statut,
       outils_recommandes: formData.outils_recommandes
@@ -265,6 +272,19 @@ export function ChallengeEditForm({ challenge, onSave, onCancel }: ChallengeEdit
               </option>
             ))}
           </select>
+        </CardContent>
+      </Card>
+
+      {/* Thématiques */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Thématiques IA</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <MultiSelectThematiques
+            value={formData.thematiques}
+            onChange={handleThematiquesChange}
+          />
         </CardContent>
       </Card>
 

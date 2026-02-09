@@ -25,7 +25,7 @@ import {
   markSolutionViewed,
   abandonParticipation
 } from '@/lib/supabase/queries';
-import type { Challenge, Participation, Solution, VortexStage } from '@/types/database';
+import type { Challenge, Participation, Solution, VortexStage, Thematique } from '@/types/database';
 
 const levelConfig: Record<string, { color: string; bgColor: string }> = {
   Explorer: { color: 'text-accent-vert', bgColor: 'bg-accent-vert' },
@@ -41,6 +41,19 @@ const VORTEX_LABELS: Record<VortexStage, string> = {
   externalize: '5. Construire',
   sensitize: '6. Tester',
   systematize: '7. Apprendre',
+};
+
+const THEMATIQUE_LABELS: Record<Thematique, { emoji: string; label: string }> = {
+  knowledge: { emoji: '📚', label: 'Knowledge & Formation' },
+  content: { emoji: '✍️', label: 'Création de contenu' },
+  data: { emoji: '📊', label: 'Data & Analyse' },
+  automation: { emoji: '🤖', label: 'Automatisation & Workflows' },
+  agents: { emoji: '💬', label: 'Agents & Assistants' },
+  strategy: { emoji: '💼', label: 'Stratégie & Conseil' },
+  code: { emoji: '🧑‍💻', label: 'Code & Développement' },
+  design: { emoji: '🎨', label: 'Design & UX' },
+  research: { emoji: '🔍', label: 'Recherche & Veille' },
+  prompting: { emoji: '🧠', label: 'Prompt Engineering' },
 };
 
 export default function ChallengeDetailPage() {
@@ -207,6 +220,13 @@ export default function ChallengeDetailPage() {
                 <Badge variant="outline" className="bg-accent-rose/10 border-accent-rose text-accent-rose">
                   {VORTEX_LABELS[challenge.etape_vortex]}
                 </Badge>
+              )}
+              {challenge.thematiques && challenge.thematiques.length > 0 && (
+                challenge.thematiques.map((theme) => (
+                  <Badge key={theme} variant="outline" className="bg-accent-jaune/10 border-accent-jaune text-accent-jaune">
+                    {THEMATIQUE_LABELS[theme].emoji} {THEMATIQUE_LABELS[theme].label}
+                  </Badge>
+                ))
               )}
               {isCompleted && (
                 <Badge className="bg-accent-vert text-black">
