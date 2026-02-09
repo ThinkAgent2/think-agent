@@ -35,11 +35,19 @@ export function ChallengeCard({ challenge, participation }: ChallengeCardProps) 
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <Badge className={config.color}>{challenge.niveau_associe}</Badge>
-          {challenge.marque !== 'Tous' && (
-            <Badge variant="outline" className="text-xs">
-              {challenge.marque}
-            </Badge>
-          )}
+          <div className="flex flex-wrap gap-1">
+            {challenge.marques && challenge.marques.length > 0 ? (
+              challenge.marques.map((marque) => (
+                <Badge key={marque} variant="outline" className="text-xs">
+                  {marque}
+                </Badge>
+              ))
+            ) : (
+              <Badge variant="outline" className="text-xs text-muted-foreground">
+                Toutes marques
+              </Badge>
+            )}
+          </div>
         </div>
         <h3 className="mt-2 text-lg font-semibold leading-tight line-clamp-2">
           {challenge.titre}

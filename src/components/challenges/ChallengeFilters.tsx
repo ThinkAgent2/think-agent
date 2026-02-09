@@ -13,7 +13,7 @@ interface ChallengeFiltersProps {
 }
 
 const niveaux: UserLevel[] = ['Explorer', 'Crafter', 'Architecte'];
-const marques: (Marque | 'Tous')[] = ['Tous', 'FLOW', 'IT', 'VALUE', 'FORGE', 'FI', 'SHIELD', 'NILO'];
+const marques: Marque[] = ['FLOW', 'IT', 'VALUE', 'FORGE', 'FI', 'SHIELD', 'NILO'];
 const difficultes = [1, 2, 3, 4, 5];
 
 const levelColors = {
@@ -37,7 +37,7 @@ export function ChallengeFilters({ filters, onFiltersChange }: ChallengeFiltersP
     });
   };
 
-  const toggleMarque = (marque: Marque | 'Tous') => {
+  const toggleMarque = (marque: Marque) => {
     onFiltersChange({
       ...filters,
       marque: filters.marque === marque ? undefined : marque,

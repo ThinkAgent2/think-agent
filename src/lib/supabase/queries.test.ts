@@ -56,12 +56,14 @@ const mockChallenge: Challenge = {
   criteres_evaluation: 'Score > 80%',
   xp: 50,
   statut: 'Actif',
-  prerequis: null,
   solution_reference: null,
   solution_fichiers: null,
-  marque: 'Tous',
+  marques: [],
   participants: 'Solo',
   livrables: [],
+  vision_impact: null,
+  le_saviez_vous: null,
+  sources: null,
   created_at: '2024-01-01T00:00:00Z',
 };
 

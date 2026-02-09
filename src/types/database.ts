@@ -40,7 +40,7 @@ export interface Challenge {
   statut: ChallengeStatus;
   solution_reference: string | null;
   solution_fichiers: string[] | null;
-  marque: Marque | 'Tous';
+  marques: Marque[];  // [] = transverse (toutes marques)
   participants: 'Solo' | 'Duo' | 'Équipe';
   livrables: string[];
   // Champs d'enrichissement
@@ -128,7 +128,7 @@ export interface UserWithStats extends User {
 // Filtres pour le catalogue
 export interface ChallengeFilters {
   niveau?: UserLevel;
-  marque?: Marque | 'Tous';
+  marque?: Marque;  // Filtre sur une marque (affiche aussi les transverses)
   difficulte?: number;
   type?: ChallengeType;
   search?: string;

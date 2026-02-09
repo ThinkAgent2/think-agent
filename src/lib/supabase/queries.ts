@@ -78,8 +78,9 @@ export async function getChallenges(filters?: ChallengeFilters): Promise<Challen
   if (filters?.niveau) {
     query = query.eq('niveau_associe', filters.niveau);
   }
-  if (filters?.marque && filters.marque !== 'Tous') {
-    query = query.or(`marque.eq.${filters.marque},marque.eq.Tous`);
+  // Filtre marques : affiche les challenges contenant la marque OU transverses ([])
+  if (filters?.marque) {
+    query = query.or(`marques.cs.["${filters.marque}"],marques.eq.[]`);
   }
   if (filters?.difficulte) {
     query = query.eq('difficulte', filters.difficulte);
@@ -106,6 +107,24 @@ export async function getChallengeById(id: string): Promise<Challenge | null> {
 
   if (error) {
     console.error('Error fetching challenge:', error);
+    return null;
+  }
+  return data;
+}
+
+export async function updateChallenge(
+  id: string,
+  updates: Partial<Challenge>
+): Promise<Challenge | null> {
+  const { data, error } = await supabase
+    .from('challenges')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating challenge:', error);
     return null;
   }
   return data;

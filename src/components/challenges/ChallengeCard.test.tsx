@@ -19,9 +19,12 @@ const mockChallenge: Challenge = {
   statut: 'Actif',
   solution_reference: null,
   solution_fichiers: null,
-  marque: 'Tous',
+  marques: [],
   participants: 'Solo',
   livrables: [],
+  vision_impact: null,
+  le_saviez_vous: null,
+  sources: null,
   created_at: '2024-01-01T00:00:00Z',
 };
 
@@ -147,7 +150,7 @@ describe('ChallengeCard', () => {
     });
 
     it('should show marque badge when marque is specific', () => {
-      const flowChallenge = { ...mockChallenge, marque: 'FLOW' as const };
+      const flowChallenge: Challenge = { ...mockChallenge, marques: ['FLOW'] };
       render(<ChallengeCard challenge={flowChallenge} />);
       
       expect(screen.getByText('FLOW')).toBeInTheDocument();

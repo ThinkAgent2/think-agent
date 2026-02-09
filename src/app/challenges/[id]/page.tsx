@@ -10,8 +10,9 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   ArrowLeft, Clock, Star, Users, Zap, Target, Wrench, 
-  CheckCircle, Loader2, FileText, Send, Eye, Paperclip, XCircle
+  CheckCircle, Loader2, FileText, Send, Eye, Paperclip, XCircle, Pencil
 } from 'lucide-react';
+import { ChallengeEditForm } from '@/components/challenges/ChallengeEditForm';
 import { useAuth } from '@/lib/auth';
 import { FileUpload } from '@/components/challenges/FileUpload';
 import type { UploadedFile } from '@/lib/supabase/storage';
@@ -46,6 +47,10 @@ export default function ChallengeDetailPage() {
   const [solutionText, setSolutionText] = useState('');
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [showReference, setShowReference] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
+  // Vérifier si l'utilisateur est admin
+  const isAdmin = user?.role === 'Administrateur';
 
   // Charger les données
   useEffect(() => {
@@ -163,14 +168,30 @@ export default function ChallengeDetailPage() {
             Retour au catalogue
           </Link>
 
+          {/* Mode édition */}
+          {isEditing && challenge ? (
+            <ChallengeEditForm
+              challenge={challenge}
+              onSave={(updated) => {
+                setChallenge(updated);
+                setIsEditing(false);
+              }}
+              onCancel={() => setIsEditing(false)}
+            />
+          ) : (
+          <>
           {/* Header */}
           <div className="mb-8">
             <div className="flex flex-wrap items-center gap-3 mb-4">
               <Badge className={`${config.bgColor} text-white`}>
                 {challenge.niveau_associe}
               </Badge>
-              {challenge.marque !== 'Tous' && (
-                <Badge variant="outline">{challenge.marque}</Badge>
+              {challenge.marques && challenge.marques.length > 0 ? (
+                challenge.marques.map((marque) => (
+                  <Badge key={marque} variant="outline">{marque}</Badge>
+                ))
+              ) : (
+                <Badge variant="outline" className="text-muted-foreground">Toutes marques</Badge>
               )}
               {isCompleted && (
                 <Badge className="bg-accent-vert text-black">
@@ -180,7 +201,20 @@ export default function ChallengeDetailPage() {
               )}
             </div>
 
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">{challenge.titre}</h1>
+            <div className="flex items-center justify-between gap-4">
+              <h1 className="text-3xl md:text-4xl font-bold">{challenge.titre}</h1>
+              {isAdmin && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditing(true)}
+                  className="border-accent-cyan text-accent-cyan hover:bg-accent-cyan hover:text-black"
+                >
+                  <Pencil className="h-4 w-4 mr-2" />
+                  Modifier
+                </Button>
+              )}
+            </div>
 
             {/* Meta */}
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
@@ -540,6 +574,8 @@ export default function ChallengeDetailPage() {
               )}
             </div>
           </div>
+          </>
+          )}
         </div>
       </main>
 

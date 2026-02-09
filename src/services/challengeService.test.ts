@@ -27,10 +27,13 @@ const mockChallenges: Challenge[] = [
     statut: 'Actif',
     solution_reference: null,
     solution_fichiers: null,
-    marque: 'Tous',
+    marques: [],
     participants: 'Solo',
     livrables: [],
     created_at: '',
+    vision_impact: null,
+    le_saviez_vous: null,
+    sources: null,
   },
   {
     id: 'c2',
@@ -47,10 +50,13 @@ const mockChallenges: Challenge[] = [
     statut: 'Actif',
     solution_reference: null,
     solution_fichiers: null,
-    marque: 'Tous',
+    marques: [],
     participants: 'Solo',
     livrables: [],
     created_at: '',
+    vision_impact: null,
+    le_saviez_vous: null,
+    sources: null,
   },
   {
     id: 'c3',
@@ -67,10 +73,13 @@ const mockChallenges: Challenge[] = [
     statut: 'Actif',
     solution_reference: null,
     solution_fichiers: null,
-    marque: 'FLOW',
+    marques: ['FLOW'],
     participants: 'Solo',
     livrables: [],
     created_at: '',
+    vision_impact: null,
+    le_saviez_vous: null,
+    sources: null,
   },
   {
     id: 'c4',
@@ -87,10 +96,13 @@ const mockChallenges: Challenge[] = [
     statut: 'Actif',
     solution_reference: null,
     solution_fichiers: null,
-    marque: 'IT',
+    marques: ['IT'],
     participants: 'Solo',
     livrables: [],
     created_at: '',
+    vision_impact: null,
+    le_saviez_vous: null,
+    sources: null,
   },
 ];
 
@@ -186,8 +198,8 @@ describe('challengeService', () => {
 
     it('should filter by marque', () => {
       const result = filterChallenges(mockChallenges, { marque: 'FLOW' });
-      // Should include FLOW + Tous
-      expect(result.some((c) => c.marque === 'FLOW')).toBe(true);
+      // Should include FLOW + transverses ([])
+      expect(result.some((c) => c.marques.includes('FLOW'))).toBe(true);
     });
 
     it('should filter by difficulte', () => {

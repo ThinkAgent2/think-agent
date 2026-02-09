@@ -110,8 +110,11 @@ export function filterChallenges(
     result = result.filter((c) => c.niveau_associe === filters.niveau);
   }
 
-  if (filters.marque && filters.marque !== 'Tous') {
-    result = result.filter((c) => c.marque === filters.marque || c.marque === 'Tous');
+  if (filters.marque) {
+    // Filtre sur marque : affiche les challenges contenant la marque OU transverses ([])
+    result = result.filter((c) => 
+      c.marques.length === 0 || c.marques.includes(filters.marque as any)
+    );
   }
 
   if (filters.difficulte) {
