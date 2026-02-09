@@ -13,7 +13,7 @@ interface ChallengeFiltersProps {
 }
 
 const niveaux: UserLevel[] = ['Explorer', 'Crafter', 'Architecte'];
-const marques: Marque[] = ['FLOW', 'IT', 'VALUE', 'FORGE', 'FI', 'SHIELD', 'NILO'];
+const marques: Marque[] = ['FLOW', 'IT', 'VALUE', 'FORGE', 'FI', 'SHIELD', 'NILO', 'DSM'];
 const difficultes = [1, 2, 3, 4, 5];
 
 const levelColors = {

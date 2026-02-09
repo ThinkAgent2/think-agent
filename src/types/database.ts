@@ -10,7 +10,7 @@ export type ParticipationStatus = 'En_cours' | 'Terminé' | 'Abandonné';
 export type EventFormat = 'En_Ligne' | 'Présentiel';
 
 // Marques eXalt
-export type Marque = 'FLOW' | 'IT' | 'VALUE' | 'FORGE' | 'FI' | 'SHIELD' | 'NILO';
+export type Marque = 'FLOW' | 'IT' | 'VALUE' | 'FORGE' | 'FI' | 'SHIELD' | 'NILO' | 'DSM';
 
 // Étapes Innovation Vortex
 export type VortexStage = 

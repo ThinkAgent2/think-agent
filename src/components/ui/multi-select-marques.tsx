@@ -10,7 +10,7 @@ interface MultiSelectMarquesProps {
   disabled?: boolean;
 }
 
-const MARQUES: Marque[] = ['FLOW', 'IT', 'VALUE', 'FORGE', 'FI', 'SHIELD', 'NILO'];
+const MARQUES: Marque[] = ['FLOW', 'IT', 'VALUE', 'FORGE', 'FI', 'SHIELD', 'NILO', 'DSM'];
 
 export function MultiSelectMarques({ value, onChange, disabled }: MultiSelectMarquesProps) {
   const isAllSelected = value.length === 0;
