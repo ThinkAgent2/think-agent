@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Upload, X, FileText, Image, Loader2 } from 'lucide-react';
+import { Upload, X, FileText, Image, Loader2, Music } from 'lucide-react';
 import { uploadSolutionFile, type UploadedFile } from '@/lib/supabase/storage';
 
 interface FileUploadProps {
@@ -14,14 +14,24 @@ interface FileUploadProps {
 }
 
 const ALLOWED_TYPES = [
+  // Images
   'image/png',
   'image/jpeg',
   'image/gif',
   'image/webp',
+  // Documents
   'application/pdf',
   'application/json',
   'text/plain',
   'text/markdown',
+  // Audio
+  'audio/mpeg',      // MP3
+  'audio/wav',
+  'audio/x-wav',
+  'audio/mp4',       // M4A
+  'audio/x-m4a',
+  'audio/ogg',
+  'audio/webm',
 ];
 
 function formatFileSize(bytes: number): string {
@@ -33,6 +43,9 @@ function formatFileSize(bytes: number): string {
 function getFileIcon(type: string) {
   if (type.startsWith('image/')) {
     return <Image className="h-4 w-4" />;
+  }
+  if (type.startsWith('audio/')) {
+    return <Music className="h-4 w-4" />;
   }
   return <FileText className="h-4 w-4" />;
 }
@@ -61,7 +74,7 @@ export function FileUpload({
 
     const invalidType = files.find((f) => !ALLOWED_TYPES.includes(f.type));
     if (invalidType) {
-      setError(`Type non supporté: ${invalidType.name}. Utilisez PNG, JPG, GIF, PDF ou TXT.`);
+      setError(`Type non supporté: ${invalidType.name}. Formats acceptés : images, PDF, TXT, JSON, audio (MP3, WAV, M4A, OGG).`);
       return;
     }
 
