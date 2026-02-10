@@ -1,7 +1,8 @@
 import { createClient } from './client';
 import type { 
   User, Challenge, Participation, Solution, 
-  Badge, DojoEvent, ChallengeFilters, LeaderboardEntry 
+  Badge, DojoEvent, ChallengeFilters, LeaderboardEntry,
+  UserLevel
 } from '@/types/database';
 
 const supabase = createClient();
@@ -280,6 +281,16 @@ export async function submitSolution(
   // Mettre à jour la participation en "Terminé"
   await updateParticipation(userId, challengeId, { statut: 'Terminé' });
 
+  // Récupérer le challenge pour les XP
+  const challenge = await getChallengeById(challengeId);
+  if (challenge) {
+    // Ajouter les XP du challenge à l'utilisateur
+    await addUserXP(userId, challenge.xp);
+  }
+
+  // Vérifier et mettre à jour le niveau + badges
+  await checkAndUpdateLevelAndBadges(userId);
+
   return data;
 }
 
@@ -473,35 +484,46 @@ export async function getMetiers() {
  * Met à jour les XP de l'utilisateur après validation d'un challenge
  */
 export async function addUserXP(userId: string, xp: number): Promise<void> {
-  const user = await getUserByEmail(''); // On a besoin de l'email ou ID
-  
-  // Utiliser RPC ou faire un update direct
-  const { error } = await supabase.rpc('increment_user_xp', { 
-    user_id: userId, 
-    xp_amount: xp 
-  });
+  // Update direct des points
+  const { data: currentUser } = await supabase
+    .from('users')
+    .select('points_totaux')
+    .eq('id', userId)
+    .single();
 
-  if (error) {
-    // Fallback: update manuel
-    const { data: currentUser } = await supabase
+  if (currentUser) {
+    await supabase
       .from('users')
-      .select('points_totaux')
-      .eq('id', userId)
-      .single();
-
-    if (currentUser) {
-      await supabase
-        .from('users')
-        .update({ points_totaux: currentUser.points_totaux + xp })
-        .eq('id', userId);
-    }
+      .update({ points_totaux: (currentUser.points_totaux || 0) + xp })
+      .eq('id', userId);
   }
 }
 
 /**
- * Vérifie et met à jour le niveau de l'utilisateur
+ * Seuils de niveau par type de challenge
+ * - Explorer: 2 challenges Explorer
+ * - Crafter: 5 challenges Crafter
+ * - Architecte: 2 challenges Architecte
  */
-export async function checkAndUpdateLevel(userId: string): Promise<void> {
+const LEVEL_THRESHOLDS = {
+  Explorer: 2,
+  Crafter: 5,
+  Architecte: 2,
+};
+
+/**
+ * Badges de volume par niveau
+ */
+const VOLUME_BADGES: Record<string, number[]> = {
+  Explorer: [2, 5, 10],
+  Crafter: [5, 10],
+  Architecte: [2, 5, 10],
+};
+
+/**
+ * Vérifie et met à jour le niveau de l'utilisateur + attribue les badges de volume
+ */
+export async function checkAndUpdateLevelAndBadges(userId: string): Promise<void> {
   const participations = await getUserParticipations(userId);
   const { data: user } = await supabase
     .from('users')
@@ -511,8 +533,8 @@ export async function checkAndUpdateLevel(userId: string): Promise<void> {
 
   if (!user) return;
 
-  // Compter les challenges complétés avec note >= 3 par niveau
-  const completedByLevel = {
+  // Compter les challenges terminés par niveau
+  const completedByLevel: Record<string, number> = {
     Explorer: 0,
     Crafter: 0,
     Architecte: 0,
@@ -520,21 +542,60 @@ export async function checkAndUpdateLevel(userId: string): Promise<void> {
 
   for (const p of participations) {
     if (p.statut === 'Terminé' && p.challenge) {
-      // Pour le MVP, on considère tous les challenges terminés comme validés
       completedByLevel[p.challenge.niveau_associe]++;
     }
   }
 
-  // Logique de passage de niveau
-  let newLevel = user.niveau_actuel;
+  // Déterminer le niveau actuel (basé sur les seuils atteints)
+  let newLevel: UserLevel = 'Explorer'; // Niveau par défaut
 
-  if (user.niveau_actuel === 'Explorer' && completedByLevel.Explorer >= 2) {
-    newLevel = 'Crafter';
-  } else if (user.niveau_actuel === 'Crafter' && completedByLevel.Crafter >= 2) {
+  if (completedByLevel.Architecte >= LEVEL_THRESHOLDS.Architecte) {
     newLevel = 'Architecte';
+  } else if (completedByLevel.Crafter >= LEVEL_THRESHOLDS.Crafter) {
+    newLevel = 'Crafter';
+  } else if (completedByLevel.Explorer >= LEVEL_THRESHOLDS.Explorer) {
+    newLevel = 'Explorer';
   }
 
+  // Mettre à jour le niveau si changé
   if (newLevel !== user.niveau_actuel) {
     await updateUser(userId, { niveau_actuel: newLevel });
   }
+
+  // Attribuer les badges de volume
+  await awardVolumeBadges(userId, completedByLevel);
+}
+
+/**
+ * Attribue les badges de volume en fonction du nombre de challenges terminés
+ */
+async function awardVolumeBadges(
+  userId: string, 
+  completedByLevel: Record<string, number>
+): Promise<void> {
+  // Récupérer tous les badges existants
+  const allBadges = await getAllBadges();
+  
+  for (const [level, thresholds] of Object.entries(VOLUME_BADGES)) {
+    const completed = completedByLevel[level] || 0;
+    
+    for (const threshold of thresholds) {
+      if (completed >= threshold) {
+        // Chercher le badge correspondant (ex: "Explorer 2", "Crafter 5")
+        const badgeName = `${level} ${threshold}`;
+        const badge = allBadges.find(b => b.nom === badgeName);
+        
+        if (badge) {
+          await awardBadge(userId, badge.id);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * @deprecated Utiliser checkAndUpdateLevelAndBadges à la place
+ */
+export async function checkAndUpdateLevel(userId: string): Promise<void> {
+  await checkAndUpdateLevelAndBadges(userId);
 }
