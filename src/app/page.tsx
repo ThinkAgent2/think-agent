@@ -120,7 +120,7 @@ export default function HomePage() {
             </div>
             
             <h2 className="mb-6 text-3xl md:text-4xl font-bold">
-              Rejoins les <span className="text-exalt-blue">1500+ consultants</span> eXalt
+              C'est maintenant qu'il faut <span className="text-exalt-blue">monter dans le train</span>.
             </h2>
             
             <p className="mx-auto mb-10 max-w-xl text-muted-foreground">
