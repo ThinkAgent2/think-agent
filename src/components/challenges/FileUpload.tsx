@@ -135,7 +135,7 @@ export function FileUpload({
           ref={inputRef}
           type="file"
           multiple
-          accept={ALLOWED_TYPES.join(',')}
+          accept={`${ALLOWED_TYPES.join(',')},.json`}
           onChange={handleFileSelect}
           className="hidden"
         />
