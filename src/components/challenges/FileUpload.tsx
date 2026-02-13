@@ -72,7 +72,11 @@ export function FileUpload({
       return;
     }
 
-    const invalidType = files.find((f) => !ALLOWED_TYPES.includes(f.type));
+    const invalidType = files.find((f) => {
+      const typeOk = ALLOWED_TYPES.includes(f.type);
+      const jsonByExt = f.name.toLowerCase().endsWith('.json');
+      return !typeOk && !jsonByExt;
+    });
     if (invalidType) {
       setError(`Type non supporté: ${invalidType.name}. Formats acceptés : images, PDF, TXT, JSON, audio (MP3, WAV, M4A, OGG).`);
       return;
