@@ -47,6 +47,7 @@ export function ChallengeCreateForm({ onSuccess, onCancel }: ChallengeCreateForm
     vision_impact: '',
     le_saviez_vous: '',
     sources: '',
+    plan_solution: '',
   });
 
   const handleChange = (

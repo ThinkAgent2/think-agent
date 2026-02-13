@@ -68,6 +68,7 @@ export interface Challenge {
   vision_impact: string | null;      // Pourquoi ce challenge est important
   le_saviez_vous: string | null;     // Anecdote / hook engageant
   sources: string[] | null;          // Liens vers articles/posts LinkedIn
+  plan_solution: string | null;      // Plan généré par OpenClaw
   created_at: string;
 }
 

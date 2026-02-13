@@ -50,6 +50,7 @@ export function ChallengeEditForm({ challenge, onSave, onCancel }: ChallengeEdit
     vision_impact: challenge.vision_impact || '',
     le_saviez_vous: challenge.le_saviez_vous || '',
     sources: (challenge.sources || []).join('\n'),
+    plan_solution: challenge.plan_solution || '',
   });
 
   const handleChange = (
@@ -94,6 +95,7 @@ export function ChallengeEditForm({ challenge, onSave, onCancel }: ChallengeEdit
         .split('\n')
         .map((s) => s.trim())
         .filter(Boolean),
+      plan_solution: formData.plan_solution || null,
     };
 
     const updated = await updateChallenge(challenge.id, updates);
@@ -343,6 +345,18 @@ export function ChallengeEditForm({ challenge, onSave, onCancel }: ChallengeEdit
               onChange={handleChange}
               placeholder="Une URL par ligne..."
               className="w-full h-24 p-3 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none resize-none"
+            />
+          </div>
+
+          {/* Plan solution (auto) */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Plan solution (auto-généré)</label>
+            <textarea
+              name="plan_solution"
+              value={formData.plan_solution}
+              readOnly
+              placeholder="Généré automatiquement par OpenClaw"
+              className="w-full h-32 p-3 rounded-lg bg-background border border-border text-muted-foreground focus:outline-none resize-none"
             />
           </div>
 

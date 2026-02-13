@@ -109,6 +109,7 @@ CREATE TABLE challenges (
   vision_impact TEXT,                -- Pourquoi ce challenge est important (stratégique)
   le_saviez_vous TEXT,               -- Anecdote / hook engageant
   sources JSONB DEFAULT '[]',        -- Liens vers articles/posts LinkedIn
+  plan_solution TEXT,                -- Plan généré par OpenClaw pour réussir le challenge
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
