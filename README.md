@@ -77,6 +77,9 @@ src/
 
 ## 🏗️ Déploiement Vercel
 
+- **Staging**: branch `staging` → Vercel project *think-agent-staging*
+- **Production**: branch `main` → Vercel project *think-agent*
+
 1. Connecte ton repo GitHub à [Vercel](https://vercel.com)
 2. Configure les variables d'environnement :
    - `NEXT_PUBLIC_SUPABASE_URL`

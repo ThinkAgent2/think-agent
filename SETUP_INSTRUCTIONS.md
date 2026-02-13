@@ -28,7 +28,6 @@ Après exécution, tu devrais voir dans **Table Editor** :
 ### 3. Lancer l'app
 
 ```bash
-cd think-agent-app
 npm run dev
 ```
 
