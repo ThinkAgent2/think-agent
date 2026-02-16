@@ -94,7 +94,8 @@ export default function ProfilePage() {
 
   const config = levelConfig[user.niveau_actuel] || levelConfig.Explorer;
   const LevelIcon = config.icon;
-  const displayName = user.nom || formatNameFromEmail(user.email) || 'Anonyme';
+  const sanitizedName = user.nom && user.nom !== 'Anonyme' ? user.nom : null;
+  const displayName = sanitizedName || formatNameFromEmail(user.email) || 'Anonyme';
   
   const inProgress = participations.filter(p => p.statut === 'En_cours');
   const completed = participations.filter(p => p.statut === 'Terminé');
