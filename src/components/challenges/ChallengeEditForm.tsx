@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MultiSelectMarques } from '@/components/ui/multi-select-marques';
 import { MultiSelectThematiques } from '@/components/ui/multi-select-thematiques';
 import { Loader2, Save, X } from 'lucide-react';
-import { updateChallenge } from '@/lib/supabase/queries';
+import { deleteChallenge, updateChallenge } from '@/lib/supabase/queries';
 import type { Challenge, UserLevel, ChallengeType, Marque, VortexStage, Thematique } from '@/types/database';
 
 interface ChallengeEditFormProps {
@@ -33,6 +33,7 @@ const VORTEX_STAGES: { value: VortexStage; label: string }[] = [
 
 export function ChallengeEditForm({ challenge, onSave, onCancel }: ChallengeEditFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [formData, setFormData] = useState({
     titre: challenge.titre,
     description: challenge.description,
@@ -103,6 +104,23 @@ export function ChallengeEditForm({ challenge, onSave, onCancel }: ChallengeEdit
 
     if (updated) {
       onSave(updated);
+    }
+  };
+
+  const handleDelete = async () => {
+    const confirmed = window.confirm('Supprimer ce challenge ? Cette action est irréversible.');
+    if (!confirmed) return;
+
+    setIsDeleting(true);
+    const success = await deleteChallenge(challenge.id);
+    setIsDeleting(false);
+
+    if (success) {
+      alert('Challenge supprimé.');
+      onCancel();
+      window.location.href = '/challenges';
+    } else {
+      alert('Erreur lors de la suppression.');
     }
   };
 
@@ -364,19 +382,34 @@ export function ChallengeEditForm({ challenge, onSave, onCancel }: ChallengeEdit
       </Card>
 
       {/* Actions */}
-      <div className="flex justify-end gap-4">
+      <div className="flex flex-wrap justify-end gap-4">
         <Button
           type="button"
           variant="outline"
           onClick={onCancel}
-          disabled={isSubmitting}
+          disabled={isSubmitting || isDeleting}
         >
           <X className="w-4 h-4 mr-2" />
           Annuler
         </Button>
         <Button
+          type="button"
+          variant="destructive"
+          onClick={handleDelete}
+          disabled={isSubmitting || isDeleting}
+        >
+          {isDeleting ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Suppression...
+            </>
+          ) : (
+            'Supprimer'
+          )}
+        </Button>
+        <Button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || isDeleting}
           className="bg-accent-jaune hover:bg-accent-jaune/80 text-black font-semibold"
         >
           {isSubmitting ? (
