@@ -74,10 +74,23 @@ export default function UserProfilePage() {
   const inProgress = participations.filter(p => p.statut === 'En_cours');
   const completed = participations.filter(p => p.statut === 'Terminé');
 
-  const currentLevelXP = user?.niveau_actuel === 'Explorer' ? 0 : user?.niveau_actuel === 'Crafter' ? 150 : 500;
-  const xpInCurrentLevel = (user?.points_totaux || 0) - currentLevelXP;
-  const xpForNextLevel = config.xpNeeded ? config.xpNeeded - currentLevelXP : 0;
-  const progressPercent = config.nextLevel ? Math.min(100, Math.max(0, (xpInCurrentLevel / xpForNextLevel) * 100)) : 100;
+  const levelThresholds: Record<'Explorer' | 'Crafter' | 'Architecte', number> = {
+    Explorer: 2,
+    Crafter: 5,
+    Architecte: 2,
+  };
+
+  const completedByLevel = {
+    Explorer: participations.filter(p => p.statut === 'Terminé' && p.challenge?.niveau_associe === 'Explorer').length,
+    Crafter: participations.filter(p => p.statut === 'Terminé' && p.challenge?.niveau_associe === 'Crafter').length,
+    Architecte: participations.filter(p => p.statut === 'Terminé' && p.challenge?.niveau_associe === 'Architecte').length,
+  };
+
+  const levelProgress = {
+    Explorer: Math.min(100, Math.round((completedByLevel.Explorer / levelThresholds.Explorer) * 100)),
+    Crafter: Math.min(100, Math.round((completedByLevel.Crafter / levelThresholds.Crafter) * 100)),
+    Architecte: Math.min(100, Math.round((completedByLevel.Architecte / levelThresholds.Architecte) * 100)),
+  };
 
   const badgesWithStatus = useMemo(() => {
     return allBadges.map((badge) => ({
@@ -155,16 +168,20 @@ export default function UserProfilePage() {
                     </div>
                   </div>
 
-                  {/* Progression vers niveau suivant */}
-                  {config.nextLevel && (
-                    <div className="mt-6 pt-6 border-t border-border">
-                      <div className="flex items-center justify-between mb-2 text-sm">
-                        <span className="text-muted-foreground">Progression vers {config.nextLevel}</span>
-                        <span className="font-medium">{Math.max(0, xpInCurrentLevel)} / {xpForNextLevel} XP</span>
+                  {/* Progression par niveau */}
+                  <div className="mt-6 pt-6 border-t border-border space-y-4">
+                    {(Object.keys(levelThresholds) as Array<keyof typeof levelThresholds>).map((level) => (
+                      <div key={level} className="space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">{level}</span>
+                          <span className="font-medium">
+                            {completedByLevel[level]} / {levelThresholds[level]} challenges
+                          </span>
+                        </div>
+                        <Progress value={levelProgress[level]} className="h-2" />
                       </div>
-                      <Progress value={progressPercent} className="h-2" />
-                    </div>
-                  )}
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
 
@@ -273,10 +290,6 @@ export default function UserProfilePage() {
                     <div className="flex justify-center py-4">
                       <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
                     </div>
-                  ) : userBadges.length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-4">
-                      Aucun badge obtenu
-                    </p>
                   ) : (
                     <div className="grid grid-cols-3 gap-3">
                       {badgesWithStatus.map((badge) => (
