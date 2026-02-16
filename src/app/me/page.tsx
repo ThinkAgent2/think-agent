@@ -325,10 +325,12 @@ export default function ProfilePage() {
                     <div className="space-y-2">
                       {leaderboard.map((entry, index) => {
                         const isCurrentUser = entry.user_id === user.id;
+                        const href = isCurrentUser ? '/me' : `/users/${entry.user_id}`;
                         return (
-                          <div
+                          <Link
                             key={entry.user_id}
-                            className={`flex items-center gap-3 p-2 rounded-lg ${
+                            href={href}
+                            className={`flex items-center gap-3 p-2 rounded-lg transition-colors hover:border hover:border-accent-cyan ${
                               isCurrentUser ? 'bg-exalt-blue/20 border border-exalt-blue/50' : ''
                             }`}
                           >
@@ -350,7 +352,7 @@ export default function ProfilePage() {
                             <span className="text-sm font-semibold text-accent-jaune">
                               {entry.points_totaux}
                             </span>
-                          </div>
+                          </Link>
                         );
                       })}
                     </div>
