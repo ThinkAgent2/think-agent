@@ -414,12 +414,29 @@ export async function updateDojoEvent(
 // LEADERBOARD
 // ==========================================
 
+const EXALT_EMAIL_DOMAIN = 'exalt-company.com';
+
+function formatNameFromEmail(email?: string | null): string | null {
+  if (!email) return null;
+  const normalizedEmail = email.toLowerCase();
+  const [localPart, domain] = normalizedEmail.split('@');
+  if (!localPart || domain !== EXALT_EMAIL_DOMAIN) return null;
+
+  const parts = localPart.split('.').filter(Boolean);
+  if (parts.length === 0) return null;
+
+  return parts
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
 export async function getLeaderboard(limit: number = 10): Promise<LeaderboardEntry[]> {
   const { data, error } = await supabase
     .from('users')
     .select(`
       id,
       nom,
+      email,
       niveau_actuel,
       points_totaux,
       marque_id
@@ -433,14 +450,17 @@ export async function getLeaderboard(limit: number = 10): Promise<LeaderboardEnt
   }
 
   // Pour simplifier, on ne fait pas de join pour le nom de marque dans le MVP
-  return (data || []).map((user, index) => ({
-    user_id: user.id,
-    nom: user.nom || 'Anonyme',
-    niveau_actuel: user.niveau_actuel,
-    points_totaux: user.points_totaux,
-    marque: null, // Simplifié pour le MVP
-    rank: index + 1,
-  }));
+  return (data || []).map((user, index) => {
+    const inferredName = formatNameFromEmail(user.email);
+    return {
+      user_id: user.id,
+      nom: user.nom || inferredName || 'Anonyme',
+      niveau_actuel: user.niveau_actuel,
+      points_totaux: user.points_totaux,
+      marque: null, // Simplifié pour le MVP
+      rank: index + 1,
+    };
+  });
 }
 
 // ==========================================
