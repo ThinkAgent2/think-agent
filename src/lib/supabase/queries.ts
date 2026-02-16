@@ -451,7 +451,7 @@ export async function updateDojoEvent(
 // LEADERBOARD
 // ==========================================
 
-export async function searchUsers(term: string, limit: number = 5): Promise<Array<Pick<User, 'id' | 'nom' | 'email'>>> {
+export async function searchUsers(term: string, limit: number = 5): Promise<Array<{ id: string; nom: string; email: string }>> {
   const trimmed = term.trim();
   if (!trimmed) return [];
 
