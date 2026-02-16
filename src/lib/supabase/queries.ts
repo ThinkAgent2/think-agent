@@ -212,6 +212,39 @@ export async function createChallenge(
   return data;
 }
 
+export async function createChallengeProposal(
+  challenge: Omit<Challenge, 'id' | 'created_at'>
+): Promise<{ data: Challenge | null; error: string | null }> {
+  const { data, error } = await supabase
+    .from('challenges')
+    .insert(challenge)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating challenge proposal:', error);
+    return { data: null, error: error.message };
+  }
+
+  return { data, error: null };
+}
+
+export async function findChallengeByTitle(title: string): Promise<Challenge | null> {
+  const { data, error } = await supabase
+    .from('challenges')
+    .select('*')
+    .ilike('titre', title)
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error finding challenge by title:', error);
+    return null;
+  }
+
+  return data;
+}
+
 export async function getUserChallenges(userId: string): Promise<Challenge[]> {
   const { data, error } = await supabase
     .from('challenges')

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MultiSelectMarques } from '@/components/ui/multi-select-marques';
 import { MultiSelectThematiques } from '@/components/ui/multi-select-thematiques';
 import { Loader2, Send, Paperclip } from 'lucide-react';
-import { createChallenge } from '@/lib/supabase/queries';
+import { createChallengeProposal, findChallengeByTitle } from '@/lib/supabase/queries';
 import { FileUpload } from '@/components/challenges/FileUpload';
 import type { Challenge, UserLevel, ChallengeType, Marque, VortexStage, Thematique } from '@/types/database';
 import type { UploadedFile } from '@/lib/supabase/storage';
@@ -34,6 +34,7 @@ const VORTEX_STAGES: { value: VortexStage; label: string }[] = [
 export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [formError, setFormError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     titre: '',
     description: '',
@@ -71,17 +72,26 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    setFormError(null);
+
     if (!formData.titre.trim() || !formData.description.trim()) {
-      alert('Titre et description sont obligatoires');
+      setFormError('Titre et description sont obligatoires');
       return;
     }
 
     if (!formData.criteres_evaluation.trim() || !formData.vision_impact.trim() || !formData.solution_proposee.trim()) {
-      alert('Critères d\'évaluation, Vision & Impact et Solution proposée sont obligatoires');
+      setFormError('Critères d\'évaluation, Vision & Impact et Solution proposée sont obligatoires');
       return;
     }
 
     setIsSubmitting(true);
+
+    const existing = await findChallengeByTitle(formData.titre.trim());
+    if (existing && existing.statut !== 'Refuse') {
+      setIsSubmitting(false);
+      setFormError('Un challenge avec ce titre existe déjà.');
+      return;
+    }
 
     const newChallenge: Omit<Challenge, 'id' | 'created_at'> = {
       titre: formData.titre,
@@ -113,11 +123,12 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
       solution_proposee_fichiers: uploadedFiles.map((file) => file.url),
     };
 
-    const created = await createChallenge(newChallenge);
+    const { data, error } = await createChallengeProposal(newChallenge);
     setIsSubmitting(false);
 
-    if (created) {
-      onSuccess?.(created);
+    if (data) {
+      onSuccess?.(data);
+      setFormError(null);
       alert('Challenge proposé ! Un admin va le valider.');
       setFormData((prev) => ({
         ...prev,
@@ -131,7 +142,7 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
         solution_proposee: '',
       }));
     } else {
-      alert('Erreur lors de la proposition.');
+      setFormError(error || 'Erreur lors de la proposition.');
     }
   };
 
@@ -142,6 +153,11 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {formError && (
+            <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              {formError}
+            </div>
+          )}
           <div className="space-y-2">
             <label className="text-sm font-medium">Titre *</label>
             <Input
