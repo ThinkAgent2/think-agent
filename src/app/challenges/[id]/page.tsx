@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
@@ -57,7 +57,6 @@ const THEMATIQUE_LABELS: Record<Thematique, { emoji: string; label: string }> = 
 
 export default function ChallengeDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const { user } = useAuth();
   const challengeId = params.id as string;
 
@@ -164,7 +163,6 @@ export default function ChallengeDetailPage() {
   const isParticipating = participation?.statut === 'En_cours';
   const hasSubmitted = !!solution;
   const isCompleted = participation?.statut === 'Terminé';
-  const isAbandoned = participation?.statut === 'Abandonné';
 
   return (
     <div className="flex min-h-screen flex-col">
