@@ -19,7 +19,7 @@ interface ChallengeEditFormProps {
 const NIVEAUX: UserLevel[] = ['Explorer', 'Crafter', 'Architecte'];
 const TYPES: ChallengeType[] = ['Quiz', 'Exercice', 'Projet', 'Use_Case'];
 const PARTICIPANTS = ['Solo', 'Duo', 'Équipe'] as const;
-const STATUTS = ['Actif', 'Archivé'] as const;
+const STATUTS = ['Actif', 'Archivé', 'Propose', 'Valide', 'Publie'] as const;
 
 const VORTEX_STAGES: { value: VortexStage; label: string }[] = [
   { value: 'contextualize', label: '1. Cadrer (Contextualize)' },

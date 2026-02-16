@@ -184,6 +184,21 @@ export async function createChallenge(
   return data;
 }
 
+export async function getUserChallenges(userId: string): Promise<Challenge[]> {
+  const { data, error } = await supabase
+    .from('challenges')
+    .select('*')
+    .eq('auteur_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching user challenges:', error);
+    return [];
+  }
+
+  return data || [];
+}
+
 // ==========================================
 // PARTICIPATIONS
 // ==========================================

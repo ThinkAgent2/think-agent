@@ -5,6 +5,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { ChallengeCard } from '@/components/challenges/ChallengeCard';
 import { ChallengeFilters } from '@/components/challenges/ChallengeFilters';
+import { ProposeChallengeForm } from '@/components/challenges/ProposeChallengeForm';
 import { Loader2, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -79,7 +80,16 @@ export default function ChallengesPage() {
 
           <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
             {/* Sidebar filters */}
-            <aside className="lg:sticky lg:top-24 lg:h-fit z-10">
+            <aside className="lg:sticky lg:top-24 lg:h-fit z-10 space-y-6">
+              {user && (
+                <ProposeChallengeForm
+                  authorId={user.id}
+                  onSuccess={() => {
+                    // refresh challenges list after proposal
+                    getChallenges(filters).then(setChallenges);
+                  }}
+                />
+              )}
               <ChallengeFilters filters={filters} onFiltersChange={setFilters} />
             </aside>
 
