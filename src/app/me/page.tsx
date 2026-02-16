@@ -35,6 +35,7 @@ export default function ProfilePage() {
   const [allBadges, setAllBadges] = useState<BadgeType[]>([]);
   const [userBadges, setUserBadges] = useState<BadgeType[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [leaderboardScope, setLeaderboardScope] = useState<'global' | 'entite' | 'cercle'>('global');
   const [userSearchTerm, setUserSearchTerm] = useState('');
   const [userSearchResults, setUserSearchResults] = useState<Array<{ id: string; nom: string; email: string }>>([]);
   const [isSearchingUsers, setIsSearchingUsers] = useState(false);
@@ -352,11 +353,30 @@ export default function ProfilePage() {
               {/* Leaderboard */}
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Trophy className="h-5 w-5 text-accent-jaune" />
-                    Leaderboard
-                  </CardTitle>
-                  <CardDescription>Top 10 global</CardDescription>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <Trophy className="h-5 w-5 text-accent-jaune" />
+                        Leaderboard
+                      </CardTitle>
+                      <CardDescription>
+                        {leaderboardScope === 'global'
+                          ? 'Top 10 global'
+                          : leaderboardScope === 'entite'
+                          ? 'Top 10 par entité'
+                          : 'Top 10 par cercle'}
+                      </CardDescription>
+                    </div>
+                    <select
+                      value={leaderboardScope}
+                      onChange={(event) => setLeaderboardScope(event.target.value as 'global' | 'entite' | 'cercle')}
+                      className="rounded-md border border-border bg-background px-2 py-1 text-xs text-muted-foreground focus:border-accent-cyan focus:outline-none"
+                    >
+                      <option value="global">Global</option>
+                      <option value="entite">Entité</option>
+                      <option value="cercle">Cercle</option>
+                    </select>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="mb-4">
