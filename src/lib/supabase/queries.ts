@@ -136,7 +136,7 @@ export async function getChallenges(filters?: ChallengeFilters): Promise<Challen
   return data || [];
 }
 
-export async function getChallengesByStatus(statuses: ChallengeStatus[]): Promise<Challenge[]> {
+export async function getChallengesByStatus(statuses: Array<Challenge['statut']>): Promise<Challenge[]> {
   const { data, error } = await supabase
     .from('challenges')
     .select('*')
