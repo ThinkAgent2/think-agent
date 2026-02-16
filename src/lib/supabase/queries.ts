@@ -4,29 +4,23 @@ import type {
   Badge, DojoEvent, ChallengeFilters, LeaderboardEntry,
   UserLevel
 } from '@/types/database';
+import { formatNameFromEmail } from '@/lib/userName';
 
 const supabase = createClient();
-
-const EXALT_EMAIL_DOMAIN = 'exalt-company.com';
-
-function formatNameFromEmail(email?: string | null): string | null {
-  if (!email) return null;
-  const normalizedEmail = email.toLowerCase();
-  const [localPart, domain] = normalizedEmail.split('@');
-  if (!localPart || domain !== EXALT_EMAIL_DOMAIN) return null;
-
-  const parts = localPart.split('.').filter(Boolean);
-  if (parts.length === 0) return null;
-
-  return parts
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
-}
 
 function shouldUpdateName(user: User, inferredName: string | null): boolean {
   if (!inferredName) return false;
   if (!user.nom) return true;
   return user.nom.trim().toLowerCase() === 'anonyme';
+}
+
+async function maybeUpdateUserName(user: User): Promise<User> {
+  const inferredName = formatNameFromEmail(user.email);
+  if (shouldUpdateName(user, inferredName)) {
+    const updated = await updateUser(user.id, { nom: inferredName });
+    return updated ?? { ...user, nom: inferredName };
+  }
+  return user;
 }
 
 // ==========================================
@@ -45,11 +39,7 @@ export async function getUserByEmail(email: string): Promise<User | null> {
   }
 
   if (data) {
-    const inferredName = formatNameFromEmail(data.email);
-    if (shouldUpdateName(data, inferredName)) {
-      const updated = await updateUser(data.id, { nom: inferredName });
-      return updated ?? { ...data, nom: inferredName };
-    }
+    return await maybeUpdateUserName(data);
   }
 
   return data;
@@ -95,6 +85,21 @@ export async function updateUser(userId: string, updates: Partial<User>): Promis
     return null;
   }
   return data;
+}
+
+export async function getUserById(userId: string): Promise<User | null> {
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', userId)
+    .single();
+
+  if (error) {
+    console.error('Error fetching user by id:', error);
+    return null;
+  }
+
+  return await maybeUpdateUserName(data);
 }
 
 // ==========================================
