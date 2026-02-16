@@ -340,6 +340,11 @@ export default function ProfilePage() {
                                   </Badge>
                                   <span className="text-xs uppercase">{challenge.statut}</span>
                                 </div>
+                                {challenge.statut === 'Refuse' && challenge.validation_commentaire && (
+                                  <p className="mt-2 text-xs text-destructive">
+                                    Refusé : {challenge.validation_commentaire}
+                                  </p>
+                                )}
                               </div>
                               <Button variant="ghost" size="sm">
                                 Voir

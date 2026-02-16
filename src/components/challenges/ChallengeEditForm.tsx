@@ -34,6 +34,7 @@ const VORTEX_STAGES: { value: VortexStage; label: string }[] = [
 export function ChallengeEditForm({ challenge, onSave, onCancel }: ChallengeEditFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isRepublishing, setIsRepublishing] = useState(false);
   const [formData, setFormData] = useState({
     titre: challenge.titre,
     description: challenge.description,
@@ -121,6 +122,19 @@ export function ChallengeEditForm({ challenge, onSave, onCancel }: ChallengeEdit
       window.location.href = '/challenges';
     } else {
       alert('Erreur lors de la suppression.');
+    }
+  };
+
+  const handleRepublish = async () => {
+    setIsRepublishing(true);
+    const updated = await updateChallenge(challenge.id, { statut: 'Propose', validation_commentaire: null });
+    setIsRepublishing(false);
+
+    if (updated) {
+      onSave(updated);
+      alert('Challenge renvoyé en validation.');
+    } else {
+      alert('Erreur lors du renvoi en validation.');
     }
   };
 
@@ -387,16 +401,33 @@ export function ChallengeEditForm({ challenge, onSave, onCancel }: ChallengeEdit
           type="button"
           variant="outline"
           onClick={onCancel}
-          disabled={isSubmitting || isDeleting}
+          disabled={isSubmitting || isDeleting || isRepublishing}
         >
           <X className="w-4 h-4 mr-2" />
           Annuler
         </Button>
+        {challenge.statut === 'Refuse' && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleRepublish}
+            disabled={isSubmitting || isDeleting || isRepublishing}
+          >
+            {isRepublishing ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Renvoi...
+              </>
+            ) : (
+              'Renvoyer en validation'
+            )}
+          </Button>
+        )}
         <Button
           type="button"
           variant="destructive"
           onClick={handleDelete}
-          disabled={isSubmitting || isDeleting}
+          disabled={isSubmitting || isDeleting || isRepublishing}
         >
           {isDeleting ? (
             <>
@@ -409,7 +440,7 @@ export function ChallengeEditForm({ challenge, onSave, onCancel }: ChallengeEdit
         </Button>
         <Button
           type="submit"
-          disabled={isSubmitting || isDeleting}
+          disabled={isSubmitting || isDeleting || isRepublishing}
           className="bg-accent-jaune hover:bg-accent-jaune/80 text-black font-semibold"
         >
           {isSubmitting ? (
