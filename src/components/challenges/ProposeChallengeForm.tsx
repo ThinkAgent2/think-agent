@@ -6,9 +6,11 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MultiSelectMarques } from '@/components/ui/multi-select-marques';
 import { MultiSelectThematiques } from '@/components/ui/multi-select-thematiques';
-import { Loader2, Send } from 'lucide-react';
+import { Loader2, Send, Paperclip } from 'lucide-react';
 import { createChallenge } from '@/lib/supabase/queries';
+import { FileUpload } from '@/components/challenges/FileUpload';
 import type { Challenge, UserLevel, ChallengeType, Marque, VortexStage, Thematique } from '@/types/database';
+import type { UploadedFile } from '@/lib/supabase/storage';
 
 interface ProposeChallengeFormProps {
   authorId: string;
@@ -31,6 +33,7 @@ const VORTEX_STAGES: { value: VortexStage; label: string }[] = [
 
 export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [formData, setFormData] = useState({
     titre: '',
     description: '',
@@ -102,6 +105,7 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
       plan_solution: null,
       auteur_id: authorId,
       solution_proposee: formData.solution_proposee || null,
+      solution_proposee_fichiers: uploadedFiles.map((file) => file.url),
     };
 
     const created = await createChallenge(newChallenge);
@@ -299,6 +303,20 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
               onChange={handleChange}
               placeholder="Décris ta solution idéale..."
               className="w-full h-24 p-3 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none resize-none"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium flex items-center gap-2">
+              <Paperclip className="h-4 w-4" />
+              Pièces jointes (optionnel)
+            </label>
+            <FileUpload
+              userId={authorId}
+              challengeId="proposal-temp"
+              onFilesChange={setUploadedFiles}
+              maxFiles={3}
+              maxSizeMB={10}
             />
           </div>
 

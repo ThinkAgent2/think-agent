@@ -66,6 +66,7 @@ export interface Challenge {
   participants: 'Solo' | 'Duo' | 'Équipe';
   auteur_id?: string | null;
   solution_proposee?: string | null;
+  solution_proposee_fichiers?: string[] | null;
   // Champs d'enrichissement
   vision_impact: string | null;      // Pourquoi ce challenge est important
   le_saviez_vous: string | null;     // Anecdote / hook engageant

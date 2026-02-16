@@ -136,6 +136,20 @@ export async function getChallenges(filters?: ChallengeFilters): Promise<Challen
   return data || [];
 }
 
+export async function getChallengesByStatus(statuses: ChallengeStatus[]): Promise<Challenge[]> {
+  const { data, error } = await supabase
+    .from('challenges')
+    .select('*')
+    .in('statut', statuses)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching challenges by status:', error);
+    return [];
+  }
+  return data || [];
+}
+
 export async function getChallengeById(id: string): Promise<Challenge | null> {
   const { data, error } = await supabase
     .from('challenges')
