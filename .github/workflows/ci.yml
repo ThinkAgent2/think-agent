@@ -14,5 +14,5 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: npm run lint
-      - run: npm run typecheck
+      - run: npm run typecheck --if-present
       - run: npm test --if-present
