@@ -16,7 +16,7 @@ import {
   Medal, Crown, Rocket, Brain, Loader2
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
-import { getUserParticipations, getAllBadges, getUserBadges, getLeaderboard } from '@/lib/supabase/queries';
+import { getUserParticipations, getAllBadges, getUserBadges, getLeaderboard, searchUsers } from '@/lib/supabase/queries';
 import { formatNameFromEmail } from '@/lib/userName';
 import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry } from '@/types/database';
 
@@ -34,6 +34,9 @@ export default function ProfilePage() {
   const [allBadges, setAllBadges] = useState<BadgeType[]>([]);
   const [userBadges, setUserBadges] = useState<BadgeType[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [userSearchTerm, setUserSearchTerm] = useState('');
+  const [userSearchResults, setUserSearchResults] = useState<Array<{ id: string; nom: string; email: string }>>([]);
+  const [isSearchingUsers, setIsSearchingUsers] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   // Rediriger si non connecté
@@ -64,6 +67,31 @@ export default function ProfilePage() {
     }
     loadData();
   }, [user]);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function runSearch() {
+      const trimmed = userSearchTerm.trim();
+      if (!trimmed) {
+        setUserSearchResults([]);
+        return;
+      }
+
+      setIsSearchingUsers(true);
+      const results = await searchUsers(trimmed, 5);
+      if (!isCancelled) {
+        setUserSearchResults(results);
+        setIsSearchingUsers(false);
+      }
+    }
+
+    const timer = setTimeout(runSearch, 250);
+    return () => {
+      isCancelled = true;
+      clearTimeout(timer);
+    };
+  }, [userSearchTerm]);
 
   if (authLoading || !user) {
     return (
@@ -330,6 +358,40 @@ export default function ProfilePage() {
                   <CardDescription>Top 10 global</CardDescription>
                 </CardHeader>
                 <CardContent>
+                  <div className="mb-4">
+                    <Input
+                      value={userSearchTerm}
+                      onChange={(event) => setUserSearchTerm(event.target.value)}
+                      placeholder="Rechercher un utilisateur (ex: Lucas)"
+                      className="bg-background border-border focus:border-accent-cyan"
+                    />
+                    {userSearchTerm.trim().length > 0 && (
+                      <div className="mt-2 rounded-lg border border-border bg-card p-2 space-y-1">
+                        {isSearchingUsers ? (
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground px-2 py-1">
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                            Recherche...
+                          </div>
+                        ) : userSearchResults.length === 0 ? (
+                          <div className="text-xs text-muted-foreground px-2 py-1">
+                            Aucun résultat
+                          </div>
+                        ) : (
+                          userSearchResults.map((result) => (
+                            <Link
+                              key={result.id}
+                              href={`/users/${result.id}`}
+                              className="flex items-center justify-between gap-2 rounded-md px-2 py-1 text-sm hover:bg-accent-cyan/10"
+                            >
+                              <span className="font-medium truncate">{result.nom}</span>
+                              <span className="text-xs text-muted-foreground truncate">{result.email}</span>
+                            </Link>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </div>
+
                   {isLoading ? (
                     <div className="flex justify-center py-4">
                       <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />

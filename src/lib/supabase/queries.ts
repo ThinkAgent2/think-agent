@@ -451,6 +451,32 @@ export async function updateDojoEvent(
 // LEADERBOARD
 // ==========================================
 
+export async function searchUsers(term: string, limit: number = 5): Promise<Array<Pick<User, 'id' | 'nom' | 'email'>>> {
+  const trimmed = term.trim();
+  if (!trimmed) return [];
+
+  const { data, error } = await supabase
+    .from('users')
+    .select('id, nom, email')
+    .or(`nom.ilike.%${trimmed}%,email.ilike.%${trimmed}%`)
+    .limit(limit);
+
+  if (error) {
+    console.error('Error searching users:', error);
+    return [];
+  }
+
+  const results = await Promise.all(
+    (data || []).map(async (user) => await maybeUpdateUserName(user as User))
+  );
+
+  return results.map((user) => ({
+    id: user.id,
+    nom: user.nom || formatNameFromEmail(user.email) || 'Anonyme',
+    email: user.email,
+  }));
+}
+
 export async function getLeaderboard(limit: number = 10): Promise<LeaderboardEntry[]> {
   const { data, error } = await supabase
     .from('users')
