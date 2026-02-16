@@ -5,7 +5,6 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { ChallengeCard } from '@/components/challenges/ChallengeCard';
 import { ChallengeFilters } from '@/components/challenges/ChallengeFilters';
-import { ProposeChallengeForm } from '@/components/challenges/ProposeChallengeForm';
 import { Loader2, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -83,21 +82,11 @@ export default function ChallengesPage() {
             <aside className="lg:sticky lg:top-24 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto z-10 space-y-6 pr-2">
               <ChallengeFilters filters={filters} onFiltersChange={setFilters} />
               {user && (
-                <details className="group rounded-xl border border-border bg-card">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 text-sm font-semibold">
-                    <span>Proposer un challenge</span>
-                    <span className="text-muted-foreground group-open:rotate-180 transition-transform">▾</span>
-                  </summary>
-                  <div className="px-3 pb-4">
-                    <ProposeChallengeForm
-                      authorId={user.id}
-                      onSuccess={() => {
-                        // refresh challenges list after proposal
-                        getChallenges(filters).then(setChallenges);
-                      }}
-                    />
-                  </div>
-                </details>
+                <Link href="/challenges/propose" className="block">
+                  <Button className="w-full bg-exalt-blue hover:bg-exalt-blue/80 text-white font-semibold">
+                    Proposer un challenge
+                  </Button>
+                </Link>
               )}
             </aside>
 
