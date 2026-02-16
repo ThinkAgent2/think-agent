@@ -320,35 +320,40 @@ export default function UserProfilePage() {
                     </p>
                   ) : (
                     <div className="space-y-2">
-                      {leaderboard.map((entry, index) => (
-                        <div
-                          key={entry.user_id}
-                          className={`flex items-center gap-3 p-2 rounded-lg ${
-                            entry.user_id === user.id ? 'bg-exalt-blue/20 border border-exalt-blue/50' : ''
-                          }`}
-                        >
-                          <span className={`w-6 text-center font-bold ${
-                            index === 0 ? 'text-accent-jaune' :
-                            index === 1 ? 'text-gray-400' :
-                            index === 2 ? 'text-amber-600' :
-                            'text-muted-foreground'
-                          }`}>
-                            {index < 3 ? ['🥇', '🥈', '🥉'][index] : entry.rank}
-                          </span>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium truncate text-sm">
-                              {entry.nom}
-                              {entry.user_id === user.id && (
-                                <span className="text-exalt-blue ml-1">(toi)</span>
-                              )}
-                            </p>
-                            <p className="text-xs text-muted-foreground">{entry.marque || '-'}</p>
-                          </div>
-                          <span className="text-sm font-semibold text-accent-jaune">
-                            {entry.points_totaux}
-                          </span>
-                        </div>
-                      ))}
+                      {leaderboard.map((entry, index) => {
+                        const isCurrentProfile = entry.user_id === user.id;
+                        const href = isCurrentProfile ? `/users/${entry.user_id}` : `/users/${entry.user_id}`;
+                        return (
+                          <Link
+                            key={entry.user_id}
+                            href={href}
+                            className={`flex items-center gap-3 p-2 rounded-lg transition-colors hover:border hover:border-accent-cyan ${
+                              isCurrentProfile ? 'bg-exalt-blue/20 border border-exalt-blue/50' : ''
+                            }`}
+                          >
+                            <span className={`w-6 text-center font-bold ${
+                              index === 0 ? 'text-accent-jaune' :
+                              index === 1 ? 'text-gray-400' :
+                              index === 2 ? 'text-amber-600' :
+                              'text-muted-foreground'
+                            }`}>
+                              {index < 3 ? ['🥇', '🥈', '🥉'][index] : entry.rank}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium truncate text-sm">
+                                {entry.nom}
+                                {isCurrentProfile && (
+                                  <span className="text-exalt-blue ml-1">(profil)</span>
+                                )}
+                              </p>
+                              <p className="text-xs text-muted-foreground">{entry.marque || '-'}</p>
+                            </div>
+                            <span className="text-sm font-semibold text-accent-jaune">
+                              {entry.points_totaux}
+                            </span>
+                          </Link>
+                        );
+                      })}
                     </div>
                   )}
                 </CardContent>
