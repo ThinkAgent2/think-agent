@@ -363,7 +363,7 @@ export default function ProfilePage() {
                     <Input
                       value={userSearchTerm}
                       onChange={(event) => setUserSearchTerm(event.target.value)}
-                      placeholder="Rechercher un utilisateur (ex: Lucas)"
+                      placeholder="Rechercher un utilisateur"
                       className="bg-background border-border focus:border-accent-cyan"
                     />
                     {userSearchTerm.trim().length > 0 && (
