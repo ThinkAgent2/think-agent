@@ -6,6 +6,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { Loader2, CheckCircle, Eye } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { getChallengesByStatus, updateChallenge, addUserXP } from '@/lib/supabase/queries';
@@ -15,11 +16,12 @@ export default function AdminChallengesPage() {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [rejectionNotes, setRejectionNotes] = useState<Record<string, string>>({});
 
   useEffect(() => {
     async function loadProposals() {
       setIsLoading(true);
-      const proposals = await getChallengesByStatus(['Propose', 'Valide']);
+      const proposals = await getChallengesByStatus(['Propose', 'Valide', 'Refuse']);
       setChallenges(proposals);
       setIsLoading(false);
     }
@@ -52,6 +54,18 @@ export default function AdminChallengesPage() {
   const handlePublish = async (challenge: Challenge) => {
     await updateChallenge(challenge.id, { statut: 'Publie' });
     setChallenges((prev) => prev.filter((item) => item.id !== challenge.id));
+  };
+
+  const handleReject = async (challenge: Challenge) => {
+    const note = rejectionNotes[challenge.id]?.trim();
+    if (!note) {
+      alert('Ajoute un commentaire pour le refus.');
+      return;
+    }
+
+    await updateChallenge(challenge.id, { statut: 'Refuse', validation_commentaire: note });
+    setChallenges((prev) => prev.filter((item) => item.id !== challenge.id));
+    setRejectionNotes((prev) => ({ ...prev, [challenge.id]: '' }));
   };
 
   return (
@@ -109,6 +123,28 @@ export default function AdminChallengesPage() {
                       )}
                     </div>
                   </div>
+
+                  {challenge.statut === 'Propose' && (
+                    <div className="mt-4">
+                      <label className="text-sm font-semibold">Commentaire de refus</label>
+                      <div className="flex flex-col gap-2 mt-2">
+                        <Input
+                          value={rejectionNotes[challenge.id] || ''}
+                          onChange={(event) =>
+                            setRejectionNotes((prev) => ({
+                              ...prev,
+                              [challenge.id]: event.target.value,
+                            }))
+                          }
+                          placeholder="Explique pourquoi le challenge est refusé"
+                        />
+                        <Button variant="outline" size="sm" onClick={() => handleReject(challenge)}>
+                          Refuser
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
                   {challenge.solution_proposee && (
                     <div className="mt-4">
                       <p className="text-sm font-semibold">Solution proposée</p>

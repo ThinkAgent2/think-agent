@@ -110,7 +110,7 @@ export async function getChallenges(filters?: ChallengeFilters): Promise<Challen
   let query = supabase
     .from('challenges')
     .select('*')
-    .eq('statut', 'Actif')
+    .in('statut', ['Actif', 'Publie'])
     .order('difficulte', { ascending: true });
 
   if (filters?.niveau) {

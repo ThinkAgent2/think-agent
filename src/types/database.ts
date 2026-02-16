@@ -4,7 +4,7 @@ export type UserLevel = 'Explorer' | 'Crafter' | 'Architecte';
 export type UserRole = 'Utilisateur' | 'Mentor' | 'Administrateur';
 export type ChallengeType = 'Quiz' | 'Exercice' | 'Projet' | 'Use_Case';
 export type EvaluationType = 'Manuelle' | 'Automatique' | 'Hybride';
-export type ChallengeStatus = 'Actif' | 'Archivé' | 'Propose' | 'Valide' | 'Publie';
+export type ChallengeStatus = 'Actif' | 'Archivé' | 'Propose' | 'Valide' | 'Publie' | 'Refuse';
 export type SolutionStatus = 'Soumise' | 'Évaluée';
 export type ParticipationStatus = 'En_cours' | 'Terminé' | 'Abandonné';
 export type EventFormat = 'En_Ligne' | 'Présentiel';
@@ -67,6 +67,7 @@ export interface Challenge {
   auteur_id?: string | null;
   solution_proposee?: string | null;
   solution_proposee_fichiers?: string[] | null;
+  validation_commentaire?: string | null;
   // Champs d'enrichissement
   vision_impact: string | null;      // Pourquoi ce challenge est important
   le_saviez_vous: string | null;     // Anecdote / hook engageant

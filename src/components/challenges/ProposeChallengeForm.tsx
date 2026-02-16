@@ -76,6 +76,11 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
       return;
     }
 
+    if (!formData.criteres_evaluation.trim() || !formData.vision_impact.trim() || !formData.solution_proposee.trim()) {
+      alert('Critères d\'évaluation, Vision & Impact et Solution proposée sont obligatoires');
+      return;
+    }
+
     setIsSubmitting(true);
 
     const newChallenge: Omit<Challenge, 'id' | 'created_at'> = {
@@ -242,12 +247,13 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Critères d'évaluation</label>
+            <label className="text-sm font-medium">Critères d'évaluation *</label>
             <textarea
               name="criteres_evaluation"
               value={formData.criteres_evaluation}
               onChange={handleChange}
               placeholder="Comment évaluer la réussite..."
+              required
               className="w-full h-20 p-3 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none resize-none"
             />
           </div>
@@ -263,12 +269,13 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Vision & Impact</label>
+            <label className="text-sm font-medium">Vision & Impact *</label>
             <textarea
               name="vision_impact"
               value={formData.vision_impact}
               onChange={handleChange}
               placeholder="Pourquoi ce challenge est important..."
+              required
               className="w-full h-20 p-3 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none resize-none"
             />
           </div>
@@ -296,12 +303,13 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Solution proposée</label>
+            <label className="text-sm font-medium">Solution proposée *</label>
             <textarea
               name="solution_proposee"
               value={formData.solution_proposee}
               onChange={handleChange}
               placeholder="Décris ta solution idéale..."
+              required
               className="w-full h-24 p-3 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none resize-none"
             />
           </div>
