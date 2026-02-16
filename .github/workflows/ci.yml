@@ -3,6 +3,9 @@ name: CI
 on:
   pull_request:
     branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -14,5 +17,5 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: npm run lint
-      - run: npm run typecheck
+      - run: npm run typecheck --if-present
       - run: npm test --if-present

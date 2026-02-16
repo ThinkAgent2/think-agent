@@ -89,7 +89,6 @@ export default function ProfilePage() {
   const progressPercent = config.nextLevel ? Math.min(100, Math.max(0, (xpInCurrentLevel / xpForNextLevel) * 100)) : 100;
 
   // Trouver la position de l'utilisateur dans le leaderboard
-  const userRank = leaderboard.findIndex(e => e.user_id === user.id) + 1;
 
   // Badges avec statut obtained
   const badgesWithStatus = allBadges.map(badge => ({

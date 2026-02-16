@@ -99,6 +99,7 @@ export function ChallengeCreateForm({ onSuccess, onCancel }: ChallengeCreateForm
         .split('\n')
         .map((s) => s.trim())
         .filter(Boolean),
+      plan_solution: formData.plan_solution || null,
     };
 
     const created = await createChallenge(newChallenge);

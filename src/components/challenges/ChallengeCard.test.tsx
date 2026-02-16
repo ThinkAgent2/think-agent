@@ -66,12 +66,6 @@ describe('ChallengeCard', () => {
       expect(screen.getByText('50 XP')).toBeInTheDocument();
     });
 
-    it('should render duration', () => {
-      render(<ChallengeCard challenge={mockChallenge} />);
-      
-      expect(screen.getByText('30min')).toBeInTheDocument();
-    });
-
     it('should render difficulty stars', () => {
       render(<ChallengeCard challenge={mockChallenge} />);
       

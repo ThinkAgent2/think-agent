@@ -112,8 +112,8 @@ export function filterChallenges(
 
   if (filters.marque) {
     // Filtre sur marque : affiche les challenges contenant la marque OU transverses ([])
-    result = result.filter((c) => 
-      c.marques.length === 0 || c.marques.includes(filters.marque as any)
+    result = result.filter((c) =>
+      c.marques.length === 0 || c.marques.includes(filters.marque as Challenge['marques'][number])
     );
   }
 

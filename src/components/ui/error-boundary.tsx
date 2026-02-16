@@ -43,9 +43,9 @@ export class ErrorBoundary extends Component<Props, State> {
           <div className="rounded-full bg-destructive/10 p-4 mb-4">
             <AlertTriangle className="h-8 w-8 text-destructive" />
           </div>
-          <h2 className="text-xl font-semibold mb-2">Oups, quelque chose s'est mal passé</h2>
+          <h2 className="text-xl font-semibold mb-2">Oups, quelque chose s&apos;est mal passé</h2>
           <p className="text-muted-foreground mb-4 max-w-md">
-            Une erreur inattendue s'est produite. Nous nous excusons pour la gêne occasionnée.
+            Une erreur inattendue s&apos;est produite. Nous nous excusons pour la gêne occasionnée.
           </p>
           {process.env.NODE_ENV === 'development' && this.state.error && (
             <pre className="text-xs text-left bg-muted p-4 rounded-lg mb-4 max-w-full overflow-auto">
