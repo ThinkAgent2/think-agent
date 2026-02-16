@@ -7,6 +7,28 @@ import type {
 
 const supabase = createClient();
 
+const EXALT_EMAIL_DOMAIN = 'exalt-company.com';
+
+function formatNameFromEmail(email?: string | null): string | null {
+  if (!email) return null;
+  const normalizedEmail = email.toLowerCase();
+  const [localPart, domain] = normalizedEmail.split('@');
+  if (!localPart || domain !== EXALT_EMAIL_DOMAIN) return null;
+
+  const parts = localPart.split('.').filter(Boolean);
+  if (parts.length === 0) return null;
+
+  return parts
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+function shouldUpdateName(user: User, inferredName: string | null): boolean {
+  if (!inferredName) return false;
+  if (!user.nom) return true;
+  return user.nom.trim().toLowerCase() === 'anonyme';
+}
+
 // ==========================================
 // USERS
 // ==========================================
@@ -21,13 +43,23 @@ export async function getUserByEmail(email: string): Promise<User | null> {
   if (error && error.code !== 'PGRST116') {
     console.error('Error fetching user:', error);
   }
+
+  if (data) {
+    const inferredName = formatNameFromEmail(data.email);
+    if (shouldUpdateName(data, inferredName)) {
+      const updated = await updateUser(data.id, { nom: inferredName });
+      return updated ?? { ...data, nom: inferredName };
+    }
+  }
+
   return data;
 }
 
 export async function createUser(email: string): Promise<User | null> {
+  const inferredName = formatNameFromEmail(email);
   const { data, error } = await supabase
     .from('users')
-    .insert({ email })
+    .insert({ email, nom: inferredName })
     .select()
     .single();
 
@@ -413,22 +445,6 @@ export async function updateDojoEvent(
 // ==========================================
 // LEADERBOARD
 // ==========================================
-
-const EXALT_EMAIL_DOMAIN = 'exalt-company.com';
-
-function formatNameFromEmail(email?: string | null): string | null {
-  if (!email) return null;
-  const normalizedEmail = email.toLowerCase();
-  const [localPart, domain] = normalizedEmail.split('@');
-  if (!localPart || domain !== EXALT_EMAIL_DOMAIN) return null;
-
-  const parts = localPart.split('.').filter(Boolean);
-  if (parts.length === 0) return null;
-
-  return parts
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
-}
 
 export async function getLeaderboard(limit: number = 10): Promise<LeaderboardEntry[]> {
   const { data, error } = await supabase
