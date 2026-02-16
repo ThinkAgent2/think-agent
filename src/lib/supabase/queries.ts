@@ -2,7 +2,7 @@ import { createClient } from './client';
 import type { 
   User, Challenge, Participation, Solution, 
   Badge, DojoEvent, ChallengeFilters, LeaderboardEntry,
-  UserLevel
+  UserLevel, ChallengeStatus
 } from '@/types/database';
 import { formatNameFromEmail } from '@/lib/userName';
 
