@@ -25,6 +25,22 @@ const levelConfig: Record<string, { color: string; icon: typeof Brain; nextLevel
   Architecte: { color: 'bg-accent-rose text-white', icon: Crown, nextLevel: null, xpNeeded: null },
 };
 
+const EXALT_EMAIL_DOMAIN = 'exalt-company.com';
+
+function formatNameFromEmail(email?: string | null): string | null {
+  if (!email) return null;
+  const normalizedEmail = email.toLowerCase();
+  const [localPart, domain] = normalizedEmail.split('@');
+  if (!localPart || domain !== EXALT_EMAIL_DOMAIN) return null;
+
+  const parts = localPart.split('.').filter(Boolean);
+  if (parts.length === 0) return null;
+
+  return parts
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
 export default function ProfilePage() {
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
@@ -78,6 +94,7 @@ export default function ProfilePage() {
 
   const config = levelConfig[user.niveau_actuel] || levelConfig.Explorer;
   const LevelIcon = config.icon;
+  const displayName = user.nom || formatNameFromEmail(user.email) || 'Anonyme';
   
   const inProgress = participations.filter(p => p.statut === 'En_cours');
   const completed = participations.filter(p => p.statut === 'Terminé');
@@ -117,7 +134,7 @@ export default function ProfilePage() {
                     
                     <div className="flex-1">
                       <div className="flex flex-wrap items-center gap-3 mb-2">
-                        <h1 className="text-2xl font-bold">{user.nom || 'Anonyme'}</h1>
+                        <h1 className="text-2xl font-bold">{displayName}</h1>
                         <Badge className={config.color}>
                           <LevelIcon className="h-3 w-3 mr-1" />
                           {user.niveau_actuel}
