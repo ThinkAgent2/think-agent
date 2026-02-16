@@ -15,7 +15,7 @@ import {
   Trophy, Zap, Target, Clock, CheckCircle,
   Medal, Crown, Rocket, Brain, Loader2, ArrowLeft
 } from 'lucide-react';
-import { getAllBadges, getLeaderboard, getUserBadges, getUserById, getUserParticipations } from '@/lib/supabase/queries';
+import { getAllBadges, getLeaderboard, getUserBadges, getUserById, getUserParticipations, getUserChallenges } from '@/lib/supabase/queries';
 import { formatNameFromEmail } from '@/lib/userName';
 import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry, User } from '@/types/database';
 
@@ -35,6 +35,7 @@ export default function UserProfilePage() {
   const [allBadges, setAllBadges] = useState<BadgeType[]>([]);
   const [userBadges, setUserBadges] = useState<BadgeType[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [proposedChallenges, setProposedChallenges] = useState<Challenge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -42,12 +43,13 @@ export default function UserProfilePage() {
       if (!userId) return;
       setIsLoading(true);
 
-      const [userData, participationsData, allBadgesData, userBadgesData, leaderboardData] = await Promise.all([
+      const [userData, participationsData, allBadgesData, userBadgesData, leaderboardData, proposedChallengesData] = await Promise.all([
         getUserById(userId),
         getUserParticipations(userId),
         getAllBadges(),
         getUserBadges(userId),
         getLeaderboard(10),
+        getUserChallenges(userId),
       ]);
 
       if (!userData) {
@@ -60,6 +62,7 @@ export default function UserProfilePage() {
       setAllBadges(allBadgesData);
       setUserBadges(userBadgesData);
       setLeaderboard(leaderboardData);
+      setProposedChallenges(proposedChallengesData);
       setIsLoading(false);
     }
 
@@ -201,6 +204,10 @@ export default function UserProfilePage() {
                         <CheckCircle className="h-4 w-4" />
                         Terminés ({completed.length})
                       </TabsTrigger>
+                      <TabsTrigger value="proposes" className="gap-2">
+                        <Medal className="h-4 w-4" />
+                        Challenges proposés ({proposedChallenges.length})
+                      </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="en-cours" className="space-y-3">
@@ -262,6 +269,40 @@ export default function UserProfilePage() {
                                 </p>
                                 <p className="text-xs text-muted-foreground">
                                   {challenge?.niveau_associe}
+                                </p>
+                              </div>
+                              <Button size="sm" variant="outline">Voir</Button>
+                            </div>
+                          </Link>
+                        ))
+                      )}
+                    </TabsContent>
+
+                    <TabsContent value="proposes" className="space-y-3">
+                      {isLoading ? (
+                        <div className="flex justify-center py-8">
+                          <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
+                        </div>
+                      ) : proposedChallenges.length === 0 ? (
+                        <div className="text-center py-8">
+                          <p className="text-muted-foreground mb-4">
+                            Aucun challenge proposé.
+                          </p>
+                        </div>
+                      ) : (
+                        proposedChallenges.map((challenge) => (
+                          <Link
+                            key={challenge.id}
+                            href={`/challenges/${challenge.id}`}
+                            className="block"
+                          >
+                            <div className="flex items-center justify-between p-4 rounded-lg border border-border hover:border-accent-cyan transition-colors">
+                              <div>
+                                <p className="font-medium">
+                                  {challenge.titre}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {challenge.niveau_associe} · {challenge.statut}
                                 </p>
                               </div>
                               <Button size="sm" variant="outline">Voir</Button>
