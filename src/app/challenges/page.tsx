@@ -80,17 +80,25 @@ export default function ChallengesPage() {
 
           <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
             {/* Sidebar filters */}
-            <aside className="lg:sticky lg:top-24 lg:h-fit z-10 space-y-6">
-              {user && (
-                <ProposeChallengeForm
-                  authorId={user.id}
-                  onSuccess={() => {
-                    // refresh challenges list after proposal
-                    getChallenges(filters).then(setChallenges);
-                  }}
-                />
-              )}
+            <aside className="lg:sticky lg:top-24 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto z-10 space-y-6 pr-2">
               <ChallengeFilters filters={filters} onFiltersChange={setFilters} />
+              {user && (
+                <details className="group rounded-xl border border-border bg-card">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 text-sm font-semibold">
+                    <span>Proposer un challenge</span>
+                    <span className="text-muted-foreground group-open:rotate-180 transition-transform">▾</span>
+                  </summary>
+                  <div className="px-3 pb-4">
+                    <ProposeChallengeForm
+                      authorId={user.id}
+                      onSuccess={() => {
+                        // refresh challenges list after proposal
+                        getChallenges(filters).then(setChallenges);
+                      }}
+                    />
+                  </div>
+                </details>
+              )}
             </aside>
 
             {/* Challenges grid */}
