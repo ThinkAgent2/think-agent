@@ -113,15 +113,15 @@ export function ChallengeEditForm({ challenge, onSave, onCancel }: ChallengeEdit
     if (!confirmed) return;
 
     setIsDeleting(true);
-    const success = await deleteChallenge(challenge.id);
+    const result = await deleteChallenge(challenge.id);
     setIsDeleting(false);
 
-    if (success) {
+    if (result.success) {
       alert('Challenge supprimé.');
       onCancel();
       window.location.href = '/challenges';
     } else {
-      alert('Erreur lors de la suppression.');
+      alert(`Erreur lors de la suppression: ${result.error || 'inconnue'}`);
     }
   };
 

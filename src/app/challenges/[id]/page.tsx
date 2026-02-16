@@ -96,7 +96,7 @@ export default function ChallengeDetailPage() {
 
   // Participer au challenge
   const handleParticipate = async () => {
-    if (!user || !challenge) return;
+    if (!user || !challenge || !isPublished) return;
 
     setIsSubmitting(true);
     const newParticipation = await createParticipation(user.id, challenge.id);
@@ -163,6 +163,7 @@ export default function ChallengeDetailPage() {
   const isParticipating = participation?.statut === 'En_cours';
   const hasSubmitted = !!solution;
   const isCompleted = participation?.statut === 'Terminé';
+  const isPublished = challenge.statut === 'Actif' || challenge.statut === 'Publie';
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -522,13 +523,13 @@ export default function ChallengeDetailPage() {
                   ) : (
                     <Button
                       onClick={handleParticipate}
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || !isPublished}
                       className="w-full bg-accent-jaune hover:bg-accent-jaune/80 text-black font-semibold"
                     >
                       {isSubmitting ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        'Participer'
+                        isPublished ? 'Participer' : 'En attente de publication'
                       )}
                     </Button>
                   )}

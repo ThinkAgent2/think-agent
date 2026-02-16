@@ -182,7 +182,7 @@ export async function updateChallenge(
   return data;
 }
 
-export async function deleteChallenge(id: string): Promise<boolean> {
+export async function deleteChallenge(id: string): Promise<{ success: boolean; error: string | null }> {
   const { error } = await supabase
     .from('challenges')
     .delete()
@@ -190,10 +190,10 @@ export async function deleteChallenge(id: string): Promise<boolean> {
 
   if (error) {
     console.error('Error deleting challenge:', error);
-    return false;
+    return { success: false, error: error.message };
   }
 
-  return true;
+  return { success: true, error: null };
 }
 
 export async function createChallenge(
