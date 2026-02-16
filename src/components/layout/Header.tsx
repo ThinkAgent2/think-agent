@@ -14,6 +14,10 @@ const navItems = [
   { href: '/me', label: 'Ma Page', icon: User },
 ];
 
+const adminItems = [
+  { href: '/admin/challenges', label: 'Validation', icon: User },
+];
+
 const levelColors: Record<string, string> = {
   Explorer: 'bg-accent-vert text-black',
   Crafter: 'bg-exalt-blue text-white',
@@ -53,6 +57,23 @@ export function Header() {
               </Link>
             );
           })}
+          {user?.role === 'Administrateur' &&
+            adminItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname.startsWith(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-2 text-sm font-medium transition-colors hover:text-accent-cyan ${
+                    isActive ? 'text-accent-cyan' : 'text-muted-foreground'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  {item.label}
+                </Link>
+              );
+            })}
         </nav>
 
         {/* User section */}
