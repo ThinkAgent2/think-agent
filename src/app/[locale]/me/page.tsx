@@ -213,7 +213,7 @@ export default function ProfilePage() {
                           {user.nom?.split(' ').map(n => n[0]).join('') || user.email[0].toUpperCase()}
                         </AvatarFallback>
                         {featuredBadgeId && (
-                          <AvatarBadge className="text-lg">
+                          <AvatarBadge className="text-xl">
                             {badgesWithStatus.find((badge) => badge.id === featuredBadgeId)?.emoji || '🏅'}
                           </AvatarBadge>
                         )}
