@@ -23,6 +23,7 @@ const THEMES: { value: IdeaTheme; labelKey: string }[] = [
 
 export function IdeaProposalForm({ authorId, onSuccess }: IdeaProposalFormProps) {
   const t = useTranslations('ideas.propose');
+  const tIdeas = useTranslations('ideas');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [formError, setFormError] = useState<string | null>(null);
@@ -132,7 +133,7 @@ export function IdeaProposalForm({ authorId, onSuccess }: IdeaProposalFormProps)
                     size="sm"
                     onClick={() => toggleTheme(theme.value)}
                   >
-                    {t(theme.labelKey)}
+                    {tIdeas(theme.labelKey)}
                   </Button>
                 );
               })}

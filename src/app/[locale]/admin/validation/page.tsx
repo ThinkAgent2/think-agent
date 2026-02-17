@@ -6,8 +6,8 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth';
-import AdminChallengesPage from '@/app/[locale]/admin/challenges/page';
-import AdminIdeasPage from '@/app/[locale]/admin/ideas/page';
+import { AdminChallengesContent } from '@/app/[locale]/admin/challenges/page';
+import { AdminIdeasContent } from '@/app/[locale]/admin/ideas/page';
 
 export default function AdminValidationHubPage() {
   const { user } = useAuth();
@@ -49,7 +49,7 @@ export default function AdminValidationHubPage() {
             </Button>
           </div>
 
-          {view === 'challenges' ? <AdminChallengesPage /> : <AdminIdeasPage />}
+          {view === 'challenges' ? <AdminChallengesContent /> : <AdminIdeasContent />}
         </div>
       </main>
 
