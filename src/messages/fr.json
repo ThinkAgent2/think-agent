@@ -1,0 +1,270 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "retry": "Réessayer",
+    "back": "Retour",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "search": "Rechercher",
+    "noResults": "Aucun résultat",
+    "allBrands": "Toutes marques",
+    "xp": "XP"
+  },
+  "nav": {
+    "challenges": "Challenges",
+    "events": "Événements",
+    "myPage": "Ma Page",
+    "validation": "Validation",
+    "login": "Se connecter",
+    "logout": "Déconnexion"
+  },
+  "home": {
+    "badge": "Plateforme eXalt",
+    "title1": "THINK",
+    "title2": "AGENT",
+    "tagline": "DON'T JUST DO IT! TEACH IT!",
+    "subtitle": "Ne le fais pas toi-même. Enseigne à l'agent comment le faire.",
+    "description": "Développe tes compétences IA en créant des agents auxquels tu enseignes ton expertise métier.",
+    "discoverChallenges": "Découvrir les challenges",
+    "levels": {
+      "title": "3 Niveaux de progression",
+      "explorer": {
+        "name": "Explorer",
+        "quote": "\"Je découvre ce que l'IA peut faire pour moi.\"",
+        "skills": ["Curiosité & expérimentation", "Prompting basique", "Réflexes sécurité"]
+      },
+      "crafter": {
+        "name": "Crafter",
+        "quote": "\"Je crée des outils qui augmentent ma productivité.\"",
+        "skills": ["Création d'assistants", "RAG & Prompt avancé", "Livrables automatisés"]
+      },
+      "architect": {
+        "name": "Architecte",
+        "quote": "\"Je ne fais plus. Je fais faire — et je repense ma valeur.\"",
+        "skills": ["Multi-agents", "Orchestration", "Vision stratégique"]
+      }
+    },
+    "cta": {
+      "badge": "Prêt à transformer ta façon de travailler ?",
+      "title": "C'est maintenant qu'il faut",
+      "highlight": "monter dans le train",
+      "description": "Commence par les challenges Explorer, puis construis tes propres outils et deviens Architecte de ta valeur.",
+      "button": "Commencer maintenant"
+    }
+  },
+  "footer": {
+    "by": "by eXalt"
+  },
+  "login": {
+    "title": "THINK AGENT",
+    "subtitle": "Entre ton email eXalt pour continuer",
+    "placeholder": "prenom.nom@exalt.fr",
+    "continue": "Continuer",
+    "connecting": "Connexion...",
+    "noPassword": "Pas besoin de mot de passe.",
+    "autoCreate": "Si c'est ta première fois, ton compte sera créé automatiquement.",
+    "invalidEmail": "Veuillez entrer une adresse email valide",
+    "genericError": "Une erreur est survenue. Veuillez réessayer."
+  },
+  "challenges": {
+    "catalog": "Catalogue des Challenges",
+    "count": "{count} challenge disponible",
+    "countPlural": "{count} challenges disponibles",
+    "newChallenge": "Nouveau challenge",
+    "proposeChallenge": "Proposer un challenge",
+    "searchPlaceholder": "Rechercher un challenge...",
+    "filters": {
+      "level": "Niveau",
+      "brand": "Marque",
+      "difficulty": "Difficulté",
+      "clearFilters": "Effacer les filtres"
+    },
+    "empty": "Aucun challenge ne correspond à tes critères.",
+    "card": {
+      "seeDetails": "Voir le détail",
+      "continue": "Continuer",
+      "review": "Revoir"
+    },
+    "detail": {
+      "backToCatalog": "Retour au catalogue",
+      "description": "Description",
+      "visionImpact": "Vision & Impact",
+      "didYouKnow": "Le saviez-vous ?",
+      "evaluationCriteria": "Critères d'évaluation",
+      "sourcesReferences": "Sources & Références",
+      "recommendedTools": "Outils recommandés",
+      "notFound": "Challenge non trouvé",
+      "completed": "Complété",
+      "inProgress": "En cours",
+      "submitBelow": "Soumets ta solution ci-dessous",
+      "stopChallenge": "Arrêter le challenge",
+      "participate": "Participer",
+      "pendingPublication": "En attente de publication",
+      "loginToParticipate": "Connecte-toi pour participer",
+      "challengeCompleted": "Challenge complété !"
+    },
+    "submit": {
+      "title": "Soumettre ta solution",
+      "descriptionLabel": "Description de ta solution",
+      "descriptionPlaceholder": "Décris ta solution, ton approche, colle tes prompts...",
+      "attachments": "Fichiers joints (optionnel)",
+      "submitButton": "Soumettre",
+      "sending": "Envoi...",
+      "solutionSubmitted": "Solution soumise"
+    },
+    "propose": {
+      "title": "Proposer un challenge",
+      "subtitle": "Décris ton challenge et propose ta solution. Un admin validera avant publication.",
+      "loginRequired": "Connecte-toi pour proposer un challenge.",
+      "form": {
+        "titleLabel": "Titre *",
+        "titlePlaceholder": "Ex: Audit IA interne",
+        "descriptionLabel": "Description *",
+        "descriptionPlaceholder": "Décris le challenge, son objectif...",
+        "level": "Niveau",
+        "type": "Type",
+        "difficulty": "Difficulté",
+        "xp": "XP",
+        "participants": "Participants",
+        "evaluationCriteria": "Critères d'évaluation *",
+        "evaluationPlaceholder": "Comment évaluer la réussite...",
+        "recommendedTools": "Outils recommandés",
+        "recommendedToolsPlaceholder": "ChatGPT, Notion...",
+        "visionImpact": "Vision & Impact *",
+        "visionPlaceholder": "Pourquoi ce challenge est important...",
+        "didYouKnow": "Le saviez-vous ?",
+        "didYouKnowPlaceholder": "Anecdote ou hook engageant...",
+        "sources": "Sources & Références",
+        "sourcesPlaceholder": "Une URL par ligne...",
+        "proposedSolution": "Solution proposée *",
+        "proposedSolutionPlaceholder": "Décris ta solution idéale...",
+        "attachments": "Pièces jointes (optionnel)",
+        "brands": "Marques concernées",
+        "themes": "Thématiques IA",
+        "vortexPhase": "Phase Vortex",
+        "vortexNotDefined": "Non définie",
+        "submit": "Proposer",
+        "sending": "Envoi...",
+        "success": "Challenge proposé ! Un admin va le valider.",
+        "errorRequired": "Titre et description sont obligatoires",
+        "errorRequiredFull": "Critères d'évaluation, Vision & Impact et Solution proposée sont obligatoires",
+        "errorDuplicate": "Un challenge avec ce titre existe déjà.",
+        "errorGeneric": "Erreur lors de la proposition."
+      }
+    }
+  },
+  "events": {
+    "title": "Événements Dojo",
+    "subtitle": "Ateliers pratiques pour progresser ensemble. Inscription via 360 Learning.",
+    "newEvent": "Nouvel événement",
+    "editEvent": "Modifier l'événement",
+    "upcoming": "Prochains événements",
+    "past": "Événements passés",
+    "empty": {
+      "title": "Aucun événement prévu pour le moment.",
+      "subtitle": "Reviens bientôt pour découvrir les prochains Dojos !"
+    },
+    "card": {
+      "online": "En ligne",
+      "inPerson": "Présentiel",
+      "ongoing": "En cours",
+      "finished": "Terminé",
+      "participantsMax": "{count} participants max",
+      "location": "Locaux eXalt Paris",
+      "registerOn360": "S'inscrire sur 360 Learning",
+      "linkComingSoon": "Lien d'inscription à venir",
+      "eventFinished": "Événement terminé"
+    }
+  },
+  "profile": {
+    "challengesCompleted": "challenges terminés",
+    "inProgress": "en cours",
+    "myChallenges": "Mes Challenges",
+    "challenges": "Challenges",
+    "tabs": {
+      "inProgress": "En cours",
+      "completed": "Terminés",
+      "proposed": "Challenges proposés"
+    },
+    "empty": {
+      "inProgress": "Aucun challenge en cours.",
+      "completed": "Aucun challenge terminé pour le moment.",
+      "proposed": "Aucun challenge proposé pour le moment.",
+      "exploreChallenges": "Explorer les challenges"
+    },
+    "refused": "Refusé",
+    "backToMyProfile": "Retour à mon profil"
+  },
+  "badges": {
+    "title": "Badges"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "global": "Top 10 global",
+    "entity": "Top 10 par entité",
+    "circle": "Top 10 par cercle",
+    "scope": {
+      "global": "Global",
+      "entity": "Entité",
+      "circle": "Cercle"
+    },
+    "searchUser": "Rechercher un utilisateur",
+    "searching": "Recherche...",
+    "noRanking": "Pas encore de classement",
+    "you": "(toi)",
+    "currentProfile": "(profil)"
+  },
+  "admin": {
+    "validation": {
+      "title": "Validation des challenges",
+      "subtitle": "Valide les challenges proposés et publie-les.",
+      "accessDenied": "Accès réservé aux administrateurs.",
+      "noPending": "Aucun challenge en attente.",
+      "validate": "Valider",
+      "publish": "Publier",
+      "reject": "Refuser",
+      "rejectionComment": "Commentaire de refus",
+      "rejectionPlaceholder": "Explique pourquoi le challenge est refusé",
+      "rejectionRequired": "Ajoute un commentaire pour le refus.",
+      "proposedSolution": "Solution proposée",
+      "attachments": "Pièces jointes"
+    }
+  },
+  "states": {
+    "loading": "Chargement...",
+    "error": {
+      "title": "Une erreur est survenue",
+      "message": "Impossible de charger les données. Veuillez réessayer.",
+      "retry": "Réessayer"
+    },
+    "empty": {
+      "title": "Aucun résultat",
+      "message": "Aucun élément à afficher pour le moment."
+    }
+  },
+  "vortex": {
+    "contextualize": "1. Cadrer",
+    "empathize": "2. Découvrir",
+    "synthesize": "3. Définir",
+    "hypothesize": "4. Idéer",
+    "externalize": "5. Construire",
+    "sensitize": "6. Tester",
+    "systematize": "7. Apprendre"
+  },
+  "themes": {
+    "knowledge": "📚 Knowledge & Formation",
+    "content": "✍️ Création de contenu",
+    "data": "📊 Data & Analyse",
+    "automation": "🤖 Automatisation & Workflows",
+    "agents": "💬 Agents & Assistants",
+    "strategy": "💼 Stratégie & Conseil",
+    "code": "🧑‍💻 Code & Développement",
+    "design": "🎨 Design & UX",
+    "research": "🔍 Recherche & Veille",
+    "prompting": "🧠 Prompt Engineering"
+  }
+}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -54,6 +55,8 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
     solution_proposee: '',
   });
 
+  const t = useTranslations('challenges.propose.form');
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -75,12 +78,12 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
     setFormError(null);
 
     if (!formData.titre.trim() || !formData.description.trim()) {
-      setFormError('Titre et description sont obligatoires');
+      setFormError(t('errorRequired'));
       return;
     }
 
     if (!formData.criteres_evaluation.trim() || !formData.vision_impact.trim() || !formData.solution_proposee.trim()) {
-      setFormError('Critères d\'évaluation, Vision & Impact et Solution proposée sont obligatoires');
+      setFormError(t('errorRequiredFull'));
       return;
     }
 
@@ -89,7 +92,7 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
     const existing = await findChallengeByTitle(formData.titre.trim());
     if (existing && existing.statut !== 'Refuse') {
       setIsSubmitting(false);
-      setFormError('Un challenge avec ce titre existe déjà.');
+      setFormError(t('errorDuplicate'));
       return;
     }
 
@@ -129,7 +132,7 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
     if (data) {
       onSuccess?.(data);
       setFormError(null);
-      alert('Challenge proposé ! Un admin va le valider.');
+      alert(t('success'));
       setFormData((prev) => ({
         ...prev,
         titre: '',
@@ -142,14 +145,14 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
         solution_proposee: '',
       }));
     } else {
-      setFormError(error || 'Erreur lors de la proposition.');
+      setFormError(error || t('errorGeneric'));
     }
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Proposer un challenge</CardTitle>
+        <CardTitle>{useTranslations('challenges.propose')('title')}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -159,23 +162,23 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
             </div>
           )}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Titre *</label>
+            <label className="text-sm font-medium">{t('titleLabel')}</label>
             <Input
               name="titre"
               value={formData.titre}
               onChange={handleChange}
-              placeholder="Ex: Audit IA interne"
+              placeholder={t('titlePlaceholder')}
               required
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Description *</label>
+            <label className="text-sm font-medium">{t('descriptionLabel')}</label>
             <textarea
               name="description"
               value={formData.description}
               onChange={handleChange}
-              placeholder="Décris le challenge, son objectif..."
+              placeholder={t('descriptionPlaceholder')}
               required
               className="w-full h-24 p-3 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none resize-none"
             />
@@ -183,7 +186,7 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
 
           <div className="grid grid-cols-1 gap-3">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Niveau</label>
+              <label className="text-sm font-medium">{t('level')}</label>
               <select
                 name="niveau_associe"
                 value={formData.niveau_associe}
@@ -200,23 +203,23 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Type</label>
+                <label className="text-sm font-medium">{t('type')}</label>
                 <select
                   name="type"
                   value={formData.type}
                   onChange={handleChange}
                   className="w-full p-2 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none"
                 >
-                  {TYPES.map((t) => (
-                    <option key={t} value={t}>
-                      {t.replace('_', ' ')}
+                  {TYPES.map((tp) => (
+                    <option key={tp} value={tp}>
+                      {tp.replace('_', ' ')}
                     </option>
                   ))}
                 </select>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Difficulté</label>
+                <label className="text-sm font-medium">{t('difficulty')}</label>
                 <select
                   name="difficulte"
                   value={formData.difficulte}
@@ -234,7 +237,7 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <label className="text-sm font-medium">XP</label>
+                <label className="text-sm font-medium">{t('xp')}</label>
                 <Input
                   name="xp"
                   type="number"
@@ -245,7 +248,7 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Participants</label>
+                <label className="text-sm font-medium">{t('participants')}</label>
                 <select
                   name="participants"
                   value={formData.participants}
@@ -263,68 +266,68 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Critères d'évaluation *</label>
+            <label className="text-sm font-medium">{t('evaluationCriteria')}</label>
             <textarea
               name="criteres_evaluation"
               value={formData.criteres_evaluation}
               onChange={handleChange}
-              placeholder="Comment évaluer la réussite..."
+              placeholder={t('evaluationPlaceholder')}
               required
               className="w-full h-20 p-3 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none resize-none"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Outils recommandés</label>
+            <label className="text-sm font-medium">{t('recommendedTools')}</label>
             <Input
               name="outils_recommandes"
               value={formData.outils_recommandes}
               onChange={handleChange}
-              placeholder="ChatGPT, Notion..."
+              placeholder={t('recommendedToolsPlaceholder')}
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Vision & Impact *</label>
+            <label className="text-sm font-medium">{t('visionImpact')}</label>
             <textarea
               name="vision_impact"
               value={formData.vision_impact}
               onChange={handleChange}
-              placeholder="Pourquoi ce challenge est important..."
+              placeholder={t('visionPlaceholder')}
               required
               className="w-full h-20 p-3 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none resize-none"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Le saviez-vous ?</label>
+            <label className="text-sm font-medium">{t('didYouKnow')}</label>
             <textarea
               name="le_saviez_vous"
               value={formData.le_saviez_vous}
               onChange={handleChange}
-              placeholder="Anecdote ou hook engageant..."
+              placeholder={t('didYouKnowPlaceholder')}
               className="w-full h-20 p-3 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none resize-none"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Sources & Références</label>
+            <label className="text-sm font-medium">{t('sources')}</label>
             <textarea
               name="sources"
               value={formData.sources}
               onChange={handleChange}
-              placeholder="Une URL par ligne..."
+              placeholder={t('sourcesPlaceholder')}
               className="w-full h-20 p-3 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none resize-none"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Solution proposée *</label>
+            <label className="text-sm font-medium">{t('proposedSolution')}</label>
             <textarea
               name="solution_proposee"
               value={formData.solution_proposee}
               onChange={handleChange}
-              placeholder="Décris ta solution idéale..."
+              placeholder={t('proposedSolutionPlaceholder')}
               required
               className="w-full h-24 p-3 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none resize-none"
             />
@@ -333,7 +336,7 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
           <div className="space-y-2">
             <label className="text-sm font-medium flex items-center gap-2">
               <Paperclip className="h-4 w-4" />
-              Pièces jointes (optionnel)
+              {t('attachments')}
             </label>
             <FileUpload
               userId={authorId}
@@ -345,7 +348,7 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Marques concernées</label>
+            <label className="text-sm font-medium">{t('brands')}</label>
             <MultiSelectMarques
               value={formData.marques}
               onChange={handleMarquesChange}
@@ -353,7 +356,7 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Thématiques IA</label>
+            <label className="text-sm font-medium">{t('themes')}</label>
             <MultiSelectThematiques
               value={formData.thematiques}
               onChange={handleThematiquesChange}
@@ -361,14 +364,14 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Phase Vortex</label>
+            <label className="text-sm font-medium">{t('vortexPhase')}</label>
             <select
               name="etape_vortex"
               value={formData.etape_vortex}
               onChange={handleChange}
               className="w-full p-2 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none"
             >
-              <option value="">Non définie</option>
+              <option value="">{t('vortexNotDefined')}</option>
               {VORTEX_STAGES.map((stage) => (
                 <option key={stage.value} value={stage.value}>
                   {stage.label}
@@ -385,12 +388,12 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
             {isSubmitting ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Envoi...
+                {t('sending')}
               </>
             ) : (
               <>
                 <Send className="w-4 h-4 mr-2" />
-                Proposer
+                {t('submit')}
               </>
             )}
           </Button>

@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import Link from 'next/link';
+import { useTranslations, useLocale } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -32,16 +33,6 @@ const levelConfig: Record<string, { color: string; bgColor: string }> = {
   Architecte: { color: 'text-accent-rose', bgColor: 'bg-accent-rose' },
 };
 
-const VORTEX_LABELS: Record<VortexStage, string> = {
-  contextualize: '1. Cadrer',
-  empathize: '2. Découvrir',
-  synthesize: '3. Définir',
-  hypothesize: '4. Idéer',
-  externalize: '5. Construire',
-  sensitize: '6. Tester',
-  systematize: '7. Apprendre',
-};
-
 const THEMATIQUE_LABELS: Record<Thematique, { emoji: string; label: string }> = {
   knowledge: { emoji: '📚', label: 'Knowledge & Formation' },
   content: { emoji: '✍️', label: 'Création de contenu' },
@@ -57,8 +48,14 @@ const THEMATIQUE_LABELS: Record<Thematique, { emoji: string; label: string }> = 
 
 export default function ChallengeDetailPage() {
   const params = useParams();
+  const locale = useLocale();
   const { user } = useAuth();
   const challengeId = params.id as string;
+  const t = useTranslations('challenges.detail');
+  const tSubmit = useTranslations('challenges.submit');
+  const tCommon = useTranslations('common');
+  const tVortex = useTranslations('vortex');
+  const tNav = useTranslations('nav');
 
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [participation, setParticipation] = useState<Participation | null>(null);
@@ -72,12 +69,17 @@ export default function ChallengeDetailPage() {
   // Vérifier si l'utilisateur est admin
   const isAdmin = user?.role === 'Administrateur';
 
+  // Helper to get localized vortex label
+  const getVortexLabel = (stage: VortexStage): string => {
+    return tVortex(stage);
+  };
+
   // Charger les données
   useEffect(() => {
     async function loadData() {
       setIsLoading(true);
       
-      const challengeData = await getChallengeById(challengeId);
+      const challengeData = await getChallengeById(challengeId, locale);
       setChallenge(challengeData);
 
       if (user && challengeData) {
@@ -92,7 +94,7 @@ export default function ChallengeDetailPage() {
       setIsLoading(false);
     }
     loadData();
-  }, [challengeId, user]);
+  }, [challengeId, user, locale]);
 
   // Participer au challenge
   const handleParticipate = async () => {
@@ -149,9 +151,9 @@ export default function ChallengeDetailPage() {
       <div className="flex min-h-screen flex-col">
         <Header />
         <main className="flex-1 flex flex-col items-center justify-center gap-4">
-          <p className="text-xl text-muted-foreground">Challenge non trouvé</p>
+          <p className="text-xl text-muted-foreground">{t('notFound')}</p>
           <Link href="/challenges">
-            <Button variant="outline">Retour au catalogue</Button>
+            <Button variant="outline">{t('backToCatalog')}</Button>
           </Link>
         </main>
         <Footer />
@@ -177,7 +179,7 @@ export default function ChallengeDetailPage() {
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent-cyan transition-colors mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
-            Retour au catalogue
+            {t('backToCatalog')}
           </Link>
 
           {/* Mode édition */}
@@ -203,11 +205,11 @@ export default function ChallengeDetailPage() {
                   <Badge key={marque} variant="outline">{marque}</Badge>
                 ))
               ) : (
-                <Badge variant="outline" className="text-muted-foreground">Toutes marques</Badge>
+                <Badge variant="outline" className="text-muted-foreground">{tCommon('allBrands')}</Badge>
               )}
               {challenge.etape_vortex && (
                 <Badge variant="outline" className="bg-accent-rose/10 border-accent-rose text-accent-rose">
-                  {VORTEX_LABELS[challenge.etape_vortex]}
+                  {getVortexLabel(challenge.etape_vortex)}
                 </Badge>
               )}
               {challenge.thematiques && challenge.thematiques.length > 0 && (
@@ -220,7 +222,7 @@ export default function ChallengeDetailPage() {
               {isCompleted && (
                 <Badge className="bg-accent-vert text-black">
                   <CheckCircle className="h-3 w-3 mr-1" />
-                  Complété
+                  {t('completed')}
                 </Badge>
               )}
             </div>
@@ -235,7 +237,7 @@ export default function ChallengeDetailPage() {
                   className="border-accent-cyan text-accent-cyan hover:bg-accent-cyan hover:text-black"
                 >
                   <Pencil className="h-4 w-4 mr-2" />
-                  Modifier
+                  {tCommon('edit')}
                 </Button>
               )}
             </div>
@@ -256,7 +258,7 @@ export default function ChallengeDetailPage() {
               </div>
               <div className="flex items-center gap-1 text-accent-jaune font-semibold">
                 <Zap className="h-4 w-4" />
-                {challenge.xp} XP
+                {challenge.xp} {tCommon('xp')}
               </div>
             </div>
           </div>
@@ -269,7 +271,7 @@ export default function ChallengeDetailPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <FileText className="h-5 w-5" />
-                    Description
+                    {t('description')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -285,7 +287,7 @@ export default function ChallengeDetailPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-accent-cyan">
                       <Zap className="h-5 w-5" />
-                      Vision &amp; Impact
+                      {t('visionImpact')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -302,7 +304,7 @@ export default function ChallengeDetailPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-accent-jaune">
                       <Star className="h-5 w-5" />
-                      Le saviez-vous ?
+                      {t('didYouKnow')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -319,7 +321,7 @@ export default function ChallengeDetailPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Target className="h-5 w-5" />
-                      Critères d&apos;évaluation
+                      {t('evaluationCriteria')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -336,7 +338,7 @@ export default function ChallengeDetailPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <FileText className="h-5 w-5" />
-                      Sources &amp; Références
+                      {t('sourcesReferences')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -371,15 +373,15 @@ export default function ChallengeDetailPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Send className="h-5 w-5" />
-                      Soumettre ta solution
+                      {tSubmit('title')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     {/* Texte */}
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Description de ta solution</label>
+                      <label className="text-sm font-medium">{tSubmit('descriptionLabel')}</label>
                       <textarea
-                        placeholder="Décris ta solution, ton approche, colle tes prompts..."
+                        placeholder={tSubmit('descriptionPlaceholder')}
                         value={solutionText}
                         onChange={(e) => setSolutionText(e.target.value)}
                         className="w-full h-48 p-4 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none resize-none"
@@ -390,7 +392,7 @@ export default function ChallengeDetailPage() {
                     <div className="space-y-2">
                       <label className="text-sm font-medium flex items-center gap-2">
                         <Paperclip className="h-4 w-4" />
-                        Fichiers joints (optionnel)
+                        {tSubmit('attachments')}
                       </label>
                       <FileUpload
                         userId={user.id}
@@ -410,12 +412,12 @@ export default function ChallengeDetailPage() {
                       {isSubmitting ? (
                         <>
                           <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Envoi...
+                          {tSubmit('sending')}
                         </>
                       ) : (
                         <>
                           <Send className="h-4 w-4 mr-2" />
-                          Soumettre
+                          {tSubmit('submitButton')}
                         </>
                       )}
                     </Button>
@@ -429,7 +431,7 @@ export default function ChallengeDetailPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-accent-vert">
                       <CheckCircle className="h-5 w-5" />
-                      Solution soumise
+                      {tSubmit('solutionSubmitted')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -447,7 +449,7 @@ export default function ChallengeDetailPage() {
                       <div className="space-y-2">
                         <p className="text-sm font-medium flex items-center gap-2">
                           <Paperclip className="h-4 w-4" />
-                          Fichiers joints
+                          {tSubmit('attachments')}
                         </p>
                         <div className="flex flex-wrap gap-2">
                           {(solution.fichiers_attaches as string[]).map((url, index) => {
@@ -482,19 +484,19 @@ export default function ChallengeDetailPage() {
                   {!user ? (
                     <div className="text-center space-y-4">
                       <p className="text-sm text-muted-foreground">
-                        Connecte-toi pour participer
+                        {t('loginToParticipate')}
                       </p>
                       <Link href="/login">
                         <Button className="w-full bg-accent-jaune hover:bg-accent-jaune/80 text-black font-semibold">
-                          Se connecter
+                          {tNav('login')}
                         </Button>
                       </Link>
                     </div>
                   ) : isCompleted ? (
                     <div className="text-center space-y-2">
                       <CheckCircle className="h-12 w-12 mx-auto text-accent-vert" />
-                      <p className="font-semibold text-accent-vert">Challenge complété !</p>
-                      <p className="text-sm text-muted-foreground">+{challenge.xp} XP</p>
+                      <p className="font-semibold text-accent-vert">{t('challengeCompleted')}</p>
+                      <p className="text-sm text-muted-foreground">+{challenge.xp} {tCommon('xp')}</p>
                     </div>
                   ) : isParticipating ? (
                     <div className="text-center space-y-4">
@@ -502,8 +504,8 @@ export default function ChallengeDetailPage() {
                         <div className="h-12 w-12 mx-auto rounded-full bg-accent-cyan/20 flex items-center justify-center">
                           <Clock className="h-6 w-6 text-accent-cyan" />
                         </div>
-                        <p className="font-semibold text-accent-cyan">En cours</p>
-                        <p className="text-sm text-muted-foreground">Soumets ta solution ci-dessous</p>
+                        <p className="font-semibold text-accent-cyan">{t('inProgress')}</p>
+                        <p className="text-sm text-muted-foreground">{t('submitBelow')}</p>
                       </div>
                       <Button
                         onClick={handleAbandon}
@@ -517,7 +519,7 @@ export default function ChallengeDetailPage() {
                         ) : (
                           <XCircle className="h-4 w-4 mr-2" />
                         )}
-                        Arrêter le challenge
+                        {t('stopChallenge')}
                       </Button>
                     </div>
                   ) : (
@@ -529,7 +531,7 @@ export default function ChallengeDetailPage() {
                       {isSubmitting ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        isPublished ? 'Participer' : 'En attente de publication'
+                        isPublished ? t('participate') : t('pendingPublication')
                       )}
                     </Button>
                   )}
@@ -542,7 +544,7 @@ export default function ChallengeDetailPage() {
                   <CardHeader className="pb-3">
                     <CardTitle className="text-lg flex items-center gap-2">
                       <Wrench className="h-5 w-5" />
-                      Outils recommandés
+                      {t('recommendedTools')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>

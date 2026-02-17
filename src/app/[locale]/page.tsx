@@ -1,4 +1,7 @@
-import Link from 'next/link';
+'use client';
+
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Zap, ArrowRight, Brain, Rocket, Crown } from 'lucide-react';
@@ -6,6 +9,8 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
 export default function HomePage() {
+  const t = useTranslations('home');
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -18,34 +23,34 @@ export default function HomePage() {
           
           <div className="container relative mx-auto px-4 text-center">
             <Badge className="mb-6 bg-accent-cyan/20 text-accent-cyan border-accent-cyan">
-              Plateforme eXalt
+              {t('badge')}
             </Badge>
             
             <h1 className="mb-6 text-5xl md:text-7xl font-black tracking-tight">
-              <span className="text-exalt-blue">THINK</span>{' '}
-              <span className="text-accent-rose">AGENT</span>
+              <span className="text-exalt-blue">{t('title1')}</span>{' '}
+              <span className="text-accent-rose">{t('title2')}</span>
             </h1>
             
             <p className="mb-4 text-2xl md:text-3xl font-bold text-accent-jaune">
-              DON&apos;T JUST DO IT! TEACH IT!
+              {t('tagline')}
             </p>
             
             <p className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground">
-              Ne le fais pas toi-même. Enseigne à l&apos;agent comment le faire.
+              {t('subtitle')}
               <br />
-              Développe tes compétences IA en créant des agents auxquels tu enseignes ton expertise métier.
+              {t('description')}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/challenges">
                 <Button size="lg" className="bg-accent-jaune hover:bg-accent-jaune/80 text-black font-bold text-lg px-8 py-6">
-                  Découvrir les challenges
+                  {t('discoverChallenges')}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
               <Link href="/login">
                 <Button size="lg" variant="outline" className="border-accent-cyan text-accent-cyan hover:bg-accent-cyan hover:text-black font-bold text-lg px-8 py-6">
-                  Se connecter
+                  {useTranslations('nav')('login')}
                 </Button>
               </Link>
             </div>
@@ -56,7 +61,7 @@ export default function HomePage() {
         <section className="py-20 bg-card/50">
           <div className="container mx-auto px-4">
             <h2 className="mb-12 text-center text-3xl md:text-4xl font-bold">
-              3 Niveaux de progression
+              {t('levels.title')}
             </h2>
 
             <div className="grid gap-8 md:grid-cols-3">
@@ -65,14 +70,14 @@ export default function HomePage() {
                 <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-accent-vert/20">
                   <Brain className="h-8 w-8 text-accent-vert" />
                 </div>
-                <Badge className="mb-4 bg-accent-vert text-black">Explorer</Badge>
+                <Badge className="mb-4 bg-accent-vert text-black">{t('levels.explorer.name')}</Badge>
                 <p className="mb-4 text-lg italic text-muted-foreground">
-                  &quot;Je découvre ce que l&apos;IA peut faire pour moi.&quot;
+                  {t('levels.explorer.quote')}
                 </p>
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>• Curiosité & expérimentation</li>
-                  <li>• Prompting basique</li>
-                  <li>• Réflexes sécurité</li>
+                  {(t.raw('levels.explorer.skills') as string[]).map((skill, i) => (
+                    <li key={i}>• {skill}</li>
+                  ))}
                 </ul>
               </div>
 
@@ -81,14 +86,14 @@ export default function HomePage() {
                 <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-exalt-blue/20">
                   <Rocket className="h-8 w-8 text-exalt-blue" />
                 </div>
-                <Badge className="mb-4 bg-exalt-blue text-white">Crafter</Badge>
+                <Badge className="mb-4 bg-exalt-blue text-white">{t('levels.crafter.name')}</Badge>
                 <p className="mb-4 text-lg italic text-muted-foreground">
-                  &quot;Je crée des outils qui augmentent ma productivité.&quot;
+                  {t('levels.crafter.quote')}
                 </p>
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>• Création d&apos;assistants</li>
-                  <li>• RAG & Prompt avancé</li>
-                  <li>• Livrables automatisés</li>
+                  {(t.raw('levels.crafter.skills') as string[]).map((skill, i) => (
+                    <li key={i}>• {skill}</li>
+                  ))}
                 </ul>
               </div>
 
@@ -97,14 +102,14 @@ export default function HomePage() {
                 <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-accent-rose/20">
                   <Crown className="h-8 w-8 text-accent-rose" />
                 </div>
-                <Badge className="mb-4 bg-accent-rose text-white">Architecte</Badge>
+                <Badge className="mb-4 bg-accent-rose text-white">{t('levels.architect.name')}</Badge>
                 <p className="mb-4 text-lg italic text-muted-foreground">
-                  &quot;Je ne fais plus. Je fais faire — et je repense ma valeur.&quot;
+                  {t('levels.architect.quote')}
                 </p>
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>• Multi-agents</li>
-                  <li>• Orchestration</li>
-                  <li>• Vision stratégique</li>
+                  {(t.raw('levels.architect.skills') as string[]).map((skill, i) => (
+                    <li key={i}>• {skill}</li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -116,20 +121,20 @@ export default function HomePage() {
           <div className="container mx-auto px-4 text-center">
             <div className="inline-flex items-center gap-2 rounded-full bg-accent-jaune/10 px-6 py-2 text-accent-jaune mb-8">
               <Zap className="h-5 w-5" />
-              <span className="font-medium">Prêt à transformer ta façon de travailler ?</span>
+              <span className="font-medium">{t('cta.badge')}</span>
             </div>
             
             <h2 className="mb-6 text-3xl md:text-4xl font-bold">
-               C&apos;est maintenant qu&apos;il faut <span className="text-exalt-blue">monter dans le train</span>.
+              {t('cta.title')} <span className="text-exalt-blue">{t('cta.highlight')}</span>.
             </h2>
             
             <p className="mx-auto mb-10 max-w-xl text-muted-foreground">
-              Commence par les challenges Explorer, puis construis tes propres outils et deviens Architecte de ta valeur.
+              {t('cta.description')}
             </p>
 
             <Link href="/challenges">
               <Button size="lg" className="bg-exalt-blue hover:bg-exalt-blue/80 text-white font-bold text-lg px-10 py-6">
-                Commencer maintenant
+                {t('cta.button')}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>

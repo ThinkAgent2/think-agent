@@ -1,21 +1,22 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar, Clock, MapPin, Users, ExternalLink, Video, Building, Loader2, Plus, Pencil } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { useAuth } from '@/lib/auth';
 import { getDojoEvents } from '@/lib/supabase/queries';
 import { DojoEventForm } from '@/components/events/DojoEventForm';
 import type { DojoEvent } from '@/types/database';
 
-function formatDate(dateString: string): string {
+function formatDate(dateString: string, locale: string): string {
   const date = new Date(dateString);
-  return date.toLocaleDateString('fr-FR', {
+  return date.toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -23,9 +24,9 @@ function formatDate(dateString: string): string {
   });
 }
 
-function formatTime(dateString: string): string {
+function formatTime(dateString: string, locale: string): string {
   const date = new Date(dateString);
-  return date.toLocaleTimeString('fr-FR', {
+  return date.toLocaleTimeString(locale === 'fr' ? 'fr-FR' : 'en-US', {
     hour: '2-digit',
     minute: '2-digit',
   });
@@ -60,10 +61,11 @@ function formatDuration(dateDebut: string, dateFin: string): string {
   return `${hours}h${mins.toString().padStart(2, '0')}`;
 }
 
-function EventCard({ event, isAdmin, onEdit }: { event: DojoEvent; isAdmin: boolean; onEdit: () => void }) {
+function EventCard({ event, isAdmin, onEdit, locale }: { event: DojoEvent; isAdmin: boolean; onEdit: () => void; locale: string }) {
   const status = getEventStatus(event);
   const isPast = status === 'past';
   const isOngoing = status === 'ongoing';
+  const t = useTranslations('events.card');
 
   return (
     <Card className={`overflow-hidden transition-all duration-300 hover:glow-cyan ${isPast ? 'opacity-60' : ''}`}>
@@ -73,22 +75,22 @@ function EventCard({ event, isAdmin, onEdit }: { event: DojoEvent; isAdmin: bool
             {event.format === 'En_Ligne' ? (
               <Badge variant="outline" className="border-accent-cyan text-accent-cyan">
                 <Video className="h-3 w-3 mr-1" />
-                En ligne
+                {t('online')}
               </Badge>
             ) : (
               <Badge variant="outline" className="border-accent-jaune text-accent-jaune">
                 <Building className="h-3 w-3 mr-1" />
-                Présentiel
+                {t('inPerson')}
               </Badge>
             )}
             {isOngoing && (
               <Badge className="bg-accent-vert text-black animate-pulse">
-                En cours
+                {t('ongoing')}
               </Badge>
             )}
             {isPast && (
               <Badge variant="secondary">
-                Terminé
+                {t('finished')}
               </Badge>
             )}
           </div>
@@ -124,28 +126,28 @@ function EventCard({ event, isAdmin, onEdit }: { event: DojoEvent; isAdmin: bool
           {/* Date */}
           <div className="flex items-center gap-3 text-sm">
             <Calendar className="h-4 w-4 text-exalt-blue" />
-            <span className="capitalize">{formatDate(event.date_debut)}</span>
+            <span className="capitalize">{formatDate(event.date_debut, locale)}</span>
           </div>
 
           {/* Horaire + Durée */}
           <div className="flex items-center gap-3 text-sm">
             <Clock className="h-4 w-4 text-accent-cyan" />
             <span>
-              {formatTime(event.date_debut)} - {formatTime(event.date_fin)} ({formatDuration(event.date_debut, event.date_fin)})
+              {formatTime(event.date_debut, locale)} - {formatTime(event.date_fin, locale)} ({formatDuration(event.date_debut, event.date_fin)})
             </span>
           </div>
 
           {/* Capacité */}
           <div className="flex items-center gap-3 text-sm text-muted-foreground">
             <Users className="h-4 w-4" />
-            <span>{event.capacite} participants max</span>
+            <span>{t('participantsMax', { count: event.capacite })}</span>
           </div>
 
           {/* Lieu si présentiel */}
           {event.format === 'Présentiel' && (
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
               <MapPin className="h-4 w-4" />
-              <span>Locaux eXalt Paris</span>
+              <span>{t('location')}</span>
             </div>
           )}
         </div>
@@ -155,18 +157,18 @@ function EventCard({ event, isAdmin, onEdit }: { event: DojoEvent; isAdmin: bool
           event.lien_360learning ? (
             <a href={event.lien_360learning} target="_blank" rel="noopener noreferrer">
               <Button className="w-full bg-accent-jaune hover:bg-accent-jaune/80 text-black font-semibold">
-                S&apos;inscrire sur 360 Learning
+                {t('registerOn360')}
                 <ExternalLink className="h-4 w-4 ml-2" />
               </Button>
             </a>
           ) : (
             <Button disabled variant="outline" className="w-full">
-              Lien d&apos;inscription à venir
+              {t('linkComingSoon')}
             </Button>
           )
         ) : (
           <Button disabled variant="outline" className="w-full">
-            Événement terminé
+            {t('eventFinished')}
           </Button>
         )}
       </CardContent>
@@ -176,20 +178,22 @@ function EventCard({ event, isAdmin, onEdit }: { event: DojoEvent; isAdmin: bool
 
 export default function EventsPage() {
   const { user } = useAuth();
+  const locale = useLocale();
   const [events, setEvents] = useState<DojoEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [editingEvent, setEditingEvent] = useState<DojoEvent | null>(null);
 
   const isAdmin = user?.role === 'Administrateur';
+  const t = useTranslations('events');
 
   useEffect(() => {
     async function loadEvents() {
-      const data = await getDojoEvents();
+      const data = await getDojoEvents(locale);
       setEvents(data);
       setIsLoading(false);
     }
     loadEvents();
-  }, []);
+  }, [locale]);
 
   // Trier les événements : à venir d'abord, puis passés
   const sortedEvents = [...events].sort((a, b) => {
@@ -216,16 +220,16 @@ export default function EventsPage() {
           {/* Page header */}
           <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">Événements Dojo</h1>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2">{t('title')}</h1>
               <p className="text-muted-foreground">
-                Ateliers pratiques pour progresser ensemble. Inscription via 360 Learning.
+                {t('subtitle')}
               </p>
             </div>
             {isAdmin && (
               <Link href="/events/new">
                 <Button className="bg-accent-jaune hover:bg-accent-jaune/80 text-black font-semibold">
                   <Plus className="h-4 w-4 mr-2" />
-                  Nouvel événement
+                  {t('newEvent')}
                 </Button>
               </Link>
             )}
@@ -242,7 +246,7 @@ export default function EventsPage() {
                 <section className="mb-12">
                   <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
                     <span className="h-3 w-3 rounded-full bg-accent-vert" />
-                    Prochains événements
+                    {t('upcoming')}
                   </h2>
                   <div className="grid gap-6 md:grid-cols-2">
                     {upcomingEvents.map((event) => (
@@ -251,6 +255,7 @@ export default function EventsPage() {
                         event={event} 
                         isAdmin={isAdmin}
                         onEdit={() => setEditingEvent(event)}
+                        locale={locale}
                       />
                     ))}
                   </div>
@@ -262,7 +267,7 @@ export default function EventsPage() {
                 <section>
                   <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-muted-foreground">
                     <span className="h-3 w-3 rounded-full bg-muted-foreground" />
-                    Événements passés
+                    {t('past')}
                   </h2>
                   <div className="grid gap-6 md:grid-cols-2">
                     {pastEvents.map((event) => (
@@ -271,6 +276,7 @@ export default function EventsPage() {
                         event={event} 
                         isAdmin={isAdmin}
                         onEdit={() => setEditingEvent(event)}
+                        locale={locale}
                       />
                     ))}
                   </div>
@@ -282,10 +288,10 @@ export default function EventsPage() {
                 <div className="text-center py-12">
                   <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                   <p className="text-muted-foreground text-lg">
-                    Aucun événement prévu pour le moment.
+                    {t('empty.title')}
                   </p>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Reviens bientôt pour découvrir les prochains Dojos !
+                    {t('empty.subtitle')}
                   </p>
                 </div>
               )}
@@ -296,7 +302,7 @@ export default function EventsPage() {
           {editingEvent && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
               <div className="bg-background rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6">
-                <h2 className="text-2xl font-bold mb-6">Modifier l&apos;événement</h2>
+                <h2 className="text-2xl font-bold mb-6">{t('editEvent')}</h2>
                 <DojoEventForm
                   event={editingEvent}
                   onSuccess={(updated) => {

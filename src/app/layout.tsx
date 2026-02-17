@@ -1,40 +1,10 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { AuthProvider } from "@/components/providers/AuthProvider";
-import { ErrorBoundary } from "@/components/ui/error-boundary";
-import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "THINK AGENT - DON'T JUST DO IT! TEACH IT!",
-  description: "Plateforme de challenges IA pour les collaborateurs d'eXalt",
-};
+// This root layout exists only for static generation setup.
+// All actual content is handled by src/app/[locale]/layout.tsx
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-  return (
-    <html lang="fr" className="dark">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background`}
-      >
-        <ErrorBoundary>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
-        </ErrorBoundary>
-      </body>
-    </html>
-  );
+}) {
+  return children;
 }

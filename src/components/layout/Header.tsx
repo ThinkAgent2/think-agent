@@ -1,22 +1,13 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { Link, usePathname } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Zap, Calendar, User, LogOut } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
-
-const navItems = [
-  { href: '/challenges', label: 'Challenges', icon: Zap },
-  { href: '/events', label: 'Événements', icon: Calendar },
-  { href: '/me', label: 'Ma Page', icon: User },
-];
-
-const adminItems = [
-  { href: '/admin/challenges', label: 'Validation', icon: User },
-];
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 const levelColors: Record<string, string> = {
   Explorer: 'bg-accent-vert text-black',
@@ -27,17 +18,31 @@ const levelColors: Record<string, string> = {
 export function Header() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const t = useTranslations('nav');
+
+  const navItems = [
+    { href: '/challenges', label: t('challenges'), icon: Zap },
+    { href: '/events', label: t('events'), icon: Calendar },
+    { href: '/me', label: t('myPage'), icon: User },
+  ];
+
+  const adminItems = [
+    { href: '/admin/challenges', label: t('validation'), icon: User },
+  ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-exalt-blue">
-            <Zap className="h-5 w-5 text-white" />
-          </div>
-          <span className="text-xl font-bold tracking-tight">THINK AGENT</span>
-        </Link>
+        {/* Language Switcher + Logo */}
+        <div className="flex items-center gap-4">
+          <LanguageSwitcher />
+          <Link href="/" className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-exalt-blue">
+              <Zap className="h-5 w-5 text-white" />
+            </div>
+            <span className="text-xl font-bold tracking-tight">THINK AGENT</span>
+          </Link>
+        </div>
 
         {/* Navigation */}
         <nav className="hidden md:flex items-center gap-6">
@@ -100,7 +105,7 @@ export function Header() {
                 size="icon"
                 onClick={logout}
                 className="text-muted-foreground hover:text-accent-rose"
-                title="Déconnexion"
+                title={t('logout')}
               >
                 <LogOut className="h-4 w-4" />
               </Button>
@@ -108,7 +113,7 @@ export function Header() {
           ) : (
             <Link href="/login">
               <Button variant="outline" size="sm" className="border-accent-cyan text-accent-cyan hover:bg-accent-cyan hover:text-black">
-                Se connecter
+                {t('login')}
               </Button>
             </Link>
           )}

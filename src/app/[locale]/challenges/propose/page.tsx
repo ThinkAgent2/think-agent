@@ -1,7 +1,8 @@
 'use client';
 
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { ArrowLeft } from 'lucide-react';
+import { Link } from '@/i18n/navigation';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { ProposeChallengeForm } from '@/components/challenges/ProposeChallengeForm';
@@ -9,6 +10,7 @@ import { useAuth } from '@/lib/auth';
 
 export default function ProposeChallengePage() {
   const { user } = useAuth();
+  const t = useTranslations('challenges.propose');
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -21,18 +23,18 @@ export default function ProposeChallengePage() {
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent-cyan transition-colors mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
-            Retour au catalogue
+            {useTranslations('challenges.detail')('backToCatalog')}
           </Link>
 
-          <h1 className="text-3xl font-bold mb-2">Proposer un challenge</h1>
+          <h1 className="text-3xl font-bold mb-2">{t('title')}</h1>
           <p className="text-muted-foreground mb-6">
-            Décris ton challenge et propose ta solution. Un admin validera avant publication.
+            {t('subtitle')}
           </p>
 
           {user ? (
             <ProposeChallengeForm authorId={user.id} />
           ) : (
-            <p className="text-muted-foreground">Connecte-toi pour proposer un challenge.</p>
+            <p className="text-muted-foreground">{t('loginRequired')}</p>
           )}
         </div>
       </main>

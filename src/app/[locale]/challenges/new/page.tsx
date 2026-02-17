@@ -1,23 +1,27 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useTranslations, useLocale } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
-import { DojoEventForm } from '@/components/events/DojoEventForm';
+import { ChallengeCreateForm } from '@/components/challenges/ChallengeCreateForm';
 
-export default function NewEventPage() {
+export default function NewChallengePage() {
   const router = useRouter();
+  const locale = useLocale();
   const { user } = useAuth();
+  const t = useTranslations('challenges');
+  const tNav = useTranslations('nav');
 
   const isAdmin = user?.role === 'Administrateur';
 
   // Rediriger si pas admin
   if (user && !isAdmin) {
-    router.push('/events');
+    router.push(`/${locale}/challenges`);
     return null;
   }
 
@@ -29,34 +33,31 @@ export default function NewEventPage() {
         <div className="container mx-auto px-4 max-w-4xl">
           {/* Back link */}
           <Link
-            href="/events"
+            href="/challenges"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent-cyan transition-colors mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
-            Retour aux événements
+            {useTranslations('challenges.detail')('backToCatalog')}
           </Link>
 
           <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold">Nouvel Événement</h1>
-            <p className="text-muted-foreground mt-2">
-              Crée un nouvel événement Dojo
-            </p>
+            <h1 className="text-3xl md:text-4xl font-bold">{t('newChallenge')}</h1>
           </div>
 
           {!user ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">Connecte-toi pour créer un événement</p>
+              <p className="text-muted-foreground">{useTranslations('challenges.detail')('loginToParticipate')}</p>
               <Link href="/login">
-                <Button className="mt-4">Se connecter</Button>
+                <Button className="mt-4">{tNav('login')}</Button>
               </Link>
             </div>
           ) : (
-            <DojoEventForm
-              onSuccess={() => {
-                router.push('/events');
+            <ChallengeCreateForm
+              onSuccess={(challenge) => {
+                router.push(`/${locale}/challenges/${challenge.id}`);
               }}
               onCancel={() => {
-                router.push('/events');
+                router.push(`/${locale}/challenges`);
               }}
             />
           )}

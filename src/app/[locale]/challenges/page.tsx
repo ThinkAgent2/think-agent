@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { ChallengeCard } from '@/components/challenges/ChallengeCard';
 import { ChallengeFilters } from '@/components/challenges/ChallengeFilters';
 import { Loader2, Plus } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { getChallenges, getUserParticipations } from '@/lib/supabase/queries';
 import { useAuth } from '@/lib/auth';
@@ -18,6 +19,8 @@ export default function ChallengesPage() {
   const [participations, setParticipations] = useState<Participation[]>([]);
   const [filters, setFilters] = useState<Filters>({});
   const [isLoading, setIsLoading] = useState(true);
+  const t = useTranslations('challenges');
+  const tCommon = useTranslations('common');
 
   // Charger les challenges
   useEffect(() => {
@@ -53,6 +56,11 @@ export default function ChallengesPage() {
     Architecte: challenges.filter((c) => c.niveau_associe === 'Architecte'),
   };
 
+  const challengeCount = challenges.length;
+  const countText = challengeCount > 1 
+    ? t('countPlural', { count: challengeCount })
+    : t('count', { count: challengeCount });
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -62,16 +70,16 @@ export default function ChallengesPage() {
           {/* Page header */}
           <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">Catalogue des Challenges</h1>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2">{t('catalog')}</h1>
               <p className="text-muted-foreground">
-                {isLoading ? 'Chargement...' : `${challenges.length} challenge${challenges.length > 1 ? 's' : ''} disponible${challenges.length > 1 ? 's' : ''}`}
+                {isLoading ? tCommon('loading') : countText}
               </p>
             </div>
             {user?.role === 'Administrateur' && (
               <Link href="/challenges/new">
                 <Button className="bg-accent-jaune hover:bg-accent-jaune/80 text-black font-semibold">
                   <Plus className="h-4 w-4 mr-2" />
-                  Nouveau challenge
+                  {t('newChallenge')}
                 </Button>
               </Link>
             )}
@@ -84,7 +92,7 @@ export default function ChallengesPage() {
               {user && (
                 <Link href="/challenges/propose" className="block">
                   <Button className="w-full bg-exalt-blue hover:bg-exalt-blue/80 text-white font-semibold">
-                    Proposer un challenge
+                    {t('proposeChallenge')}
                   </Button>
                 </Link>
               )}
@@ -159,7 +167,7 @@ export default function ChallengesPage() {
                   {challenges.length === 0 && (
                     <div className="text-center py-12">
                       <p className="text-muted-foreground text-lg">
-                        Aucun challenge ne correspond à tes critères.
+                        {t('empty')}
                       </p>
                     </div>
                   )}

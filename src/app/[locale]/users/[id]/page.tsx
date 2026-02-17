@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useTranslations, useLocale } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,14 +13,13 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
-import { 
-  Trophy, Zap, Target, Clock, CheckCircle, 
-  Medal, Crown, Rocket, Brain, Loader2
+import {
+  Trophy, Zap, Target, Clock, CheckCircle,
+  Medal, Crown, Rocket, Brain, Loader2, ArrowLeft
 } from 'lucide-react';
-import { useAuth } from '@/lib/auth';
-import { getUserParticipations, getAllBadges, getUserBadges, getLeaderboard, searchUsers, getUserChallenges } from '@/lib/supabase/queries';
+import { getAllBadges, getLeaderboard, getUserBadges, getUserById, getUserParticipations, getUserChallenges, searchUsers } from '@/lib/supabase/queries';
 import { formatNameFromEmail } from '@/lib/userName';
-import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry } from '@/types/database';
+import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry, User } from '@/types/database';
 
 const levelConfig: Record<string, { color: string; icon: typeof Brain; nextLevel: string | null; xpNeeded: number | null }> = {
   Explorer: { color: 'bg-accent-vert text-black', icon: Brain, nextLevel: 'Crafter', xpNeeded: 150 },
@@ -27,10 +27,13 @@ const levelConfig: Record<string, { color: string; icon: typeof Brain; nextLevel
   Architecte: { color: 'bg-accent-rose text-white', icon: Crown, nextLevel: null, xpNeeded: null },
 };
 
-export default function ProfilePage() {
+export default function UserProfilePage() {
   const router = useRouter();
-  const { user, isLoading: authLoading } = useAuth();
-  const [activeTab, setActiveTab] = useState('en-cours');
+  const params = useParams();
+  const locale = useLocale();
+  const userId = params.id as string;
+
+  const [user, setUser] = useState<User | null>(null);
   const [participations, setParticipations] = useState<(Participation & { challenge?: Challenge })[]>([]);
   const [allBadges, setAllBadges] = useState<BadgeType[]>([]);
   const [userBadges, setUserBadges] = useState<BadgeType[]>([]);
@@ -42,27 +45,31 @@ export default function ProfilePage() {
   const [proposedChallenges, setProposedChallenges] = useState<Challenge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Rediriger si non connecté
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/login');
-    }
-  }, [user, authLoading, router]);
+  const t = useTranslations('profile');
+  const tBadges = useTranslations('badges');
+  const tLeaderboard = useTranslations('leaderboard');
+  const tCommon = useTranslations('common');
 
-  // Charger les données
   useEffect(() => {
     async function loadData() {
-      if (!user) return;
-
+      if (!userId) return;
       setIsLoading(true);
-      const [participationsData, allBadgesData, userBadgesData, leaderboardData, proposedChallengesData] = await Promise.all([
-        getUserParticipations(user.id),
-        getAllBadges(),
-        getUserBadges(user.id),
+
+      const [userData, participationsData, allBadgesData, userBadgesData, leaderboardData, proposedChallengesData] = await Promise.all([
+        getUserById(userId),
+        getUserParticipations(userId),
+        getAllBadges(locale),
+        getUserBadges(userId, locale),
         getLeaderboard(10),
-        getUserChallenges(user.id),
+        getUserChallenges(userId),
       ]);
 
+      if (!userData) {
+        router.push(`/${locale}/me`);
+        return;
+      }
+
+      setUser(userData);
       setParticipations(participationsData);
       setAllBadges(allBadgesData);
       setUserBadges(userBadgesData);
@@ -70,8 +77,9 @@ export default function ProfilePage() {
       setProposedChallenges(proposedChallengesData);
       setIsLoading(false);
     }
+
     loadData();
-  }, [user]);
+  }, [router, userId, locale]);
 
   useEffect(() => {
     let isCancelled = false;
@@ -98,27 +106,14 @@ export default function ProfilePage() {
     };
   }, [userSearchTerm]);
 
-  if (authLoading || !user) {
-    return (
-      <div className="flex min-h-screen flex-col">
-        <Header />
-        <main className="flex-1 flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-exalt-blue" />
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  const config = levelConfig[user.niveau_actuel] || levelConfig.Explorer;
+  const config = user ? (levelConfig[user.niveau_actuel] || levelConfig.Explorer) : levelConfig.Explorer;
   const LevelIcon = config.icon;
-  const sanitizedName = user.nom && user.nom !== 'Anonyme' ? user.nom : null;
-  const displayName = sanitizedName || formatNameFromEmail(user.email) || 'Anonyme';
-  
+  const sanitizedName = user?.nom && user.nom !== 'Anonyme' ? user.nom : null;
+  const displayName = sanitizedName || formatNameFromEmail(user?.email) || 'Anonyme';
+
   const inProgress = participations.filter(p => p.statut === 'En_cours');
   const completed = participations.filter(p => p.statut === 'Terminé');
 
-  // Progression par niveau (basée sur challenges terminés)
   const levelThresholds: Record<'Explorer' | 'Crafter' | 'Architecte', number> = {
     Explorer: 2,
     Crafter: 5,
@@ -137,13 +132,24 @@ export default function ProfilePage() {
     Architecte: Math.min(100, Math.round((completedByLevel.Architecte / levelThresholds.Architecte) * 100)),
   };
 
-  // Trouver la position de l'utilisateur dans le leaderboard
+  const badgesWithStatus = useMemo(() => {
+    return allBadges.map((badge) => ({
+      ...badge,
+      obtained: userBadges.some((ub) => ub.id === badge.id),
+    }));
+  }, [allBadges, userBadges]);
 
-  // Badges avec statut obtained
-  const badgesWithStatus = allBadges.map(badge => ({
-    ...badge,
-    obtained: userBadges.some(ub => ub.id === badge.id),
-  }));
+  if (isLoading || !user) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-exalt-blue" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -151,6 +157,16 @@ export default function ProfilePage() {
 
       <main className="flex-1 py-8">
         <div className="container mx-auto px-4">
+          <div className="mb-6">
+            <Link
+              href="/me"
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent-cyan transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              {t('backToMyProfile')}
+            </Link>
+          </div>
+
           <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
             {/* Main content */}
             <div className="space-y-8">
@@ -178,15 +194,15 @@ export default function ProfilePage() {
                       <div className="flex flex-wrap gap-4 text-sm">
                         <div className="flex items-center gap-1">
                           <Zap className="h-4 w-4 text-accent-jaune" />
-                          <span className="font-semibold">{user.points_totaux} XP</span>
+                          <span className="font-semibold">{user.points_totaux} {tCommon('xp')}</span>
                         </div>
                         <div className="flex items-center gap-1 text-muted-foreground">
                           <CheckCircle className="h-4 w-4" />
-                          <span>{completed.length} challenges terminés</span>
+                          <span>{completed.length} {t('challengesCompleted')}</span>
                         </div>
                         <div className="flex items-center gap-1 text-muted-foreground">
                           <Target className="h-4 w-4" />
-                          <span>{inProgress.length} en cours</span>
+                          <span>{inProgress.length} {t('inProgress')}</span>
                         </div>
                       </div>
                     </div>
@@ -212,22 +228,22 @@ export default function ProfilePage() {
               {/* Challenges tabs */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Mes Challenges</CardTitle>
+                  <CardTitle>{t('challenges')}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Tabs value={activeTab} onValueChange={setActiveTab}>
+                  <Tabs defaultValue="en-cours">
                     <TabsList className="mb-4">
                       <TabsTrigger value="en-cours" className="gap-2">
                         <Clock className="h-4 w-4" />
-                        En cours ({inProgress.length})
+                        {t('tabs.inProgress')} ({inProgress.length})
                       </TabsTrigger>
                       <TabsTrigger value="termines" className="gap-2">
                         <CheckCircle className="h-4 w-4" />
-                        Terminés ({completed.length})
+                        {t('tabs.completed')} ({completed.length})
                       </TabsTrigger>
                       <TabsTrigger value="proposes" className="gap-2">
                         <Medal className="h-4 w-4" />
-                        Challenges proposés ({proposedChallenges.length})
+                        {t('tabs.proposed')} ({proposedChallenges.length})
                       </TabsTrigger>
                     </TabsList>
 
@@ -239,11 +255,8 @@ export default function ProfilePage() {
                       ) : inProgress.length === 0 ? (
                         <div className="text-center py-8">
                           <p className="text-muted-foreground mb-4">
-                            Aucun challenge en cours.
+                            {t('empty.inProgress')}
                           </p>
-                          <Link href="/challenges">
-                            <Button variant="outline">Explorer les challenges</Button>
-                          </Link>
                         </div>
                       ) : (
                         inProgress.map(({ challenge, ...participation }) => (
@@ -254,20 +267,14 @@ export default function ProfilePage() {
                           >
                             <div className="flex items-center justify-between p-4 rounded-lg border border-border hover:border-accent-cyan transition-colors">
                               <div>
-                                <h4 className="font-medium">{challenge?.titre || 'Challenge'}</h4>
-                                <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
-                                  <Badge variant="outline" className="text-xs">
-                                    {challenge?.niveau_associe}
-                                  </Badge>
-                                  <span className="flex items-center gap-1 text-accent-jaune">
-                                    <Zap className="h-3 w-3" />
-                                    {challenge?.xp} XP
-                                  </span>
-                                </div>
+                                <p className="font-medium">
+                                  {challenge?.titre || 'Challenge'}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {challenge?.niveau_associe}
+                                </p>
                               </div>
-                              <Button size="sm" className="bg-accent-cyan hover:bg-accent-cyan/80 text-black">
-                                Continuer
-                              </Button>
+                              <Button size="sm" variant="outline">{tCommon('view')}</Button>
                             </div>
                           </Link>
                         ))
@@ -280,9 +287,11 @@ export default function ProfilePage() {
                           <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
                         </div>
                       ) : completed.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-8">
-                          Aucun challenge terminé pour le moment.
-                        </p>
+                        <div className="text-center py-8">
+                          <p className="text-muted-foreground mb-4">
+                            {t('empty.completed')}
+                          </p>
+                        </div>
                       ) : (
                         completed.map(({ challenge, ...participation }) => (
                           <Link
@@ -290,25 +299,16 @@ export default function ProfilePage() {
                             href={`/challenges/${participation.challenge_id}`}
                             className="block"
                           >
-                            <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-card/50 hover:border-accent-vert transition-colors">
-                              <div className="flex items-center gap-3">
-                                <CheckCircle className="h-5 w-5 text-accent-vert" />
-                                <div>
-                                  <h4 className="font-medium">{challenge?.titre || 'Challenge'}</h4>
-                                  <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
-                                    <Badge variant="outline" className="text-xs">
-                                      {challenge?.niveau_associe}
-                                    </Badge>
-                                    <span className="flex items-center gap-1 text-accent-vert">
-                                      <Zap className="h-3 w-3" />
-                                      +{challenge?.xp} XP
-                                    </span>
-                                  </div>
-                                </div>
+                            <div className="flex items-center justify-between p-4 rounded-lg border border-border hover:border-accent-cyan transition-colors">
+                              <div>
+                                <p className="font-medium">
+                                  {challenge?.titre || 'Challenge'}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {challenge?.niveau_associe}
+                                </p>
                               </div>
-                              <Button variant="ghost" size="sm">
-                                Revoir
-                              </Button>
+                              <Button size="sm" variant="outline">{tCommon('view')}</Button>
                             </div>
                           </Link>
                         ))
@@ -321,9 +321,11 @@ export default function ProfilePage() {
                           <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
                         </div>
                       ) : proposedChallenges.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-8">
-                          Aucun challenge proposé pour le moment.
-                        </p>
+                        <div className="text-center py-8">
+                          <p className="text-muted-foreground mb-4">
+                            {t('empty.proposed')}
+                          </p>
+                        </div>
                       ) : (
                         proposedChallenges.map((challenge) => (
                           <Link
@@ -331,24 +333,16 @@ export default function ProfilePage() {
                             href={`/challenges/${challenge.id}`}
                             className="block"
                           >
-                            <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-card/50 hover:border-accent-cyan transition-colors">
+                            <div className="flex items-center justify-between p-4 rounded-lg border border-border hover:border-accent-cyan transition-colors">
                               <div>
-                                <h4 className="font-medium">{challenge.titre}</h4>
-                                <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
-                                  <Badge variant="outline" className="text-xs">
-                                    {challenge.niveau_associe}
-                                  </Badge>
-                                  <span className="text-xs uppercase">{challenge.statut}</span>
-                                </div>
-                                {challenge.statut === 'Refuse' && challenge.validation_commentaire && (
-                                  <p className="mt-2 text-xs text-destructive">
-                                    Refusé : {challenge.validation_commentaire}
-                                  </p>
-                                )}
+                                <p className="font-medium">
+                                  {challenge.titre}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {challenge.niveau_associe} · {challenge.statut}
+                                </p>
                               </div>
-                              <Button variant="ghost" size="sm">
-                                Voir
-                              </Button>
+                              <Button size="sm" variant="outline">{tCommon('view')}</Button>
                             </div>
                           </Link>
                         ))
@@ -360,13 +354,13 @@ export default function ProfilePage() {
             </div>
 
             {/* Sidebar */}
-            <div className="space-y-6">
+            <div className="space-y-8">
               {/* Badges */}
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <Medal className="h-5 w-5 text-accent-jaune" />
-                    Badges
+                    <Trophy className="h-5 w-5 text-accent-jaune" />
+                    {tBadges('title')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -404,14 +398,14 @@ export default function ProfilePage() {
                     <div>
                       <CardTitle className="text-lg flex items-center gap-2">
                         <Trophy className="h-5 w-5 text-accent-jaune" />
-                        Leaderboard
+                        {tLeaderboard('title')}
                       </CardTitle>
                       <CardDescription>
                         {leaderboardScope === 'global'
-                          ? 'Top 10 global'
+                          ? tLeaderboard('global')
                           : leaderboardScope === 'entite'
-                          ? 'Top 10 par entité'
-                          : 'Top 10 par cercle'}
+                          ? tLeaderboard('entity')
+                          : tLeaderboard('circle')}
                       </CardDescription>
                     </div>
                     <select
@@ -419,9 +413,9 @@ export default function ProfilePage() {
                       onChange={(event) => setLeaderboardScope(event.target.value as 'global' | 'entite' | 'cercle')}
                       className="rounded-md border border-border bg-background px-2 py-1 text-xs text-muted-foreground focus:border-accent-cyan focus:outline-none"
                     >
-                      <option value="global">Global</option>
-                      <option value="entite">Entité</option>
-                      <option value="cercle">Cercle</option>
+                      <option value="global">{tLeaderboard('scope.global')}</option>
+                      <option value="entite">{tLeaderboard('scope.entity')}</option>
+                      <option value="cercle">{tLeaderboard('scope.circle')}</option>
                     </select>
                   </div>
                 </CardHeader>
@@ -430,7 +424,7 @@ export default function ProfilePage() {
                     <Input
                       value={userSearchTerm}
                       onChange={(event) => setUserSearchTerm(event.target.value)}
-                      placeholder="Rechercher un utilisateur"
+                      placeholder={tLeaderboard('searchUser')}
                       className="bg-background border-border focus:border-accent-cyan"
                     />
                     {userSearchTerm.trim().length > 0 && (
@@ -438,11 +432,11 @@ export default function ProfilePage() {
                         {isSearchingUsers ? (
                           <div className="flex items-center gap-2 text-xs text-muted-foreground px-2 py-1">
                             <Loader2 className="h-3 w-3 animate-spin" />
-                            Recherche...
+                            {tLeaderboard('searching')}
                           </div>
                         ) : userSearchResults.length === 0 ? (
                           <div className="text-xs text-muted-foreground px-2 py-1">
-                            Aucun résultat
+                            {tCommon('noResults')}
                           </div>
                         ) : (
                           userSearchResults.map((result) => (
@@ -466,19 +460,19 @@ export default function ProfilePage() {
                     </div>
                   ) : leaderboard.length === 0 ? (
                     <p className="text-sm text-muted-foreground text-center py-4">
-                      Pas encore de classement
+                      {tLeaderboard('noRanking')}
                     </p>
                   ) : (
                     <div className="space-y-2">
                       {leaderboard.map((entry, index) => {
-                        const isCurrentUser = entry.user_id === user.id;
-                        const href = isCurrentUser ? '/me' : `/users/${entry.user_id}`;
+                        const isCurrentProfile = entry.user_id === user.id;
+                        const href = `/users/${entry.user_id}`;
                         return (
                           <Link
                             key={entry.user_id}
                             href={href}
                             className={`flex items-center gap-3 p-2 rounded-lg transition-colors hover:border hover:border-accent-cyan ${
-                              isCurrentUser ? 'bg-exalt-blue/20 border border-exalt-blue/50' : ''
+                              isCurrentProfile ? 'bg-exalt-blue/20 border border-exalt-blue/50' : ''
                             }`}
                           >
                             <span className={`w-6 text-center font-bold ${
@@ -492,7 +486,9 @@ export default function ProfilePage() {
                             <div className="flex-1 min-w-0">
                               <p className="font-medium truncate text-sm">
                                 {entry.nom}
-                                {isCurrentUser && <span className="text-exalt-blue ml-1">(toi)</span>}
+                                {isCurrentProfile && (
+                                  <span className="text-exalt-blue ml-1">{tLeaderboard('currentProfile')}</span>
+                                )}
                               </p>
                               <p className="text-xs text-muted-foreground">{entry.marque || '-'}</p>
                             </div>

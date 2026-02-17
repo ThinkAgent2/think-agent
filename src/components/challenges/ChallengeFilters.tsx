@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -24,6 +25,7 @@ const levelColors = {
 
 export function ChallengeFilters({ filters, onFiltersChange }: ChallengeFiltersProps) {
   const [searchValue, setSearchValue] = useState(filters.search || '');
+  const t = useTranslations('challenges.filters');
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,7 +67,7 @@ export function ChallengeFilters({ filters, onFiltersChange }: ChallengeFiltersP
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="text"
-          placeholder="Rechercher un challenge..."
+          placeholder={useTranslations('challenges')('searchPlaceholder')}
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           className="pl-10 bg-card border-border"
@@ -74,7 +76,7 @@ export function ChallengeFilters({ filters, onFiltersChange }: ChallengeFiltersP
 
       {/* Niveau */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-muted-foreground">Niveau</label>
+        <label className="text-sm font-medium text-muted-foreground">{t('level')}</label>
         <div className="flex flex-wrap gap-2">
           {niveaux.map((niveau) => (
             <Badge
@@ -95,7 +97,7 @@ export function ChallengeFilters({ filters, onFiltersChange }: ChallengeFiltersP
 
       {/* Marque */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-muted-foreground">Marque</label>
+        <label className="text-sm font-medium text-muted-foreground">{t('brand')}</label>
         <div className="flex flex-wrap gap-2">
           {marques.map((marque) => (
             <Badge
@@ -116,7 +118,7 @@ export function ChallengeFilters({ filters, onFiltersChange }: ChallengeFiltersP
 
       {/* Difficulté */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-muted-foreground">Difficulté</label>
+        <label className="text-sm font-medium text-muted-foreground">{t('difficulty')}</label>
         <div className="flex flex-wrap gap-2">
           {difficultes.map((diff) => (
             <Button
@@ -145,7 +147,7 @@ export function ChallengeFilters({ filters, onFiltersChange }: ChallengeFiltersP
           onClick={clearFilters}
         >
           <X className="h-4 w-4 mr-2" />
-          Effacer les filtres
+          {t('clearFilters')}
         </Button>
       )}
     </div>

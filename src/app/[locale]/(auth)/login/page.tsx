@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useTranslations, useLocale } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,17 +12,19 @@ import { useAuth } from '@/lib/auth';
 
 export default function LoginPage() {
   const router = useRouter();
+  const locale = useLocale();
   const { user, login, isLoading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const t = useTranslations('login');
 
   // Rediriger si déjà connecté
   useEffect(() => {
     if (user && !authLoading) {
-      router.push('/challenges');
+      router.push(`/${locale}/challenges`);
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, locale]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +33,7 @@ export default function LoginPage() {
     const trimmedEmail = email.trim().toLowerCase();
     
     if (!trimmedEmail || !trimmedEmail.includes('@')) {
-      setError('Veuillez entrer une adresse email valide');
+      setError(t('invalidEmail'));
       return;
     }
 
@@ -40,12 +43,12 @@ export default function LoginPage() {
       const loggedInUser = await login(trimmedEmail);
       
       if (loggedInUser) {
-        router.push('/challenges');
+        router.push(`/${locale}/challenges`);
       } else {
-        setError('Une erreur est survenue. Veuillez réessayer.');
+        setError(t('genericError'));
       }
     } catch {
-      setError('Une erreur est survenue. Veuillez réessayer.');
+      setError(t('genericError'));
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +74,7 @@ export default function LoginPage() {
         className="absolute top-8 left-8 flex items-center gap-2 text-sm text-muted-foreground hover:text-accent-cyan transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
-        Retour
+        {useTranslations('common')('back')}
       </Link>
 
       {/* Card */}
@@ -88,7 +91,7 @@ export default function LoginPage() {
           </CardTitle>
           
           <CardDescription className="text-muted-foreground">
-            Entre ton email eXalt pour continuer
+            {t('subtitle')}
           </CardDescription>
         </CardHeader>
 
@@ -99,7 +102,7 @@ export default function LoginPage() {
                 <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   type="email"
-                  placeholder="prenom.nom@exalt.fr"
+                  placeholder={t('placeholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 bg-background border-border focus:border-accent-cyan"
@@ -120,24 +123,24 @@ export default function LoginPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Connexion...
+                  {t('connecting')}
                 </>
               ) : (
-                'Continuer'
+                t('continue')
               )}
             </Button>
           </form>
 
           <p className="mt-6 text-center text-xs text-muted-foreground">
-            Pas besoin de mot de passe.<br />
-            Si c&apos;est ta première fois, ton compte sera créé automatiquement.
+            {t('noPassword')}<br />
+            {t('autoCreate')}
           </p>
         </CardContent>
       </Card>
 
       {/* Tagline */}
       <p className="relative mt-8 text-sm text-muted-foreground">
-        DON&apos;T JUST DO IT! TEACH IT!
+        {useTranslations('home')('tagline')}
       </p>
     </div>
   );

@@ -5,6 +5,7 @@ import type {
   UserLevel, ChallengeStatus
 } from '@/types/database';
 import { formatNameFromEmail } from '@/lib/userName';
+import { localizeChallenge, localizeBadge, localizeDojoEvent } from './localization';
 
 const supabase = createClient();
 
@@ -106,7 +107,7 @@ export async function getUserById(userId: string): Promise<User | null> {
 // CHALLENGES
 // ==========================================
 
-export async function getChallenges(filters?: ChallengeFilters): Promise<Challenge[]> {
+export async function getChallenges(filters?: ChallengeFilters, locale: string = 'fr'): Promise<Challenge[]> {
   let query = supabase
     .from('challenges')
     .select('*')
@@ -133,7 +134,7 @@ export async function getChallenges(filters?: ChallengeFilters): Promise<Challen
     console.error('Error fetching challenges:', error);
     return [];
   }
-  return data || [];
+  return (data || []).map(challenge => localizeChallenge(challenge, locale));
 }
 
 export async function getChallengesByStatus(statuses: Array<Challenge['statut']>): Promise<Challenge[]> {
@@ -150,7 +151,7 @@ export async function getChallengesByStatus(statuses: Array<Challenge['statut']>
   return data || [];
 }
 
-export async function getChallengeById(id: string): Promise<Challenge | null> {
+export async function getChallengeById(id: string, locale: string = 'fr'): Promise<Challenge | null> {
   const { data, error } = await supabase
     .from('challenges')
     .select('*')
@@ -161,7 +162,7 @@ export async function getChallengeById(id: string): Promise<Challenge | null> {
     console.error('Error fetching challenge:', error);
     return null;
   }
-  return data;
+  return data ? localizeChallenge(data, locale) : null;
 }
 
 export async function updateChallenge(
@@ -419,7 +420,7 @@ export async function markSolutionViewed(userId: string, challengeId: string): P
 // BADGES
 // ==========================================
 
-export async function getAllBadges(): Promise<Badge[]> {
+export async function getAllBadges(locale: string = 'fr'): Promise<Badge[]> {
   const { data, error } = await supabase
     .from('badges')
     .select('*');
@@ -428,10 +429,10 @@ export async function getAllBadges(): Promise<Badge[]> {
     console.error('Error fetching badges:', error);
     return [];
   }
-  return data || [];
+  return (data || []).map(badge => localizeBadge(badge, locale));
 }
 
-export async function getUserBadges(userId: string): Promise<Badge[]> {
+export async function getUserBadges(userId: string, locale: string = 'fr'): Promise<Badge[]> {
   const { data, error } = await supabase
     .from('user_badges')
     .select(`
@@ -443,7 +444,7 @@ export async function getUserBadges(userId: string): Promise<Badge[]> {
     console.error('Error fetching user badges:', error);
     return [];
   }
-  return data?.map(d => d.badge as unknown as Badge) || [];
+  return (data?.map(d => d.badge as unknown as Badge) || []).map(badge => localizeBadge(badge, locale));
 }
 
 export async function awardBadge(userId: string, badgeId: string): Promise<boolean> {
@@ -462,7 +463,7 @@ export async function awardBadge(userId: string, badgeId: string): Promise<boole
 // ÉVÉNEMENTS DOJO
 // ==========================================
 
-export async function getDojoEvents(): Promise<DojoEvent[]> {
+export async function getDojoEvents(locale: string = 'fr'): Promise<DojoEvent[]> {
   const { data, error } = await supabase
     .from('evenements_dojo')
     .select('*')
@@ -472,7 +473,7 @@ export async function getDojoEvents(): Promise<DojoEvent[]> {
     console.error('Error fetching events:', error);
     return [];
   }
-  return data || [];
+  return (data || []).map(event => localizeDojoEvent(event, locale));
 }
 
 export async function getDojoEventById(id: string): Promise<DojoEvent | null> {

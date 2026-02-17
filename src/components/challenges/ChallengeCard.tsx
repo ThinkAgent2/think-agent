@@ -1,6 +1,7 @@
 'use client';
 
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,6 +23,8 @@ export function ChallengeCard({ challenge, participation }: ChallengeCardProps) 
   const config = levelConfig[challenge.niveau_associe];
   const isCompleted = participation?.statut === 'Terminé';
   const isInProgress = participation?.statut === 'En_cours';
+  const t = useTranslations('challenges.card');
+  const tCommon = useTranslations('common');
 
   return (
     <Card className={`group relative overflow-hidden transition-all duration-300 bg-card border-border ${config.glow} transition-glow`}>
@@ -44,7 +47,7 @@ export function ChallengeCard({ challenge, participation }: ChallengeCardProps) 
               ))
             ) : (
               <Badge variant="outline" className="text-xs text-muted-foreground">
-                Toutes marques
+                {tCommon('allBrands')}
               </Badge>
             )}
           </div>
@@ -79,7 +82,7 @@ export function ChallengeCard({ challenge, participation }: ChallengeCardProps) 
           {/* XP */}
           <div className="flex items-center gap-1 text-accent-jaune font-medium">
             <Zap className="h-3 w-3" />
-            {challenge.xp} XP
+            {challenge.xp} {tCommon('xp')}
           </div>
         </div>
       </CardContent>
@@ -89,7 +92,7 @@ export function ChallengeCard({ challenge, participation }: ChallengeCardProps) 
           <Button
             className={`w-full ${isInProgress ? 'bg-accent-cyan hover:bg-accent-cyan/80' : 'bg-accent-jaune hover:bg-accent-jaune/80'} text-black font-semibold`}
           >
-            {isCompleted ? 'Revoir' : isInProgress ? 'Continuer' : 'Voir le détail'}
+            {isCompleted ? t('review') : isInProgress ? t('continue') : t('seeDetails')}
           </Button>
         </Link>
       </CardFooter>
