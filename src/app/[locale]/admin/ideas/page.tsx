@@ -17,13 +17,21 @@ export function AdminIdeasContent() {
   const [ideas, setIdeas] = useState<IdeaWithVotes[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [githubUsernames, setGithubUsernames] = useState<Record<string, string>>({});
+  const [isInviting, setIsInviting] = useState<Record<string, boolean>>({});
   const [rejectionNotes, setRejectionNotes] = useState<Record<string, string>>({});
 
   useEffect(() => {
     async function loadIdeas() {
       setIsLoading(true);
       const data = await getIdeasWithVotes(null);
-      setIdeas(data.filter((idea) => idea.statut === 'Proposee'));
+      const pending = data.filter((idea) => idea.statut === 'Proposee');
+      setIdeas(pending);
+      setGithubUsernames(
+        pending.reduce((acc, idea) => {
+          if (idea.github_username) acc[idea.id] = idea.github_username;
+          return acc;
+        }, {} as Record<string, string>)
+      );
       setIsLoading(false);
     }
     loadIdeas();
@@ -36,13 +44,30 @@ export function AdminIdeasContent() {
       return;
     }
 
+    setIsInviting((prev) => ({ ...prev, [idea.id]: true }));
+
+    const inviteResponse = await fetch('/api/github/invite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username }),
+    });
+
+    if (!inviteResponse.ok) {
+      const data = await inviteResponse.json().catch(() => ({}));
+      setIsInviting((prev) => ({ ...prev, [idea.id]: false }));
+      alert(data?.error || t('inviteError'));
+      return;
+    }
+
     const updated = await updateIdeaProposal(idea.id, {
       statut: 'Validee',
       github_username: username,
     });
 
+    setIsInviting((prev) => ({ ...prev, [idea.id]: false }));
+
     if (updated) {
-      setIdeas((prev) => prev.map((item) => (item.id === idea.id ? { ...item, ...updated } : item)));
+      setIdeas((prev) => prev.filter((item) => item.id !== idea.id));
     }
   };
 
@@ -124,8 +149,10 @@ export function AdminIdeasContent() {
                   />
                 </div>
                 <div className="flex items-end gap-2">
-                  <Button onClick={() => handleValidate(idea)}>{t('validate')}</Button>
-                  <Button variant="outline" onClick={() => handleReject(idea)}>
+                  <Button onClick={() => handleValidate(idea)} disabled={isInviting[idea.id]}>
+                    {isInviting[idea.id] ? t('inviting') : t('validate')}
+                  </Button>
+                  <Button variant="outline" onClick={() => handleReject(idea)} disabled={isInviting[idea.id]}>
                     {t('reject')}
                   </Button>
                 </div>

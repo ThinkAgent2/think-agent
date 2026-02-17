@@ -251,6 +251,8 @@
       "githubLabel": "GitHub username (for repo access)",
       "githubPlaceholder": "ex: firstnamelastname",
       "githubRequired": "Add the GitHub username before validating.",
+      "inviting": "Inviting...",
+      "inviteError": "GitHub invitation failed.",
       "loading": "Loading..."
     },
     "validationHub": {

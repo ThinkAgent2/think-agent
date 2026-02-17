@@ -251,6 +251,8 @@
       "githubLabel": "Pseudo GitHub (pour accès repo)",
       "githubPlaceholder": "ex: prenomnom",
       "githubRequired": "Ajoute le pseudo GitHub avant de valider.",
+      "inviting": "Invitation...",
+      "inviteError": "Invitation GitHub impossible.",
       "loading": "Chargement..."
     },
     "validationHub": {
