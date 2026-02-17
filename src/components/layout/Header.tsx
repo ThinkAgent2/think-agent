@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Zap, Calendar, User, LogOut } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
@@ -96,9 +96,15 @@ export function Header() {
               </div>
               <Link href="/me">
                 <Avatar className="h-8 w-8 cursor-pointer transition-glow hover:glow-cyan">
+                  {user.avatar_url && <AvatarImage src={user.avatar_url} alt={user.nom || user.email} />}
                   <AvatarFallback className="bg-exalt-blue text-white text-xs">
                     {user.nom?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
                   </AvatarFallback>
+                  {user.featured_badge_id && (
+                    <AvatarBadge>
+                      <span className="text-[10px]">🏅</span>
+                    </AvatarBadge>
+                  )}
                 </Avatar>
               </Link>
               <Button
