@@ -114,7 +114,7 @@ export function Header() {
                   </AvatarFallback>
                   {user.featured_badge_id && (
                     <AvatarBadge className="text-xs">
-                      {userBadgesMap.get(user.featured_badge_id) || '🏅'}
+                      {userBadgesMap.get(user.featured_badge_id)}
                     </AvatarBadge>
                   )}
                 </Avatar>
