@@ -758,6 +758,19 @@ export async function getUserValidatedIdeas(userId: string): Promise<IdeaProposa
   return data || [];
 }
 
+export async function deleteIdeaProposal(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('idea_proposals')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error deleting idea proposal:', error);
+    return false;
+  }
+  return true;
+}
+
 // ==========================================
 // LOGIQUE MÉTIER
 // ==========================================

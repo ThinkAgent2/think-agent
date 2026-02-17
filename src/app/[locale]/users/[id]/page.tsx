@@ -50,6 +50,7 @@ export default function UserProfilePage() {
   const tBadges = useTranslations('badges');
   const tLeaderboard = useTranslations('leaderboard');
   const tCommon = useTranslations('common');
+  const tIdeas = useTranslations('ideas');
 
   useEffect(() => {
     async function loadData() {
@@ -372,10 +373,10 @@ export default function UserProfilePage() {
                           <div key={idea.id} className="rounded-lg border border-border bg-card/50 p-4 space-y-2">
                             <div className="flex items-center gap-2">
                               <Badge variant="outline" className="text-xs">
-                                {idea.themes[0] ? t(`ideas.ideaThemes.${idea.themes[0]}`) : '-'}
+                                {idea.themes[0] ? tIdeas(`ideaThemes.${idea.themes[0]}`) : '-'}
                               </Badge>
                               <span className="text-xs uppercase text-muted-foreground">
-                                {t(`ideas.ideaStatus.${idea.statut}`)}
+                                {tIdeas(`ideaStatus.${idea.statut}`)}
                               </span>
                             </div>
                             <p className="font-medium">{idea.titre}</p>

@@ -334,10 +334,16 @@
       "success": "Idea proposed!",
       "errorRequired": "Title and description are required",
       "errorThemeRequired": "Select a theme",
+      "errorNoChanges": "Update your idea before resubmitting.",
+      "updated": "Idea updated.",
+      "limitReached": "Limit reached: you already have 3 pending ideas.",
       "errorGeneric": "Error while proposing."
     },
     "statusLabel": "Status",
     "commentLabel": "Comment",
+    "edit": "Edit",
+    "editHint": "Update your idea and resubmit for validation.",
+    "deleteConfirm": "Delete this idea?",
     "ideaStatus": {
       "Proposee": "Proposed",
       "Validee": "Validated",

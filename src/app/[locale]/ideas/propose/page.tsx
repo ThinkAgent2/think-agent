@@ -7,10 +7,24 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { IdeaProposalForm } from '@/components/ideas/IdeaProposalForm';
 import { useAuth } from '@/lib/auth';
+import { getUserIdeas } from '@/lib/supabase/queries';
+import { useEffect, useState } from 'react';
 
 export default function ProposeIdeaPage() {
   const { user } = useAuth();
   const t = useTranslations('ideas.propose');
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    async function loadCount() {
+      if (!user) return;
+      const ideas = await getUserIdeas(user.id);
+      setPendingCount(ideas.filter((idea) => idea.statut === 'Proposee').length);
+    }
+    loadCount();
+  }, [user]);
+
+  const limitReached = pendingCount >= 3;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -30,7 +44,13 @@ export default function ProposeIdeaPage() {
           <p className="text-muted-foreground mb-6">{t('subtitle')}</p>
 
           {user ? (
-            <IdeaProposalForm authorId={user.id} />
+            limitReached ? (
+              <div className="rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground">
+                {t('limitReached')}
+              </div>
+            ) : (
+              <IdeaProposalForm authorId={user.id} />
+            )
           ) : (
             <p className="text-muted-foreground">{t('loginRequired')}</p>
           )}

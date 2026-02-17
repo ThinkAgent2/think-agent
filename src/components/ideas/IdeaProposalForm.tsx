@@ -5,13 +5,14 @@ import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { createIdeaProposal } from '@/lib/supabase/queries';
+import { createIdeaProposal, updateIdeaProposal } from '@/lib/supabase/queries';
 import type { IdeaTheme, IdeaProposal } from '@/types/database';
 import { FileUpload } from '@/components/challenges/FileUpload';
 import type { UploadedFile } from '@/lib/supabase/storage';
 
 interface IdeaProposalFormProps {
   authorId: string;
+  existingIdea?: IdeaProposal;
   onSuccess?: (idea: IdeaProposal) => void;
 }
 
@@ -21,17 +22,17 @@ const THEMES: { value: IdeaTheme; labelKey: string }[] = [
   { value: 'amelioration_ui', labelKey: 'themes.amelioration_ui' },
 ];
 
-export function IdeaProposalForm({ authorId, onSuccess }: IdeaProposalFormProps) {
+export function IdeaProposalForm({ authorId, existingIdea, onSuccess }: IdeaProposalFormProps) {
   const t = useTranslations('ideas.propose');
   const tIdeas = useTranslations('ideas');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [formError, setFormError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    titre: '',
-    description: '',
-    themes: [] as IdeaTheme[],
-    githubUsername: '',
+    titre: existingIdea?.titre || '',
+    description: existingIdea?.description || '',
+    themes: existingIdea?.themes || ([] as IdeaTheme[]),
+    githubUsername: existingIdea?.github_username || '',
   });
 
   const toggleTheme = (theme: IdeaTheme) => {
@@ -58,30 +59,59 @@ export function IdeaProposalForm({ authorId, onSuccess }: IdeaProposalFormProps)
       return;
     }
 
+    if (
+      existingIdea &&
+      formData.titre.trim() === existingIdea.titre &&
+      formData.description.trim() === existingIdea.description &&
+      formData.githubUsername.trim() === (existingIdea.github_username || '') &&
+      JSON.stringify(formData.themes) === JSON.stringify(existingIdea.themes || []) &&
+      uploadedFiles.length === 0
+    ) {
+      setFormError(t('errorNoChanges'));
+      return;
+    }
+
     setIsSubmitting(true);
+
+    const screenshots = uploadedFiles.length > 0
+      ? uploadedFiles.map((file) => file.url)
+      : (existingIdea?.screenshots || []);
 
     const newIdea: Omit<IdeaProposal, 'id' | 'created_at' | 'updated_at'> = {
       titre: formData.titre.trim(),
       description: formData.description.trim(),
       auteur_id: authorId,
       themes: formData.themes,
-      screenshots: uploadedFiles.map((file) => file.url),
+      screenshots,
       statut: 'Proposee',
       github_username: formData.githubUsername.trim() || null,
       validation_commentaire: null,
     };
 
-    const { data, error } = await createIdeaProposal(newIdea);
+    const result = existingIdea
+      ? await updateIdeaProposal(existingIdea.id, {
+          titre: newIdea.titre,
+          description: newIdea.description,
+          themes: newIdea.themes,
+          screenshots: newIdea.screenshots,
+          github_username: newIdea.github_username,
+          statut: 'Proposee',
+          validation_commentaire: null,
+        })
+      : (await createIdeaProposal(newIdea)).data;
+
     setIsSubmitting(false);
 
-    if (data) {
-      onSuccess?.(data);
+    if (result) {
+      onSuccess?.(result);
       setFormError(null);
-      alert(t('success'));
-      setFormData({ titre: '', description: '', themes: [], githubUsername: '' });
-      setUploadedFiles([]);
+      alert(existingIdea ? t('updated') : t('success'));
+      if (!existingIdea) {
+        setFormData({ titre: '', description: '', themes: [], githubUsername: '' });
+        setUploadedFiles([]);
+      }
     } else {
-      setFormError(error || t('errorGeneric'));
+      setFormError(t('errorGeneric'));
     }
   };
 

@@ -18,9 +18,10 @@ import {
   Medal, Crown, Rocket, Brain, Loader2
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
-import { getUserParticipations, getAllBadges, getUserBadges, getLeaderboard, searchUsers, getUserChallenges, getUserIdeas } from '@/lib/supabase/queries';
+import { getUserParticipations, getAllBadges, getUserBadges, getLeaderboard, searchUsers, getUserChallenges, getUserIdeas, deleteIdeaProposal } from '@/lib/supabase/queries';
 import { formatNameFromEmail } from '@/lib/userName';
 import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry, IdeaProposal } from '@/types/database';
+import { IdeaProposalForm } from '@/components/ideas/IdeaProposalForm';
 
 const levelConfig: Record<string, { color: string; icon: typeof Brain; nextLevel: string | null; xpNeeded: number | null }> = {
   Explorer: { color: 'bg-accent-vert text-black', icon: Brain, nextLevel: 'Crafter', xpNeeded: 150 },
@@ -43,6 +44,7 @@ export default function ProfilePage() {
   const [isSearchingUsers, setIsSearchingUsers] = useState(false);
   const [proposedChallenges, setProposedChallenges] = useState<Challenge[]>([]);
   const [myIdeas, setMyIdeas] = useState<IdeaProposal[]>([]);
+  const [editingIdea, setEditingIdea] = useState<IdeaProposal | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const t = useTranslations('profile');
@@ -50,6 +52,7 @@ export default function ProfilePage() {
   const tLeaderboard = useTranslations('leaderboard');
   const tCommon = useTranslations('common');
   const tChallenges = useTranslations('challenges.card');
+  const tIdeas = useTranslations('ideas');
 
   // Rediriger si non connecté
   useEffect(() => {
@@ -154,6 +157,26 @@ export default function ProfilePage() {
     obtained: userBadges.some(ub => ub.id === badge.id),
   }));
 
+  const pendingIdeasCount = myIdeas.filter((idea) => idea.statut === 'Proposee').length;
+
+  const handleDeleteIdea = async (idea: IdeaProposal) => {
+    const confirmed = window.confirm(tIdeas('deleteConfirm'));
+    if (!confirmed) return;
+
+    const success = await deleteIdeaProposal(idea.id);
+    if (success) {
+      setMyIdeas((prev) => prev.filter((item) => item.id !== idea.id));
+      if (editingIdea?.id === idea.id) {
+        setEditingIdea(null);
+      }
+    }
+  };
+
+  const handleIdeaUpdated = (updated: IdeaProposal) => {
+    setMyIdeas((prev) => prev.map((item) => (item.id === updated.id ? updated : item)));
+    setEditingIdea(null);
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -221,30 +244,47 @@ export default function ProfilePage() {
               {/* Challenges tabs */}
               <Card>
                 <CardHeader>
-                  <CardTitle>{t('myChallenges')}</CardTitle>
+                  <div className="flex items-center justify-between gap-4">
+                    <CardTitle>{t('myChallenges')}</CardTitle>
+                    {editingIdea && (
+                      <Button variant="outline" size="sm" onClick={() => setEditingIdea(null)}>
+                        {tCommon('cancel')}
+                      </Button>
+                    )}
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <Tabs value={activeTab} onValueChange={setActiveTab}>
-                    <TabsList className="mb-4">
-                      <TabsTrigger value="en-cours" className="gap-2">
-                        <Clock className="h-4 w-4" />
-                        {t('tabs.inProgress')} ({inProgress.length})
-                      </TabsTrigger>
-                      <TabsTrigger value="termines" className="gap-2">
-                        <CheckCircle className="h-4 w-4" />
-                        {t('tabs.completed')} ({completed.length})
-                      </TabsTrigger>
-                      <TabsTrigger value="proposes" className="gap-2">
-                        <Medal className="h-4 w-4" />
-                        {t('tabs.proposed')} ({proposedChallenges.length})
-                      </TabsTrigger>
-                      <TabsTrigger value="ideas" className="gap-2">
-                        <Brain className="h-4 w-4" />
-                        {t('tabs.ideas')} ({myIdeas.length})
-                      </TabsTrigger>
-                    </TabsList>
+                  {editingIdea ? (
+                    <div className="space-y-4">
+                      <p className="text-sm text-muted-foreground">{tIdeas('editHint')}</p>
+                      <IdeaProposalForm
+                        authorId={user.id}
+                        existingIdea={editingIdea}
+                        onSuccess={handleIdeaUpdated}
+                      />
+                    </div>
+                  ) : (
+                    <Tabs value={activeTab} onValueChange={setActiveTab}>
+                      <TabsList className="mb-4">
+                        <TabsTrigger value="en-cours" className="gap-2">
+                          <Clock className="h-4 w-4" />
+                          {t('tabs.inProgress')} ({inProgress.length})
+                        </TabsTrigger>
+                        <TabsTrigger value="termines" className="gap-2">
+                          <CheckCircle className="h-4 w-4" />
+                          {t('tabs.completed')} ({completed.length})
+                        </TabsTrigger>
+                        <TabsTrigger value="proposes" className="gap-2">
+                          <Medal className="h-4 w-4" />
+                          {t('tabs.proposed')} ({proposedChallenges.length})
+                        </TabsTrigger>
+                        <TabsTrigger value="ideas" className="gap-2">
+                          <Brain className="h-4 w-4" />
+                          {t('tabs.ideas')} ({myIdeas.length})
+                        </TabsTrigger>
+                      </TabsList>
 
-                    <TabsContent value="en-cours" className="space-y-3">
+                      <TabsContent value="en-cours" className="space-y-3">
                       {isLoading ? (
                         <div className="flex justify-center py-8">
                           <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
@@ -382,10 +422,10 @@ export default function ProfilePage() {
                           <div key={idea.id} className="rounded-lg border border-border bg-card/50 p-4 space-y-2">
                             <div className="flex items-center gap-2">
                               <Badge variant="outline" className="text-xs">
-                                {idea.themes[0] ? t(`ideas.ideaThemes.${idea.themes[0]}`) : '-'}
+                                {idea.themes[0] ? tIdeas(`ideaThemes.${idea.themes[0]}`) : '-'}
                               </Badge>
                               <span className="text-xs uppercase text-muted-foreground">
-                                {t(`ideas.ideaStatus.${idea.statut}`)}
+                                {tIdeas(`ideaStatus.${idea.statut}`)}
                               </span>
                             </div>
                             <h4 className="font-medium">{idea.titre}</h4>
@@ -395,6 +435,23 @@ export default function ProfilePage() {
                                 {t('refused')}: {idea.validation_commentaire}
                               </p>
                             )}
+                            <div className="flex items-center gap-2 pt-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setEditingIdea(idea)}
+                              >
+                                {tIdeas('edit')}
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-destructive hover:text-destructive"
+                                onClick={() => handleDeleteIdea(idea)}
+                              >
+                                {tCommon('delete')}
+                              </Button>
+                            </div>
                           </div>
                         ))
                       )}
@@ -402,6 +459,12 @@ export default function ProfilePage() {
                   </Tabs>
                 </CardContent>
               </Card>
+
+              {pendingIdeasCount >= 3 && (
+                <div className="rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground">
+                  {tIdeas('limitReached')}
+                </div>
+              )}
             </div>
 
             {/* Sidebar */}

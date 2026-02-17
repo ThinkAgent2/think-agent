@@ -334,10 +334,16 @@
       "success": "Idée proposée !",
       "errorRequired": "Titre et description sont obligatoires",
       "errorThemeRequired": "Choisis une thématique",
+      "errorNoChanges": "Modifie ton idée avant de la renvoyer.",
+      "updated": "Idée mise à jour.",
+      "limitReached": "Limite atteinte : tu as déjà 3 idées en attente.",
       "errorGeneric": "Erreur lors de la proposition."
     },
     "statusLabel": "Statut",
     "commentLabel": "Commentaire",
+    "edit": "Modifier",
+    "editHint": "Modifie ton idée puis renvoie-la pour validation.",
+    "deleteConfirm": "Supprimer cette idée ?",
     "ideaStatus": {
       "Proposee": "Proposée",
       "Validee": "Validée",
