@@ -17,9 +17,9 @@ import {
   Trophy, Zap, Target, Clock, CheckCircle,
   Medal, Crown, Rocket, Brain, Loader2, ArrowLeft
 } from 'lucide-react';
-import { getAllBadges, getLeaderboard, getUserBadges, getUserById, getUserParticipations, getUserChallenges, searchUsers } from '@/lib/supabase/queries';
+import { getAllBadges, getLeaderboard, getUserBadges, getUserById, getUserParticipations, getUserChallenges, searchUsers, getUserValidatedIdeas } from '@/lib/supabase/queries';
 import { formatNameFromEmail } from '@/lib/userName';
-import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry, User } from '@/types/database';
+import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry, User, IdeaProposal } from '@/types/database';
 
 const levelConfig: Record<string, { color: string; icon: typeof Brain; nextLevel: string | null; xpNeeded: number | null }> = {
   Explorer: { color: 'bg-accent-vert text-black', icon: Brain, nextLevel: 'Crafter', xpNeeded: 150 },
@@ -43,6 +43,7 @@ export default function UserProfilePage() {
   const [userSearchResults, setUserSearchResults] = useState<Array<{ id: string; nom: string; email: string }>>([]);
   const [isSearchingUsers, setIsSearchingUsers] = useState(false);
   const [proposedChallenges, setProposedChallenges] = useState<Challenge[]>([]);
+  const [validatedIdeas, setValidatedIdeas] = useState<IdeaProposal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const t = useTranslations('profile');
@@ -55,13 +56,14 @@ export default function UserProfilePage() {
       if (!userId) return;
       setIsLoading(true);
 
-      const [userData, participationsData, allBadgesData, userBadgesData, leaderboardData, proposedChallengesData] = await Promise.all([
+      const [userData, participationsData, allBadgesData, userBadgesData, leaderboardData, proposedChallengesData, validatedIdeasData] = await Promise.all([
         getUserById(userId),
         getUserParticipations(userId),
         getAllBadges(locale),
         getUserBadges(userId, locale),
         getLeaderboard(10),
         getUserChallenges(userId),
+        getUserValidatedIdeas(userId),
       ]);
 
       if (!userData) {
@@ -75,6 +77,7 @@ export default function UserProfilePage() {
       setUserBadges(userBadgesData);
       setLeaderboard(leaderboardData);
       setProposedChallenges(proposedChallengesData);
+      setValidatedIdeas(validatedIdeasData);
       setIsLoading(false);
     }
 
@@ -245,6 +248,10 @@ export default function UserProfilePage() {
                         <Medal className="h-4 w-4" />
                         {t('tabs.proposed')} ({proposedChallenges.length})
                       </TabsTrigger>
+                      <TabsTrigger value="ideas" className="gap-2">
+                        <Brain className="h-4 w-4" />
+                        {t('tabs.ideas')} ({validatedIdeas.length})
+                      </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="en-cours" className="space-y-3">
@@ -345,6 +352,35 @@ export default function UserProfilePage() {
                               <Button size="sm" variant="outline">{tCommon('view')}</Button>
                             </div>
                           </Link>
+                        ))
+                      )}
+                    </TabsContent>
+
+                    <TabsContent value="ideas" className="space-y-3">
+                      {isLoading ? (
+                        <div className="flex justify-center py-8">
+                          <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
+                        </div>
+                      ) : validatedIdeas.length === 0 ? (
+                        <div className="text-center py-8">
+                          <p className="text-muted-foreground mb-4">
+                            {t('empty.ideas')}
+                          </p>
+                        </div>
+                      ) : (
+                        validatedIdeas.map((idea) => (
+                          <div key={idea.id} className="rounded-lg border border-border bg-card/50 p-4 space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="text-xs">
+                                {idea.themes[0] ? t(`ideaThemes.${idea.themes[0]}`) : '-'}
+                              </Badge>
+                              <span className="text-xs uppercase text-muted-foreground">
+                                {t(`ideaStatus.${idea.statut}`)}
+                              </span>
+                            </div>
+                            <p className="font-medium">{idea.titre}</p>
+                            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{idea.description}</p>
+                          </div>
                         ))
                       )}
                     </TabsContent>

@@ -31,6 +31,7 @@ export function IdeaProposalForm({ authorId, onSuccess }: IdeaProposalFormProps)
     titre: '',
     description: '',
     themes: [] as IdeaTheme[],
+    githubUsername: '',
   });
 
   const toggleTheme = (theme: IdeaTheme) => {
@@ -66,7 +67,7 @@ export function IdeaProposalForm({ authorId, onSuccess }: IdeaProposalFormProps)
       themes: formData.themes,
       screenshots: uploadedFiles.map((file) => file.url),
       statut: 'Proposee',
-      github_username: null,
+      github_username: formData.githubUsername.trim() || null,
       validation_commentaire: null,
     };
 
@@ -77,7 +78,7 @@ export function IdeaProposalForm({ authorId, onSuccess }: IdeaProposalFormProps)
       onSuccess?.(data);
       setFormError(null);
       alert(t('success'));
-      setFormData({ titre: '', description: '', themes: [] });
+      setFormData({ titre: '', description: '', themes: [], githubUsername: '' });
       setUploadedFiles([]);
     } else {
       setFormError(error || t('errorGeneric'));
@@ -117,6 +118,16 @@ export function IdeaProposalForm({ authorId, onSuccess }: IdeaProposalFormProps)
               placeholder={t('descriptionPlaceholder')}
               required
               className="w-full h-28 p-3 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none resize-none"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t('githubLabel')}</label>
+            <Input
+              name="githubUsername"
+              value={formData.githubUsername}
+              onChange={(e) => setFormData((prev) => ({ ...prev, githubUsername: e.target.value }))}
+              placeholder={t('githubPlaceholder')}
             />
           </div>
 

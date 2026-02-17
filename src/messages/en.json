@@ -191,12 +191,14 @@
     "tabs": {
       "inProgress": "In progress",
       "completed": "Completed",
-      "proposed": "Proposed challenges"
+      "proposed": "Proposed challenges",
+      "ideas": "Ideas"
     },
     "empty": {
       "inProgress": "No challenge in progress.",
       "completed": "No completed challenge yet.",
       "proposed": "No proposed challenge yet.",
+      "ideas": "No ideas proposed yet.",
       "exploreChallenges": "Explore challenges"
     },
     "refused": "Refused",
@@ -322,6 +324,8 @@
       "titlePlaceholder": "Ex: Add dark mode",
       "descriptionLabel": "Description *",
       "descriptionPlaceholder": "Explain the problem, context and impact...",
+      "githubLabel": "GitHub username (optional)",
+      "githubPlaceholder": "ex: firstnamelastname",
       "themesLabel": "Theme *",
       "themesHint": "Select a single theme.",
       "screenshots": "Screenshots (optional)",
@@ -331,6 +335,18 @@
       "errorRequired": "Title and description are required",
       "errorThemeRequired": "Select a theme",
       "errorGeneric": "Error while proposing."
+    },
+    "statusLabel": "Status",
+    "commentLabel": "Comment",
+    "ideaStatus": {
+      "Proposee": "Proposed",
+      "Validee": "Validated",
+      "Refusee": "Rejected"
+    },
+    "ideaThemes": {
+      "correction_bug": "Bug fix",
+      "nouvelle_fonctionnalite": "New feature",
+      "amelioration_ui": "UI/UX improvement"
     }
   }
 }

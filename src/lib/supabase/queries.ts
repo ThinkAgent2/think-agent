@@ -727,6 +727,37 @@ export async function updateIdeaProposal(
   return data;
 }
 
+export async function getUserIdeas(userId: string): Promise<IdeaProposal[]> {
+  const { data, error } = await supabase
+    .from('idea_proposals')
+    .select('*')
+    .eq('auteur_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching user ideas:', error);
+    return [];
+  }
+
+  return data || [];
+}
+
+export async function getUserValidatedIdeas(userId: string): Promise<IdeaProposal[]> {
+  const { data, error } = await supabase
+    .from('idea_proposals')
+    .select('*')
+    .eq('auteur_id', userId)
+    .eq('statut', 'Validee')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching user validated ideas:', error);
+    return [];
+  }
+
+  return data || [];
+}
+
 // ==========================================
 // LOGIQUE MÉTIER
 // ==========================================

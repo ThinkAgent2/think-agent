@@ -18,9 +18,9 @@ import {
   Medal, Crown, Rocket, Brain, Loader2
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
-import { getUserParticipations, getAllBadges, getUserBadges, getLeaderboard, searchUsers, getUserChallenges } from '@/lib/supabase/queries';
+import { getUserParticipations, getAllBadges, getUserBadges, getLeaderboard, searchUsers, getUserChallenges, getUserIdeas } from '@/lib/supabase/queries';
 import { formatNameFromEmail } from '@/lib/userName';
-import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry } from '@/types/database';
+import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry, IdeaProposal } from '@/types/database';
 
 const levelConfig: Record<string, { color: string; icon: typeof Brain; nextLevel: string | null; xpNeeded: number | null }> = {
   Explorer: { color: 'bg-accent-vert text-black', icon: Brain, nextLevel: 'Crafter', xpNeeded: 150 },
@@ -42,6 +42,7 @@ export default function ProfilePage() {
   const [userSearchResults, setUserSearchResults] = useState<Array<{ id: string; nom: string; email: string }>>([]);
   const [isSearchingUsers, setIsSearchingUsers] = useState(false);
   const [proposedChallenges, setProposedChallenges] = useState<Challenge[]>([]);
+  const [myIdeas, setMyIdeas] = useState<IdeaProposal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const t = useTranslations('profile');
@@ -63,12 +64,13 @@ export default function ProfilePage() {
       if (!user) return;
 
       setIsLoading(true);
-      const [participationsData, allBadgesData, userBadgesData, leaderboardData, proposedChallengesData] = await Promise.all([
+      const [participationsData, allBadgesData, userBadgesData, leaderboardData, proposedChallengesData, myIdeasData] = await Promise.all([
         getUserParticipations(user.id),
         getAllBadges(locale),
         getUserBadges(user.id, locale),
         getLeaderboard(10),
         getUserChallenges(user.id),
+        getUserIdeas(user.id),
       ]);
 
       setParticipations(participationsData);
@@ -76,6 +78,7 @@ export default function ProfilePage() {
       setUserBadges(userBadgesData);
       setLeaderboard(leaderboardData);
       setProposedChallenges(proposedChallengesData);
+      setMyIdeas(myIdeasData);
       setIsLoading(false);
     }
     loadData();
@@ -235,6 +238,10 @@ export default function ProfilePage() {
                         <Medal className="h-4 w-4" />
                         {t('tabs.proposed')} ({proposedChallenges.length})
                       </TabsTrigger>
+                      <TabsTrigger value="ideas" className="gap-2">
+                        <Brain className="h-4 w-4" />
+                        {t('tabs.ideas')} ({myIdeas.length})
+                      </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="en-cours" className="space-y-3">
@@ -357,6 +364,38 @@ export default function ProfilePage() {
                               </Button>
                             </div>
                           </Link>
+                        ))
+                      )}
+                    </TabsContent>
+
+                    <TabsContent value="ideas" className="space-y-3">
+                      {isLoading ? (
+                        <div className="flex justify-center py-8">
+                          <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
+                        </div>
+                      ) : myIdeas.length === 0 ? (
+                        <p className="text-muted-foreground text-center py-8">
+                          {t('empty.ideas')}
+                        </p>
+                      ) : (
+                        myIdeas.map((idea) => (
+                          <div key={idea.id} className="rounded-lg border border-border bg-card/50 p-4 space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="text-xs">
+                                {idea.themes[0] ? t(`ideaThemes.${idea.themes[0]}`) : '-'}
+                              </Badge>
+                              <span className="text-xs uppercase text-muted-foreground">
+                                {t(`ideaStatus.${idea.statut}`)}
+                              </span>
+                            </div>
+                            <h4 className="font-medium">{idea.titre}</h4>
+                            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{idea.description}</p>
+                            {idea.statut === 'Refusee' && idea.validation_commentaire && (
+                              <p className="text-xs text-destructive">
+                                {t('refused')}: {idea.validation_commentaire}
+                              </p>
+                            )}
+                          </div>
                         ))
                       )}
                     </TabsContent>
