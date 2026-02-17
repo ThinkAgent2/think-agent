@@ -48,6 +48,7 @@ export default function ProfilePage() {
   const tBadges = useTranslations('badges');
   const tLeaderboard = useTranslations('leaderboard');
   const tCommon = useTranslations('common');
+  const tChallenges = useTranslations('challenges.card');
 
   // Rediriger si non connecté
   useEffect(() => {
@@ -271,7 +272,7 @@ export default function ProfilePage() {
                                 </div>
                               </div>
                               <Button size="sm" className="bg-accent-cyan hover:bg-accent-cyan/80 text-black">
-                                {useTranslations('challenges.card')('continue')}
+                                {tChallenges('continue')}
                               </Button>
                             </div>
                           </Link>
@@ -312,7 +313,7 @@ export default function ProfilePage() {
                                 </div>
                               </div>
                               <Button variant="ghost" size="sm">
-                                {useTranslations('challenges.card')('review')}
+                                {tChallenges('review')}
                               </Button>
                             </div>
                           </Link>
