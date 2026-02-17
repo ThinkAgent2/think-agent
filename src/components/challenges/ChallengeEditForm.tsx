@@ -7,7 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MultiSelectMarques } from '@/components/ui/multi-select-marques';
 import { MultiSelectThematiques } from '@/components/ui/multi-select-thematiques';
 import { Loader2, Save, X } from 'lucide-react';
-import { deleteChallenge, updateChallenge } from '@/lib/supabase/queries';
+import { updateChallenge } from '@/lib/supabase/queries';
+import { deleteChallengeAdmin } from '@/app/actions/admin';
+import { useAuth } from '@/lib/auth';
 import type { Challenge, UserLevel, ChallengeType, Marque, VortexStage, Thematique } from '@/types/database';
 
 interface ChallengeEditFormProps {
@@ -32,6 +34,7 @@ const VORTEX_STAGES: { value: VortexStage; label: string }[] = [
 ];
 
 export function ChallengeEditForm({ challenge, onSave, onCancel }: ChallengeEditFormProps) {
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRepublishing, setIsRepublishing] = useState(false);
@@ -109,11 +112,16 @@ export function ChallengeEditForm({ challenge, onSave, onCancel }: ChallengeEdit
   };
 
   const handleDelete = async () => {
+    if (!user?.email) {
+      alert('Vous devez être connecté pour supprimer un challenge.');
+      return;
+    }
+
     const confirmed = window.confirm('Supprimer ce challenge ? Cette action est irréversible.');
     if (!confirmed) return;
 
     setIsDeleting(true);
-    const result = await deleteChallenge(challenge.id);
+    const result = await deleteChallengeAdmin(challenge.id, user.email);
     setIsDeleting(false);
 
     if (result.success) {
