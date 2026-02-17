@@ -285,178 +285,175 @@ export default function ProfilePage() {
                       </TabsList>
 
                       <TabsContent value="en-cours" className="space-y-3">
-                      {isLoading ? (
-                        <div className="flex justify-center py-8">
-                          <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
-                        </div>
-                      ) : inProgress.length === 0 ? (
-                        <div className="text-center py-8">
-                          <p className="text-muted-foreground mb-4">
-                            {t('empty.inProgress')}
-                          </p>
-                          <Link href="/challenges">
-                            <Button variant="outline">{t('empty.exploreChallenges')}</Button>
-                          </Link>
-                        </div>
-                      ) : (
-                        inProgress.map(({ challenge, ...participation }) => (
-                          <Link
-                            key={participation.challenge_id}
-                            href={`/challenges/${participation.challenge_id}`}
-                            className="block"
-                          >
-                            <div className="flex items-center justify-between p-4 rounded-lg border border-border hover:border-accent-cyan transition-colors">
-                              <div>
-                                <h4 className="font-medium">{challenge?.titre || 'Challenge'}</h4>
-                                <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
-                                  <Badge variant="outline" className="text-xs">
-                                    {challenge?.niveau_associe}
-                                  </Badge>
-                                  <span className="flex items-center gap-1 text-accent-jaune">
-                                    <Zap className="h-3 w-3" />
-                                    {challenge?.xp} {tCommon('xp')}
-                                  </span>
-                                </div>
-                              </div>
-                              <Button size="sm" className="bg-accent-cyan hover:bg-accent-cyan/80 text-black">
-                                {tChallenges('continue')}
-                              </Button>
-                            </div>
-                          </Link>
-                        ))
-                      )}
-                    </TabsContent>
-
-                    <TabsContent value="termines" className="space-y-3">
-                      {isLoading ? (
-                        <div className="flex justify-center py-8">
-                          <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
-                        </div>
-                      ) : completed.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-8">
-                          {t('empty.completed')}
-                        </p>
-                      ) : (
-                        completed.map(({ challenge, ...participation }) => (
-                          <Link
-                            key={participation.challenge_id}
-                            href={`/challenges/${participation.challenge_id}`}
-                            className="block"
-                          >
-                            <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-card/50 hover:border-accent-vert transition-colors">
-                              <div className="flex items-center gap-3">
-                                <CheckCircle className="h-5 w-5 text-accent-vert" />
+                        {isLoading ? (
+                          <div className="flex justify-center py-8">
+                            <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
+                          </div>
+                        ) : inProgress.length === 0 ? (
+                          <div className="text-center py-8">
+                            <p className="text-muted-foreground mb-4">
+                              {t('empty.inProgress')}
+                            </p>
+                            <Link href="/challenges">
+                              <Button variant="outline">{t('empty.exploreChallenges')}</Button>
+                            </Link>
+                          </div>
+                        ) : (
+                          inProgress.map(({ challenge, ...participation }) => (
+                            <Link
+                              key={participation.challenge_id}
+                              href={"/challenges/" + participation.challenge_id}
+                              className="block"
+                            >
+                              <div className="flex items-center justify-between p-4 rounded-lg border border-border hover:border-accent-cyan transition-colors">
                                 <div>
                                   <h4 className="font-medium">{challenge?.titre || 'Challenge'}</h4>
                                   <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
                                     <Badge variant="outline" className="text-xs">
                                       {challenge?.niveau_associe}
                                     </Badge>
-                                    <span className="flex items-center gap-1 text-accent-vert">
+                                    <span className="flex items-center gap-1 text-accent-jaune">
                                       <Zap className="h-3 w-3" />
-                                      +{challenge?.xp} {tCommon('xp')}
+                                      {challenge?.xp} {tCommon('xp')}
                                     </span>
                                   </div>
                                 </div>
+                                <Button size="sm" className="bg-accent-cyan hover:bg-accent-cyan/80 text-black">
+                                  {tChallenges('continue')}
+                                </Button>
                               </div>
-                              <Button variant="ghost" size="sm">
-                                {tChallenges('review')}
-                              </Button>
-                            </div>
-                          </Link>
-                        ))
-                      )}
-                    </TabsContent>
+                            </Link>
+                          ))
+                        )}
+                      </TabsContent>
 
-                    <TabsContent value="proposes" className="space-y-3">
-                      {isLoading ? (
-                        <div className="flex justify-center py-8">
-                          <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
-                        </div>
-                      ) : proposedChallenges.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-8">
-                          {t('empty.proposed')}
-                        </p>
-                      ) : (
-                        proposedChallenges.map((challenge) => (
-                          <Link
-                            key={challenge.id}
-                            href={`/challenges/${challenge.id}`}
-                            className="block"
-                          >
-                            <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-card/50 hover:border-accent-cyan transition-colors">
-                              <div>
-                                <h4 className="font-medium">{challenge.titre}</h4>
-                                <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
-                                  <Badge variant="outline" className="text-xs">
-                                    {challenge.niveau_associe}
-                                  </Badge>
-                                  <span className="text-xs uppercase">{challenge.statut}</span>
-                                </div>
-                                {challenge.statut === 'Refuse' && challenge.validation_commentaire && (
-                                  <p className="mt-2 text-xs text-destructive">
-                                    {t('refused')}: {challenge.validation_commentaire}
-                                  </p>
-                                )}
-                              </div>
-                              <Button variant="ghost" size="sm">
-                                {tCommon('view')}
-                              </Button>
-                            </div>
-                          </Link>
-                        ))
-                      )}
-                    </TabsContent>
-
-                    <TabsContent value="ideas" className="space-y-3">
-                      {isLoading ? (
-                        <div className="flex justify-center py-8">
-                          <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
-                        </div>
-                      ) : myIdeas.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-8">
-                          {t('empty.ideas')}
-                        </p>
-                      ) : (
-                        myIdeas.map((idea) => (
-                          <div key={idea.id} className="rounded-lg border border-border bg-card/50 p-4 space-y-2">
-                            <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="text-xs">
-                                {idea.themes[0] ? tIdeas(`ideaThemes.${idea.themes[0]}`) : '-'}
-                              </Badge>
-                              <span className="text-xs uppercase text-muted-foreground">
-                                {tIdeas(`ideaStatus.${idea.statut}`)}
-                              </span>
-                            </div>
-                            <h4 className="font-medium">{idea.titre}</h4>
-                            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{idea.description}</p>
-                            {idea.statut === 'Refusee' && idea.validation_commentaire && (
-                              <p className="text-xs text-destructive">
-                                {t('refused')}: {idea.validation_commentaire}
-                              </p>
-                            )}
-                            <div className="flex items-center gap-2 pt-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setEditingIdea(idea)}
-                              >
-                                {tIdeas('edit')}
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-destructive hover:text-destructive"
-                                onClick={() => handleDeleteIdea(idea)}
-                              >
-                                {tCommon('delete')}
-                              </Button>
-                            </div>
+                      <TabsContent value="termines" className="space-y-3">
+                        {isLoading ? (
+                          <div className="flex justify-center py-8">
+                            <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
                           </div>
-                        ))
-                      )}
-                    </TabsContent>
-                  </Tabs>
+                        ) : completed.length === 0 ? (
+                          <p className="text-muted-foreground text-center py-8">
+                            {t('empty.completed')}
+                          </p>
+                        ) : (
+                          completed.map(({ challenge, ...participation }) => (
+                            <Link
+                              key={participation.challenge_id}
+                              href={"/challenges/" + participation.challenge_id}
+                              className="block"
+                            >
+                              <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-card/50 hover:border-accent-vert transition-colors">
+                                <div className="flex items-center gap-3">
+                                  <CheckCircle className="h-5 w-5 text-accent-vert" />
+                                  <div>
+                                    <h4 className="font-medium">{challenge?.titre || 'Challenge'}</h4>
+                                    <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
+                                      <Badge variant="outline" className="text-xs">
+                                        {challenge?.niveau_associe}
+                                      </Badge>
+                                      <span className="flex items-center gap-1 text-accent-vert">
+                                        <Zap className="h-3 w-3" />
+                                        +{challenge?.xp} {tCommon('xp')}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <Button variant="ghost" size="sm">
+                                  {tChallenges('review')}
+                                </Button>
+                              </div>
+                            </Link>
+                          ))
+                        )}
+                      </TabsContent>
+
+                      <TabsContent value="proposes" className="space-y-3">
+                        {isLoading ? (
+                          <div className="flex justify-center py-8">
+                            <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
+                          </div>
+                        ) : proposedChallenges.length === 0 ? (
+                          <p className="text-muted-foreground text-center py-8">
+                            {t('empty.proposed')}
+                          </p>
+                        ) : (
+                          proposedChallenges.map((challenge) => (
+                            <Link
+                              key={challenge.id}
+                              href={"/challenges/" + challenge.id}
+                              className="block"
+                            >
+                              <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-card/50 hover:border-accent-cyan transition-colors">
+                                <div>
+                                  <h4 className="font-medium">{challenge.titre}</h4>
+                                  <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
+                                    <Badge variant="outline" className="text-xs">
+                                      {challenge.niveau_associe}
+                                    </Badge>
+                                    <span className="text-xs uppercase">{challenge.statut}</span>
+                                  </div>
+                                  {challenge.statut === 'Refuse' && challenge.validation_commentaire && (
+                                    <p className="mt-2 text-xs text-destructive">
+                                      {t('refused')}: {challenge.validation_commentaire}
+                                    </p>
+                                  )}
+                                </div>
+                                <Button variant="ghost" size="sm">
+                                  {tCommon('view')}
+                                </Button>
+                              </div>
+                            </Link>
+                          ))
+                        )}
+                      </TabsContent>
+
+                      <TabsContent value="ideas" className="space-y-3">
+                        {isLoading ? (
+                          <div className="flex justify-center py-8">
+                            <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
+                          </div>
+                        ) : myIdeas.length === 0 ? (
+                          <p className="text-muted-foreground text-center py-8">
+                            {t('empty.ideas')}
+                          </p>
+                        ) : (
+                          myIdeas.map((idea) => (
+                            <div key={idea.id} className="rounded-lg border border-border bg-card/50 p-4 space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Badge variant="outline" className="text-xs">
+                                  {idea.themes[0] ? tIdeas('ideaThemes.' + idea.themes[0]) : '-'}
+                                </Badge>
+                                <span className="text-xs uppercase text-muted-foreground">
+                                  {tIdeas('ideaStatus.' + idea.statut)}
+                                </span>
+                              </div>
+                              <h4 className="font-medium">{idea.titre}</h4>
+                              <p className="text-sm text-muted-foreground whitespace-pre-wrap">{idea.description}</p>
+                              {idea.statut === 'Refusee' && idea.validation_commentaire && (
+                                <p className="text-xs text-destructive">
+                                  {t('refused')}: {idea.validation_commentaire}
+                                </p>
+                              )}
+                              <div className="flex items-center gap-2 pt-2">
+                                <Button variant="outline" size="sm" onClick={() => setEditingIdea(idea)}>
+                                  {tIdeas('edit')}
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-destructive hover:text-destructive"
+                                  onClick={() => handleDeleteIdea(idea)}
+                                >
+                                  {tCommon('delete')}
+                                </Button>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </TabsContent>
+                    </Tabs>
+                  )}
                 </CardContent>
               </Card>
 
