@@ -19,6 +19,8 @@
     "events": "Events",
     "myPage": "My Page",
     "validation": "Validation",
+    "ideas": "Ideas",
+    "ideasValidation": "Ideas validation",
     "login": "Sign in",
     "logout": "Sign out"
   },
@@ -232,6 +234,21 @@
       "rejectionRequired": "Add a comment for the rejection.",
       "proposedSolution": "Proposed solution",
       "attachments": "Attachments"
+    },
+    "ideas": {
+      "title": "Ideas validation",
+      "subtitle": "Validate proposed ideas and collect GitHub for repo access.",
+      "accessDenied": "Access reserved for administrators.",
+      "noPending": "No pending idea.",
+      "validate": "Validate",
+      "reject": "Reject",
+      "rejectionComment": "Rejection comment",
+      "rejectionPlaceholder": "Explain why the idea is rejected",
+      "rejectionRequired": "Add a comment for the rejection.",
+      "githubLabel": "GitHub username (for repo access)",
+      "githubPlaceholder": "ex: firstnamelastname",
+      "githubRequired": "Add the GitHub username before validating.",
+      "loading": "Loading..."
     }
   },
   "states": {
@@ -266,5 +283,47 @@
     "design": "🎨 Design & UX",
     "research": "🔍 Research & Monitoring",
     "prompting": "🧠 Prompt Engineering"
+  },
+  "ideas": {
+    "title": "Ideas",
+    "subtitle": "Propose ideas to improve the platform and vote for the best ones.",
+    "loading": "Loading...",
+    "empty": "No ideas yet.",
+    "loginRequiredToVote": "Sign in to vote.",
+    "vote": "Vote",
+    "voted": "Voted",
+    "votes": "{count} vote",
+    "votesPlural": "{count} votes",
+    "status": {
+      "Proposee": "Proposed",
+      "Validee": "Validated",
+      "Refusee": "Rejected"
+    },
+    "themes": {
+      "correction_bug": "Bug fix",
+      "nouvelle_fonctionnalite": "New feature",
+      "amelioration_ui": "UI/UX improvement",
+      "performance": "Performance",
+      "contenu": "Content",
+      "autre": "Other"
+    },
+    "propose": {
+      "title": "Propose an idea",
+      "subtitle": "Describe your idea and add screenshots if needed.",
+      "backToIdeas": "Back to ideas",
+      "loginRequired": "Sign in to propose an idea.",
+      "titleLabel": "Title *",
+      "titlePlaceholder": "Ex: Add dark mode",
+      "descriptionLabel": "Description *",
+      "descriptionPlaceholder": "Explain the problem, context and impact...",
+      "themesLabel": "Themes (max 3)",
+      "themesHint": "Select up to 3 themes.",
+      "screenshots": "Screenshots (optional)",
+      "submit": "Propose",
+      "sending": "Sending...",
+      "success": "Idea proposed!",
+      "errorRequired": "Title and description are required",
+      "errorGeneric": "Error while proposing."
+    }
   }
 }

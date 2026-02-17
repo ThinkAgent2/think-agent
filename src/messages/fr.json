@@ -19,6 +19,8 @@
     "events": "Événements",
     "myPage": "Ma Page",
     "validation": "Validation",
+    "ideas": "Idées",
+    "ideasValidation": "Validation idées",
     "login": "Se connecter",
     "logout": "Déconnexion"
   },
@@ -232,6 +234,21 @@
       "rejectionRequired": "Ajoute un commentaire pour le refus.",
       "proposedSolution": "Solution proposée",
       "attachments": "Pièces jointes"
+    },
+    "ideas": {
+      "title": "Validation des idées",
+      "subtitle": "Valide les idées proposées et collecte le GitHub pour l'accès repo.",
+      "accessDenied": "Accès réservé aux administrateurs.",
+      "noPending": "Aucune idée en attente.",
+      "validate": "Valider",
+      "reject": "Refuser",
+      "rejectionComment": "Commentaire de refus",
+      "rejectionPlaceholder": "Explique pourquoi l'idée est refusée",
+      "rejectionRequired": "Ajoute un commentaire pour le refus.",
+      "githubLabel": "Pseudo GitHub (pour accès repo)",
+      "githubPlaceholder": "ex: prenomnom",
+      "githubRequired": "Ajoute le pseudo GitHub avant de valider.",
+      "loading": "Chargement..."
     }
   },
   "states": {
@@ -266,5 +283,47 @@
     "design": "🎨 Design & UX",
     "research": "🔍 Recherche & Veille",
     "prompting": "🧠 Prompt Engineering"
+  },
+  "ideas": {
+    "title": "Idées",
+    "subtitle": "Propose des idées pour améliorer la plateforme et vote pour les meilleures.",
+    "loading": "Chargement...",
+    "empty": "Aucune idée pour le moment.",
+    "loginRequiredToVote": "Connecte-toi pour voter.",
+    "vote": "Voter",
+    "voted": "Voté",
+    "votes": "{count} vote",
+    "votesPlural": "{count} votes",
+    "status": {
+      "Proposee": "Proposée",
+      "Validee": "Validée",
+      "Refusee": "Refusée"
+    },
+    "themes": {
+      "correction_bug": "Correction de bug",
+      "nouvelle_fonctionnalite": "Nouvelle fonctionnalité",
+      "amelioration_ui": "Amélioration UI/UX",
+      "performance": "Performance",
+      "contenu": "Contenu",
+      "autre": "Autre"
+    },
+    "propose": {
+      "title": "Proposer une idée",
+      "subtitle": "Décris ton idée et ajoute des screenshots si besoin.",
+      "backToIdeas": "Retour aux idées",
+      "loginRequired": "Connecte-toi pour proposer une idée.",
+      "titleLabel": "Titre *",
+      "titlePlaceholder": "Ex: Ajout d'un mode sombre",
+      "descriptionLabel": "Description *",
+      "descriptionPlaceholder": "Explique le problème, le contexte et l'impact...",
+      "themesLabel": "Thématiques (max 3)",
+      "themesHint": "Sélectionne jusqu'à 3 thématiques.",
+      "screenshots": "Screenshots (optionnel)",
+      "submit": "Proposer",
+      "sending": "Envoi...",
+      "success": "Idée proposée !",
+      "errorRequired": "Titre et description sont obligatoires",
+      "errorGeneric": "Erreur lors de la proposition."
+    }
   }
 }

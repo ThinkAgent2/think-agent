@@ -22,12 +22,14 @@ export function Header() {
 
   const navItems = [
     { href: '/challenges', label: t('challenges'), icon: Zap },
+    { href: '/ideas', label: t('ideas'), icon: Zap },
     { href: '/events', label: t('events'), icon: Calendar },
     { href: '/me', label: t('myPage'), icon: User },
   ];
 
   const adminItems = [
     { href: '/admin/challenges', label: t('validation'), icon: User },
+    { href: '/admin/ideas', label: t('ideasValidation'), icon: User },
   ];
 
   return (

@@ -8,6 +8,14 @@ export type ChallengeStatus = 'Actif' | 'Archivé' | 'Propose' | 'Valide' | 'Pub
 export type SolutionStatus = 'Soumise' | 'Évaluée';
 export type ParticipationStatus = 'En_cours' | 'Terminé' | 'Abandonné';
 export type EventFormat = 'En_Ligne' | 'Présentiel';
+export type IdeaStatus = 'Proposee' | 'Validee' | 'Refusee';
+export type IdeaTheme =
+  | 'correction_bug'
+  | 'nouvelle_fonctionnalite'
+  | 'amelioration_ui'
+  | 'performance'
+  | 'contenu'
+  | 'autre';
 
 // Marques eXalt
 export type Marque = 'FLOW' | 'IT' | 'VALUE' | 'FORGE' | 'FI' | 'SHIELD' | 'NILO' | 'DSM';
@@ -103,6 +111,32 @@ export interface Badge {
   description: string;
   emoji: string;
   conditions: Record<string, unknown>;
+}
+
+export interface IdeaProposal {
+  id: string;
+  titre: string;
+  description: string;
+  auteur_id: string | null;
+  themes: IdeaTheme[];
+  screenshots: string[] | null;
+  statut: IdeaStatus;
+  github_username: string | null;
+  validation_commentaire: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface IdeaVote {
+  id: string;
+  idea_id: string;
+  user_id: string;
+  created_at: string;
+}
+
+export interface IdeaWithVotes extends IdeaProposal {
+  votes: number;
+  hasVoted?: boolean;
 }
 
 export interface UserBadge {

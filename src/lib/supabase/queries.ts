@@ -2,7 +2,7 @@ import { createClient } from './client';
 import type { 
   User, Challenge, Participation, Solution, 
   Badge, DojoEvent, ChallengeFilters, LeaderboardEntry,
-  UserLevel, ChallengeStatus
+  UserLevel, ChallengeStatus, IdeaProposal, IdeaVote, IdeaWithVotes
 } from '@/types/database';
 import { formatNameFromEmail } from '@/lib/userName';
 import { localizeChallenge, localizeBadge, localizeDojoEvent } from './localization';
@@ -618,6 +618,113 @@ export async function getMetiers() {
     return [];
   }
   return data || [];
+}
+
+// ==========================================
+// IDEAS
+// ==========================================
+
+type IdeaVoteCount = { idea_id: string; votes: number };
+
+type IdeaVoteRow = { idea_id: string };
+
+export async function getIdeasWithVotes(userId?: string | null): Promise<IdeaWithVotes[]> {
+  const { data: ideas, error } = await supabase
+    .from('idea_proposals')
+    .select('*');
+
+  if (error) {
+    console.error('Error fetching ideas:', error);
+    return [];
+  }
+
+  const { data: counts, error: countError } = await supabase
+    .from('idea_vote_counts')
+    .select('*');
+
+  if (countError) {
+    console.error('Error fetching idea vote counts:', countError);
+  }
+
+  const votesMap = new Map<string, number>();
+  (counts as IdeaVoteCount[] | null | undefined)?.forEach((row) => {
+    votesMap.set(row.idea_id, row.votes);
+  });
+
+  let userVotesSet = new Set<string>();
+  if (userId) {
+    const { data: userVotes, error: userVoteError } = await supabase
+      .from('idea_votes')
+      .select('idea_id')
+      .eq('user_id', userId);
+
+    if (userVoteError) {
+      console.error('Error fetching user votes:', userVoteError);
+    }
+
+    (userVotes as IdeaVoteRow[] | null | undefined)?.forEach((row) => {
+      userVotesSet.add(row.idea_id);
+    });
+  }
+
+  const mapped = (ideas || []).map((idea) => ({
+    ...(idea as IdeaProposal),
+    votes: votesMap.get(idea.id) ?? 0,
+    hasVoted: userId ? userVotesSet.has(idea.id) : false,
+  }));
+
+  return mapped.sort((a, b) => {
+    if (b.votes !== a.votes) return b.votes - a.votes;
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
+}
+
+export async function createIdeaProposal(
+  idea: Omit<IdeaProposal, 'id' | 'created_at' | 'updated_at'>
+): Promise<{ data: IdeaProposal | null; error: string | null }> {
+  const { data, error } = await supabase
+    .from('idea_proposals')
+    .insert(idea)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating idea proposal:', error);
+    return { data: null, error: error.message };
+  }
+
+  return { data, error: null };
+}
+
+export async function voteIdea(ideaId: string, userId: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('idea_votes')
+    .insert({ idea_id: ideaId, user_id: userId });
+
+  if (error) {
+    console.error('Error voting idea:', error);
+    return false;
+  }
+
+  return true;
+}
+
+export async function updateIdeaProposal(
+  id: string,
+  updates: Partial<IdeaProposal>
+): Promise<IdeaProposal | null> {
+  const { data, error } = await supabase
+    .from('idea_proposals')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating idea proposal:', error);
+    return null;
+  }
+  return data;
 }
 
 // ==========================================
