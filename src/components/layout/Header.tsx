@@ -28,8 +28,7 @@ export function Header() {
   ];
 
   const adminItems = [
-    { href: '/admin/challenges', label: t('validation'), icon: User },
-    { href: '/admin/ideas', label: t('ideasValidation'), icon: User },
+    { href: '/admin/validation', label: t('validation'), icon: User },
   ];
 
   return (

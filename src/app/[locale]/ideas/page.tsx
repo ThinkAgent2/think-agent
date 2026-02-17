@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth';
 import { getIdeasWithVotes, voteIdea } from '@/lib/supabase/queries';
 import { IdeaCard } from '@/components/ideas/IdeaCard';
@@ -48,8 +50,17 @@ export default function IdeasPage() {
 
       <main className="flex-1 py-8">
         <div className="container mx-auto px-4 max-w-4xl">
-          <h1 className="text-3xl font-bold mb-2">{t('title')}</h1>
-          <p className="text-muted-foreground mb-6">{t('subtitle')}</p>
+          <div className="flex items-start justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">{t('title')}</h1>
+              <p className="text-muted-foreground">{t('subtitle')}</p>
+            </div>
+            <Link href="/ideas/propose">
+              <Button size="sm" className="bg-exalt-blue hover:bg-exalt-blue/80 text-white">
+                {t('proposeCta')}
+              </Button>
+            </Link>
+          </div>
 
           {!user && (
             <p className="text-sm text-muted-foreground mb-4">{t('loginRequiredToVote')}</p>

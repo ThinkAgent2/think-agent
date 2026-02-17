@@ -11,8 +11,7 @@ import { useAuth } from '@/lib/auth';
 import { getIdeasWithVotes, updateIdeaProposal } from '@/lib/supabase/queries';
 import type { IdeaWithVotes } from '@/types/database';
 
-export default function AdminIdeasPage() {
-  const { user } = useAuth();
+export function AdminIdeasContent() {
   const t = useTranslations('admin.ideas');
   const tIdeas = useTranslations('ideas');
   const [ideas, setIdeas] = useState<IdeaWithVotes[]>([]);
@@ -29,18 +28,6 @@ export default function AdminIdeasPage() {
     }
     loadIdeas();
   }, []);
-
-  if (!user || user.role !== 'Administrateur') {
-    return (
-      <div className="flex min-h-screen flex-col">
-        <Header />
-        <main className="flex-1 flex items-center justify-center">
-          <p className="text-muted-foreground">{t('accessDenied')}</p>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
 
   const handleValidate = async (idea: IdeaWithVotes) => {
     const username = githubUsernames[idea.id]?.trim();
@@ -78,96 +65,117 @@ export default function AdminIdeasPage() {
   };
 
   return (
+    <>
+      <h1 className="text-3xl font-bold mb-2">{t('title')}</h1>
+      <p className="text-muted-foreground mb-6">{t('subtitle')}</p>
+
+      {isLoading ? (
+        <p className="text-muted-foreground">{t('loading')}</p>
+      ) : ideas.length === 0 ? (
+        <p className="text-muted-foreground">{t('noPending')}</p>
+      ) : (
+        <div className="space-y-4">
+          {ideas.map((idea) => (
+            <div key={idea.id} className="rounded-lg border border-border bg-card p-4 space-y-3">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    {idea.themes.map((theme) => (
+                      <Badge key={theme} variant="outline">
+                        {tIdeas(`themes.${theme}`)}
+                      </Badge>
+                    ))}
+                    <Badge className="bg-accent-cyan/20 text-accent-cyan border-accent-cyan/40">
+                      {tIdeas(`status.${idea.statut}`)}
+                    </Badge>
+                  </div>
+                  <h3 className="text-lg font-semibold">{idea.titre}</h3>
+                  <p className="text-sm text-muted-foreground">{idea.description}</p>
+                </div>
+                <div className="text-sm text-muted-foreground">{tIdeas('votes', { count: idea.votes })}</div>
+              </div>
+
+              {idea.screenshots && idea.screenshots.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {idea.screenshots.map((url) => (
+                    <a key={url} href={url} target="_blank" rel="noreferrer">
+                      <img
+                        src={url}
+                        alt={idea.titre}
+                        className="w-full h-24 object-cover rounded-md border border-border"
+                      />
+                    </a>
+                  ))}
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t('githubLabel')}</label>
+                  <Input
+                    value={githubUsernames[idea.id] || ''}
+                    onChange={(event) =>
+                      setGithubUsernames((prev) => ({
+                        ...prev,
+                        [idea.id]: event.target.value,
+                      }))
+                    }
+                    placeholder={t('githubPlaceholder')}
+                  />
+                </div>
+                <div className="flex items-end gap-2">
+                  <Button onClick={() => handleValidate(idea)}>{t('validate')}</Button>
+                  <Button variant="outline" onClick={() => handleReject(idea)}>
+                    {t('reject')}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">{t('rejectionComment')}</label>
+                <Input
+                  value={rejectionNotes[idea.id] || ''}
+                  onChange={(event) =>
+                    setRejectionNotes((prev) => ({
+                      ...prev,
+                      [idea.id]: event.target.value,
+                    }))
+                  }
+                  placeholder={t('rejectionPlaceholder')}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
+export default function AdminIdeasPage() {
+  const { user } = useAuth();
+  const t = useTranslations('admin.ideas');
+
+  if (!user || user.role !== 'Administrateur') {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <p className="text-muted-foreground">{t('accessDenied')}</p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
     <div className="flex min-h-screen flex-col">
       <Header />
-
       <main className="flex-1 py-8">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold mb-2">{t('title')}</h1>
-          <p className="text-muted-foreground mb-6">{t('subtitle')}</p>
-
-          {isLoading ? (
-            <p className="text-muted-foreground">{t('loading')}</p>
-          ) : ideas.length === 0 ? (
-            <p className="text-muted-foreground">{t('noPending')}</p>
-          ) : (
-            <div className="space-y-4">
-              {ideas.map((idea) => (
-                <div key={idea.id} className="rounded-lg border border-border bg-card p-4 space-y-3">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        {idea.themes.map((theme) => (
-                          <Badge key={theme} variant="outline">
-                            {tIdeas(`themes.${theme}`)}
-                          </Badge>
-                        ))}
-                        <Badge className="bg-accent-cyan/20 text-accent-cyan border-accent-cyan/40">
-                          {tIdeas(`status.${idea.statut}`)}
-                        </Badge>
-                      </div>
-                      <h3 className="text-lg font-semibold">{idea.titre}</h3>
-                      <p className="text-sm text-muted-foreground">{idea.description}</p>
-                    </div>
-                    <div className="text-sm text-muted-foreground">{tIdeas('votes', { count: idea.votes })}</div>
-                  </div>
-
-                  {idea.screenshots && idea.screenshots.length > 0 && (
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      {idea.screenshots.map((url) => (
-                        <a key={url} href={url} target="_blank" rel="noreferrer">
-                          <img
-                            src={url}
-                            alt={idea.titre}
-                            className="w-full h-24 object-cover rounded-md border border-border"
-                          />
-                        </a>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">{t('githubLabel')}</label>
-                      <Input
-                        value={githubUsernames[idea.id] || ''}
-                        onChange={(event) =>
-                          setGithubUsernames((prev) => ({
-                            ...prev,
-                            [idea.id]: event.target.value,
-                          }))
-                        }
-                        placeholder={t('githubPlaceholder')}
-                      />
-                    </div>
-                    <div className="flex items-end gap-2">
-                      <Button onClick={() => handleValidate(idea)}>{t('validate')}</Button>
-                      <Button variant="outline" onClick={() => handleReject(idea)}>
-                        {t('reject')}
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">{t('rejectionComment')}</label>
-                    <Input
-                      value={rejectionNotes[idea.id] || ''}
-                      onChange={(event) =>
-                        setRejectionNotes((prev) => ({
-                          ...prev,
-                          [idea.id]: event.target.value,
-                        }))
-                      }
-                      placeholder={t('rejectionPlaceholder')}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          <AdminIdeasContent />
         </div>
       </main>
-
       <Footer />
     </div>
   );

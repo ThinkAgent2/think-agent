@@ -21,6 +21,7 @@
     "validation": "Validation",
     "ideas": "Idées",
     "ideasValidation": "Validation idées",
+    "proposeIdea": "Proposer une idée",
     "login": "Se connecter",
     "logout": "Déconnexion"
   },
@@ -249,6 +250,11 @@
       "githubPlaceholder": "ex: prenomnom",
       "githubRequired": "Ajoute le pseudo GitHub avant de valider.",
       "loading": "Chargement..."
+    },
+    "validationHub": {
+      "accessDenied": "Accès réservé aux administrateurs.",
+      "challenges": "Challenges",
+      "ideas": "Idées"
     }
   },
   "states": {
@@ -287,6 +293,7 @@
   "ideas": {
     "title": "Idées",
     "subtitle": "Propose des idées pour améliorer la plateforme et vote pour les meilleures.",
+    "proposeCta": "Proposer une idée",
     "loading": "Chargement...",
     "empty": "Aucune idée pour le moment.",
     "loginRequiredToVote": "Connecte-toi pour voter.",
