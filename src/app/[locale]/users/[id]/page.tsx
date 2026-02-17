@@ -72,6 +72,13 @@ export default function UserProfilePage() {
         return;
       }
 
+      const currentUserRaw = window.localStorage.getItem('think_agent_user');
+      const currentUser = currentUserRaw ? JSON.parse(currentUserRaw) : null;
+      if (currentUser?.id && currentUser.id === userData.id) {
+        router.push(`/${locale}/me`);
+        return;
+      }
+
       setUser(userData);
       setParticipations(participationsData);
       setAllBadges(allBadgesData);

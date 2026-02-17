@@ -188,6 +188,7 @@ export default function ProfilePage() {
     const updated = await updateUser(user.id, { featured_badge_id: badgeId });
     if (updated) {
       setFeaturedBadgeId(badgeId);
+      setStoredUser(updated);
     }
     setIsUpdatingBadge(false);
   };
