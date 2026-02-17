@@ -12,10 +12,7 @@ export type IdeaStatus = 'Proposee' | 'Validee' | 'Refusee';
 export type IdeaTheme =
   | 'correction_bug'
   | 'nouvelle_fonctionnalite'
-  | 'amelioration_ui'
-  | 'performance'
-  | 'contenu'
-  | 'autre';
+  | 'amelioration_ui';
 
 // Marques eXalt
 export type Marque = 'FLOW' | 'IT' | 'VALUE' | 'FORGE' | 'FI' | 'SHIELD' | 'NILO' | 'DSM';

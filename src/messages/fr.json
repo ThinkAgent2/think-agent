@@ -309,10 +309,7 @@
     "themes": {
       "correction_bug": "Correction de bug",
       "nouvelle_fonctionnalite": "Nouvelle fonctionnalité",
-      "amelioration_ui": "Amélioration UI/UX",
-      "performance": "Performance",
-      "contenu": "Contenu",
-      "autre": "Autre"
+      "amelioration_ui": "Amélioration UI/UX"
     },
     "propose": {
       "title": "Proposer une idée",
@@ -323,13 +320,14 @@
       "titlePlaceholder": "Ex: Ajout d'un mode sombre",
       "descriptionLabel": "Description *",
       "descriptionPlaceholder": "Explique le problème, le contexte et l'impact...",
-      "themesLabel": "Thématiques (max 3)",
-      "themesHint": "Sélectionne jusqu'à 3 thématiques.",
+      "themesLabel": "Thématique *",
+      "themesHint": "Choisis une seule thématique.",
       "screenshots": "Screenshots (optionnel)",
       "submit": "Proposer",
       "sending": "Envoi...",
       "success": "Idée proposée !",
       "errorRequired": "Titre et description sont obligatoires",
+      "errorThemeRequired": "Choisis une thématique",
       "errorGeneric": "Erreur lors de la proposition."
     }
   }

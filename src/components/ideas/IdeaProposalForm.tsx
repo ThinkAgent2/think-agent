@@ -19,9 +19,6 @@ const THEMES: { value: IdeaTheme; labelKey: string }[] = [
   { value: 'correction_bug', labelKey: 'themes.correction_bug' },
   { value: 'nouvelle_fonctionnalite', labelKey: 'themes.nouvelle_fonctionnalite' },
   { value: 'amelioration_ui', labelKey: 'themes.amelioration_ui' },
-  { value: 'performance', labelKey: 'themes.performance' },
-  { value: 'contenu', labelKey: 'themes.contenu' },
-  { value: 'autre', labelKey: 'themes.autre' },
 ];
 
 export function IdeaProposalForm({ authorId, onSuccess }: IdeaProposalFormProps) {
@@ -39,10 +36,9 @@ export function IdeaProposalForm({ authorId, onSuccess }: IdeaProposalFormProps)
     setFormData((prev) => {
       const exists = prev.themes.includes(theme);
       if (exists) {
-        return { ...prev, themes: prev.themes.filter((t) => t !== theme) };
+        return { ...prev, themes: [] };
       }
-      if (prev.themes.length >= 3) return prev;
-      return { ...prev, themes: [...prev.themes, theme] };
+      return { ...prev, themes: [theme] };
     });
   };
 
@@ -52,6 +48,11 @@ export function IdeaProposalForm({ authorId, onSuccess }: IdeaProposalFormProps)
 
     if (!formData.titre.trim() || !formData.description.trim()) {
       setFormError(t('errorRequired'));
+      return;
+    }
+
+    if (formData.themes.length === 0) {
+      setFormError(t('errorThemeRequired'));
       return;
     }
 
@@ -123,7 +124,6 @@ export function IdeaProposalForm({ authorId, onSuccess }: IdeaProposalFormProps)
             <div className="flex flex-wrap gap-2">
               {THEMES.map((theme) => {
                 const active = formData.themes.includes(theme.value);
-                const maxed = !active && formData.themes.length >= 3;
                 return (
                   <Button
                     key={theme.value}
@@ -131,7 +131,6 @@ export function IdeaProposalForm({ authorId, onSuccess }: IdeaProposalFormProps)
                     variant={active ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => toggleTheme(theme.value)}
-                    disabled={maxed}
                   >
                     {t(theme.labelKey)}
                   </Button>

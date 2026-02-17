@@ -309,10 +309,7 @@
     "themes": {
       "correction_bug": "Bug fix",
       "nouvelle_fonctionnalite": "New feature",
-      "amelioration_ui": "UI/UX improvement",
-      "performance": "Performance",
-      "contenu": "Content",
-      "autre": "Other"
+      "amelioration_ui": "UI/UX improvement"
     },
     "propose": {
       "title": "Propose an idea",
@@ -323,13 +320,14 @@
       "titlePlaceholder": "Ex: Add dark mode",
       "descriptionLabel": "Description *",
       "descriptionPlaceholder": "Explain the problem, context and impact...",
-      "themesLabel": "Themes (max 3)",
-      "themesHint": "Select up to 3 themes.",
+      "themesLabel": "Theme *",
+      "themesHint": "Select a single theme.",
       "screenshots": "Screenshots (optional)",
       "submit": "Propose",
       "sending": "Sending...",
       "success": "Idea proposed!",
       "errorRequired": "Title and description are required",
+      "errorThemeRequired": "Select a theme",
       "errorGeneric": "Error while proposing."
     }
   }
