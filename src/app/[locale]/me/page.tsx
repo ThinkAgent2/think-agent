@@ -11,17 +11,19 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { 
   Trophy, Zap, Target, Clock, CheckCircle, 
   Medal, Crown, Rocket, Brain, Loader2
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
-import { getUserParticipations, getAllBadges, getUserBadges, getLeaderboard, searchUsers, getUserChallenges, getUserIdeas, deleteIdeaProposal } from '@/lib/supabase/queries';
+import { getUserParticipations, getAllBadges, getUserBadges, getLeaderboard, searchUsers, getUserChallenges, getUserIdeas, deleteIdeaProposal, updateUser } from '@/lib/supabase/queries';
 import { formatNameFromEmail } from '@/lib/userName';
 import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry, IdeaProposal } from '@/types/database';
 import { IdeaProposalForm } from '@/components/ideas/IdeaProposalForm';
+import { AvatarUpload } from '@/components/profile/AvatarUpload';
+import { setStoredUser } from '@/lib/auth';
 
 const levelConfig: Record<string, { color: string; icon: typeof Brain; nextLevel: string | null; xpNeeded: number | null }> = {
   Explorer: { color: 'bg-accent-vert text-black', icon: Brain, nextLevel: 'Crafter', xpNeeded: 150 },
@@ -45,6 +47,8 @@ export default function ProfilePage() {
   const [proposedChallenges, setProposedChallenges] = useState<Challenge[]>([]);
   const [myIdeas, setMyIdeas] = useState<IdeaProposal[]>([]);
   const [editingIdea, setEditingIdea] = useState<IdeaProposal | null>(null);
+  const [featuredBadgeId, setFeaturedBadgeId] = useState<string | null>(null);
+  const [isUpdatingBadge, setIsUpdatingBadge] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const t = useTranslations('profile');
@@ -82,6 +86,7 @@ export default function ProfilePage() {
       setLeaderboard(leaderboardData);
       setProposedChallenges(proposedChallengesData);
       setMyIdeas(myIdeasData);
+      setFeaturedBadgeId(user.featured_badge_id || null);
       setIsLoading(false);
     }
     loadData();
@@ -177,6 +182,16 @@ export default function ProfilePage() {
     setEditingIdea(null);
   };
 
+  const handleBadgeSelect = async (badgeId: string | null) => {
+    if (!user) return;
+    setIsUpdatingBadge(true);
+    const updated = await updateUser(user.id, { featured_badge_id: badgeId });
+    if (updated) {
+      setFeaturedBadgeId(badgeId);
+    }
+    setIsUpdatingBadge(false);
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -190,12 +205,29 @@ export default function ProfilePage() {
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                    <Avatar className="h-20 w-20">
-                      <AvatarFallback className="bg-exalt-blue text-white text-2xl">
-                        {user.nom?.split(' ').map(n => n[0]).join('') || user.email[0].toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    
+                    <div className="flex flex-col items-start gap-3">
+                      <Avatar className="h-20 w-20">
+                        {user.avatar_url && <AvatarImage src={user.avatar_url} alt={displayName} />}
+                        <AvatarFallback className="bg-exalt-blue text-white text-2xl">
+                          {user.nom?.split(' ').map(n => n[0]).join('') || user.email[0].toUpperCase()}
+                        </AvatarFallback>
+                        {featuredBadgeId && (
+                          <AvatarBadge>
+                            <span className="text-[10px]">
+                              {badgesWithStatus.find((badge) => badge.id === featuredBadgeId)?.emoji || '🏅'}
+                            </span>
+                          </AvatarBadge>
+                        )}
+                      </Avatar>
+                      <AvatarUpload
+                        user={user}
+                        onUpdated={(updated) => {
+                          setStoredUser(updated);
+                          setFeaturedBadgeId(updated.featured_badge_id || null);
+                        }}
+                      />
+                    </div>
+
                     <div className="flex-1">
                       <div className="flex flex-wrap items-center gap-3 mb-2">
                         <h1 className="text-2xl font-bold">{displayName}</h1>
@@ -480,23 +512,62 @@ export default function ProfilePage() {
                       <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
                     </div>
                   ) : (
-                    <div className="grid grid-cols-3 gap-3">
-                      {badgesWithStatus.map((badge) => (
-                        <div
-                          key={badge.id}
-                          className={`flex flex-col items-center p-3 rounded-lg border transition-all ${
-                            badge.obtained
-                              ? 'border-accent-jaune/50 bg-accent-jaune/10'
-                              : 'border-border opacity-40'
-                          }`}
-                          title={badge.description || badge.nom}
-                        >
-                          <span className="text-2xl mb-1">{badge.emoji}</span>
-                          <span className="text-xs text-center text-muted-foreground">
-                            {badge.nom}
-                          </span>
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-sm font-medium mb-2">{t('featuredBadge')}</p>
+                        <div className="grid grid-cols-3 gap-3">
+                          {badgesWithStatus
+                            .filter((badge) => badge.obtained)
+                            .map((badge) => (
+                              <button
+                                key={badge.id}
+                                onClick={() => handleBadgeSelect(badge.id)}
+                                disabled={isUpdatingBadge}
+                                className={`flex flex-col items-center p-3 rounded-lg border transition-all ${
+                                  featuredBadgeId === badge.id
+                                    ? 'border-accent-cyan bg-accent-cyan/10'
+                                    : 'border-border'
+                                }`}
+                              >
+                                <span className="text-2xl mb-1">{badge.emoji}</span>
+                                <span className="text-xs text-center text-muted-foreground">
+                                  {badge.nom}
+                                </span>
+                              </button>
+                            ))}
                         </div>
-                      ))}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="mt-2"
+                          onClick={() => handleBadgeSelect(null)}
+                          disabled={isUpdatingBadge}
+                        >
+                          {t('featuredBadgeClear')}
+                        </Button>
+                      </div>
+
+                      <div>
+                        <p className="text-sm font-medium mb-2">{t('allBadges')}</p>
+                        <div className="grid grid-cols-3 gap-3">
+                          {badgesWithStatus.map((badge) => (
+                            <div
+                              key={badge.id}
+                              className={`flex flex-col items-center p-3 rounded-lg border transition-all ${
+                                badge.obtained
+                                  ? 'border-accent-jaune/50 bg-accent-jaune/10'
+                                  : 'border-border opacity-40'
+                              }`}
+                              title={badge.description || badge.nom}
+                            >
+                              <span className="text-2xl mb-1">{badge.emoji}</span>
+                              <span className="text-xs text-center text-muted-foreground">
+                                {badge.nom}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   )}
                 </CardContent>

@@ -202,7 +202,18 @@
       "exploreChallenges": "Explore challenges"
     },
     "refused": "Refused",
-    "backToMyProfile": "Back to my profile"
+    "backToMyProfile": "Back to my profile",
+    "featuredBadge": "Displayed badge",
+    "featuredBadgeClear": "Remove badge",
+    "allBadges": "All badges",
+    "avatar": {
+      "upload": "Change photo",
+      "uploading": "Uploading...",
+      "errorType": "Unsupported format (PNG/JPG/WebP).",
+      "errorSize": "Image too large (max 2 MB).",
+      "errorUpload": "Image upload error.",
+      "errorSave": "Error while saving."
+    }
   },
   "badges": {
     "title": "Badges"

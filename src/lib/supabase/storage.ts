@@ -2,6 +2,7 @@ import { createClient } from './client';
 
 const supabase = createClient();
 const BUCKET_NAME = 'solutions';
+const AVATAR_BUCKET = 'avatars';
 
 export interface UploadedFile {
   path: string;
@@ -114,4 +115,19 @@ export async function listSolutionFiles(
     return [];
   }
   return data.map((f) => `${userId}/${challengeId}/${f.name}`);
+}
+
+/**
+ * Supprimer un avatar
+ */
+export async function deleteAvatarFile(path: string): Promise<boolean> {
+  const { error } = await supabase.storage
+    .from(AVATAR_BUCKET)
+    .remove([path]);
+
+  if (error) {
+    console.error('Error deleting avatar file:', error);
+    return false;
+  }
+  return true;
 }

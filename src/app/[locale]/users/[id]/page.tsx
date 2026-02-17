@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import {
   Trophy, Zap, Target, Clock, CheckCircle,
@@ -179,9 +179,17 @@ export default function UserProfilePage() {
                 <CardContent className="pt-6">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
                     <Avatar className="h-20 w-20">
+                      {user.avatar_url && <AvatarImage src={user.avatar_url} alt={displayName} />}
                       <AvatarFallback className="bg-exalt-blue text-white text-2xl">
                         {user.nom?.split(' ').map(n => n[0]).join('') || user.email[0].toUpperCase()}
                       </AvatarFallback>
+                      {user.featured_badge_id && (
+                        <AvatarBadge>
+                          <span className="text-[10px]">
+                            {badgesWithStatus.find((badge) => badge.id === user.featured_badge_id)?.emoji || '🏅'}
+                          </span>
+                        </AvatarBadge>
+                      )}
                     </Avatar>
                     
                     <div className="flex-1">
