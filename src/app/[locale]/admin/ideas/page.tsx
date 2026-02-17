@@ -23,7 +23,7 @@ export function AdminIdeasContent() {
     async function loadIdeas() {
       setIsLoading(true);
       const data = await getIdeasWithVotes(null);
-      setIdeas(data.filter((idea) => idea.statut !== 'Validee'));
+      setIdeas(data.filter((idea) => idea.statut === 'Proposee'));
       setIsLoading(false);
     }
     loadIdeas();

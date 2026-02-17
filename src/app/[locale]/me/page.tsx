@@ -382,10 +382,10 @@ export default function ProfilePage() {
                           <div key={idea.id} className="rounded-lg border border-border bg-card/50 p-4 space-y-2">
                             <div className="flex items-center gap-2">
                               <Badge variant="outline" className="text-xs">
-                                {idea.themes[0] ? t(`ideaThemes.${idea.themes[0]}`) : '-'}
+                                {idea.themes[0] ? t(`ideas.ideaThemes.${idea.themes[0]}`) : '-'}
                               </Badge>
                               <span className="text-xs uppercase text-muted-foreground">
-                                {t(`ideaStatus.${idea.statut}`)}
+                                {t(`ideas.ideaStatus.${idea.statut}`)}
                               </span>
                             </div>
                             <h4 className="font-medium">{idea.titre}</h4>
