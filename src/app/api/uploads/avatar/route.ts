@@ -20,7 +20,7 @@ export async function POST(request: Request) {
 
   const buffer = Buffer.from(base64, 'base64');
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase.storage
     .from(BUCKET)
     .upload(path, buffer, {
