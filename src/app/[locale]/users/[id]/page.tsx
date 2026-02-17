@@ -192,7 +192,7 @@ export default function UserProfilePage() {
                       </AvatarFallback>
                       {user.featured_badge_id && (
                         <AvatarBadge>
-                          <span className="text-[10px]">
+                          <span className="text-xs">
                             {badgesWithStatus.find((badge) => badge.id === user.featured_badge_id)?.emoji || '🏅'}
                           </span>
                         </AvatarBadge>

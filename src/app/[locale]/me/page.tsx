@@ -214,7 +214,7 @@ export default function ProfilePage() {
                         </AvatarFallback>
                         {featuredBadgeId && (
                           <AvatarBadge>
-                            <span className="text-[10px]">
+                            <span className="text-xs">
                               {badgesWithStatus.find((badge) => badge.id === featuredBadgeId)?.emoji || '🏅'}
                             </span>
                           </AvatarBadge>
