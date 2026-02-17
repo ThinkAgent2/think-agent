@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
@@ -8,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Zap, Calendar, User, LogOut } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { getUserBadges } from '@/lib/supabase/queries';
 
 const levelColors: Record<string, string> = {
   Explorer: 'bg-accent-vert text-black',
@@ -19,6 +21,16 @@ export function Header() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const t = useTranslations('nav');
+  const [userBadgesMap, setUserBadgesMap] = React.useState(new Map<string, string>());
+
+  React.useEffect(() => {
+    async function loadBadges() {
+      if (!user) return;
+      const badges = await getUserBadges(user.id);
+      setUserBadgesMap(new Map(badges.map((badge) => [badge.id, badge.emoji])));
+    }
+    loadBadges();
+  }, [user]);
 
   const navItems = [
     { href: '/challenges', label: t('challenges'), icon: Zap },
@@ -101,8 +113,8 @@ export function Header() {
                     {user.nom?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
                   </AvatarFallback>
                   {user.featured_badge_id && (
-                    <AvatarBadge>
-                      <span className="text-[10px]">🏅</span>
+                    <AvatarBadge className="text-xs">
+                      {userBadgesMap.get(user.featured_badge_id) || '🏅'}
                     </AvatarBadge>
                   )}
                 </Avatar>
