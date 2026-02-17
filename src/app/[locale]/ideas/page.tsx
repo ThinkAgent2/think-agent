@@ -49,40 +49,47 @@ export default function IdeasPage() {
       <Header />
 
       <main className="flex-1 py-8">
-        <div className="container mx-auto px-4 max-w-4xl">
-          <div className="flex items-start justify-between gap-4 mb-6">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">{t('title')}</h1>
-              <p className="text-muted-foreground">{t('subtitle')}</p>
-            </div>
-            <Link href="/ideas/propose">
-              <Button size="sm" className="bg-exalt-blue hover:bg-exalt-blue/80 text-white">
-                {t('proposeCta')}
-              </Button>
-            </Link>
+        <div className="container mx-auto px-4 max-w-6xl">
+          <h1 className="text-3xl font-bold mb-2">{t('title')}</h1>
+          <p className="text-muted-foreground mb-6">{t('subtitle')}</p>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <aside className="lg:col-span-1">
+              <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+                <h2 className="text-lg font-semibold">{t('proposeTitle')}</h2>
+                <p className="text-sm text-muted-foreground">{t('proposeDescription')}</p>
+                <Link href="/ideas/propose">
+                  <Button size="sm" className="bg-exalt-blue hover:bg-exalt-blue/80 text-white">
+                    {t('proposeCta')}
+                  </Button>
+                </Link>
+              </div>
+            </aside>
+
+            <section className="lg:col-span-2">
+              {!user && (
+                <p className="text-sm text-muted-foreground mb-4">{t('loginRequiredToVote')}</p>
+              )}
+
+              {isLoading ? (
+                <p className="text-muted-foreground">{t('loading')}</p>
+              ) : ideas.length === 0 ? (
+                <p className="text-muted-foreground">{t('empty')}</p>
+              ) : (
+                <div className="space-y-4">
+                  {ideas.map((idea) => (
+                    <IdeaCard
+                      key={idea.id}
+                      idea={idea}
+                      canVote={!!user}
+                      onVote={handleVote}
+                      disabled={isVoting === idea.id}
+                    />
+                  ))}
+                </div>
+              )}
+            </section>
           </div>
-
-          {!user && (
-            <p className="text-sm text-muted-foreground mb-4">{t('loginRequiredToVote')}</p>
-          )}
-
-          {isLoading ? (
-            <p className="text-muted-foreground">{t('loading')}</p>
-          ) : ideas.length === 0 ? (
-            <p className="text-muted-foreground">{t('empty')}</p>
-          ) : (
-            <div className="space-y-4">
-              {ideas.map((idea) => (
-                <IdeaCard
-                  key={idea.id}
-                  idea={idea}
-                  canVote={!!user}
-                  onVote={handleVote}
-                  disabled={isVoting === idea.id}
-                />
-              ))}
-            </div>
-          )}
         </div>
       </main>
 

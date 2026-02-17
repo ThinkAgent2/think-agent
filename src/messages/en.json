@@ -294,6 +294,8 @@
     "title": "Ideas",
     "subtitle": "Propose ideas to improve the platform and vote for the best ones.",
     "proposeCta": "Propose an idea",
+    "proposeTitle": "Propose a new idea",
+    "proposeDescription": "Share an improvement, a new feature or a bug to fix.",
     "loading": "Loading...",
     "empty": "No ideas yet.",
     "loginRequiredToVote": "Sign in to vote.",
