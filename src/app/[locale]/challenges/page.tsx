@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { ChallengeCard } from '@/components/challenges/ChallengeCard';
@@ -15,6 +15,7 @@ import type { Challenge, Participation, ChallengeFilters as Filters } from '@/ty
 
 export default function ChallengesPage() {
   const { user } = useAuth();
+  const locale = useLocale();
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [participations, setParticipations] = useState<Participation[]>([]);
   const [filters, setFilters] = useState<Filters>({});
@@ -26,12 +27,12 @@ export default function ChallengesPage() {
   useEffect(() => {
     async function loadChallenges() {
       setIsLoading(true);
-      const data = await getChallenges(filters);
+      const data = await getChallenges(filters, locale);
       setChallenges(data);
       setIsLoading(false);
     }
     loadChallenges();
-  }, [filters]);
+  }, [filters, locale]);
 
   // Charger les participations de l'utilisateur
   useEffect(() => {
