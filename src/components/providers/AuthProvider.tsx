@@ -82,6 +82,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
     await loadUser(authId);
   }, [supabase, loadUser]);
 
+  useEffect(() => {
+    async function handleVisibility() {
+      if (document.visibilityState === 'visible') {
+        await refreshUser();
+      }
+    }
+
+    async function handleFocus() {
+      await refreshUser();
+    }
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [refreshUser]);
+
   return (
     <AuthContext.Provider value={{ user, isLoading, login, logout, refreshUser }}>
       {children}
