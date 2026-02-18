@@ -50,11 +50,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [supabase, loadUser]);
 
   const login = useCallback(async () => {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
     await supabase.auth.signInWithOAuth({
       provider: 'azure',
       options: {
         scopes: 'email',
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${siteUrl}/auth/callback`,
       },
     });
   }, [supabase]);
