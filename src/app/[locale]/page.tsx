@@ -11,6 +11,7 @@ import { useAuth } from '@/lib/auth';
 
 export default function HomePage() {
   const t = useTranslations('home');
+  const tNav = useTranslations('nav');
   const { user } = useAuth();
 
   return (
@@ -53,7 +54,7 @@ export default function HomePage() {
               {!user && (
                 <Link href="/login">
                   <Button size="lg" variant="outline" className="border-accent-cyan text-accent-cyan hover:bg-accent-cyan hover:text-black font-bold text-lg px-8 py-6">
-                    {useTranslations('nav')('login')}
+                    {tNav('login')}
                   </Button>
                 </Link>
               )}
