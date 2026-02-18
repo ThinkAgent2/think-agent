@@ -34,7 +34,7 @@ const levelConfig: Record<string, { color: string; icon: typeof Brain; nextLevel
 export default function ProfilePage() {
   const router = useRouter();
   const locale = useLocale();
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, isLoading: authLoading, refreshUser } = useAuth();
   const [activeTab, setActiveTab] = useState('en-cours');
   const [participations, setParticipations] = useState<(Participation & { challenge?: Challenge })[]>([]);
   const [allBadges, setAllBadges] = useState<BadgeType[]>([]);
@@ -189,6 +189,7 @@ export default function ProfilePage() {
     if (updated) {
       setFeaturedBadgeId(badgeId);
       setStoredUser(updated);
+      await refreshUser();
     }
     setIsUpdatingBadge(false);
   };
