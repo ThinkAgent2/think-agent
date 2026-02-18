@@ -113,7 +113,7 @@ export function Header() {
                     {user.nom?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
                   </AvatarFallback>
                   {user.featured_badge_id && (
-                    <AvatarBadge className="text-xs">
+                    <AvatarBadge className="text-xs translate-x-0.5 translate-y-0.5">
                       {userBadgesMap.get(user.featured_badge_id) ?? '🏅'}
                     </AvatarBadge>
                   )}

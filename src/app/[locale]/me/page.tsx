@@ -214,7 +214,7 @@ export default function ProfilePage() {
                           {user.nom?.split(' ').map(n => n[0]).join('') || user.email[0].toUpperCase()}
                         </AvatarFallback>
                         {featuredBadgeId && (
-                          <AvatarBadge className="text-2xl size-10">
+                          <AvatarBadge className="text-3xl size-12">
                             {badgesWithStatus.find((badge) => badge.id === featuredBadgeId)?.emoji || '🏅'}
                           </AvatarBadge>
                         )}
