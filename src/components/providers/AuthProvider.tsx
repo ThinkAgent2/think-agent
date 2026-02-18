@@ -51,11 +51,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const login = useCallback(async () => {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+    const locale = window.location.pathname.split('/')[1] || 'fr';
     await supabase.auth.signInWithOAuth({
       provider: 'azure',
       options: {
         scopes: 'email',
-        redirectTo: `${siteUrl}/auth/callback`,
+        redirectTo: `${siteUrl}/${locale}/auth/callback`,
       },
     });
   }, [supabase]);
