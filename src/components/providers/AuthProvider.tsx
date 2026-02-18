@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, ReactNode, useMemo } from 'react';
+import { useState, useEffect, useCallback, ReactNode, useMemo, useRef } from 'react';
 import { AuthContext } from '@/lib/auth';
 import { getUserByAuthId } from '@/lib/supabase/queries';
 import { createClient } from '@/lib/supabase/client';
@@ -14,12 +14,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const supabase = useMemo(() => createClient(), []);
+  const lastAuthIdRef = useRef<string | null>(null);
 
   const loadUser = useCallback(async (authId: string | null) => {
+    if (authId === lastAuthIdRef.current) {
+      return;
+    }
+
+    lastAuthIdRef.current = authId;
+
     if (!authId) {
       setUser(null);
       return;
     }
+
     const dbUser = await getUserByAuthId(authId);
     setUser(dbUser);
   }, []);
