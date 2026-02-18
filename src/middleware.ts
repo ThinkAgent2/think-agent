@@ -9,8 +9,9 @@ export async function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const locale = url.pathname.split('/')[1];
   const hasCode = url.searchParams.has('code');
+  const isCallback = url.pathname.startsWith(`/${locale}/auth/callback`);
 
-  if (hasCode && locale) {
+  if (hasCode && locale && !isCallback) {
     url.pathname = `/${locale}/auth/callback`;
     return Response.redirect(url);
   }
