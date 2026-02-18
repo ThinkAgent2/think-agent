@@ -22,6 +22,9 @@ export function Header() {
   const { user, logout } = useAuth();
   const t = useTranslations('nav');
   const [userBadgesMap, setUserBadgesMap] = React.useState(new Map<string, string>());
+  const featuredBadgeEmoji = user?.featured_badge_id
+    ? userBadgesMap.get(user.featured_badge_id) || null
+    : null;
 
   React.useEffect(() => {
     async function loadBadges() {
@@ -112,9 +115,9 @@ export function Header() {
                   <AvatarFallback className="bg-exalt-blue text-white text-xs">
                     {user.nom?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
                   </AvatarFallback>
-                  {user.featured_badge_id && (
+                  {featuredBadgeEmoji && (
                     <AvatarBadge className="text-xs translate-x-0.5 translate-y-0.5">
-                      {userBadgesMap.get(user.featured_badge_id) ?? '🏅'}
+                      {featuredBadgeEmoji}
                     </AvatarBadge>
                   )}
                 </Avatar>
