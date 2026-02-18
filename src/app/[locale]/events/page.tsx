@@ -187,12 +187,26 @@ export default function EventsPage() {
   const t = useTranslations('events');
 
   useEffect(() => {
+    let isCancelled = false;
+
     async function loadEvents() {
-      const data = await getDojoEvents(locale);
-      setEvents(data);
-      setIsLoading(false);
+      setIsLoading(true);
+      try {
+        const data = await getDojoEvents(locale);
+        if (!isCancelled) {
+          setEvents(data);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      }
     }
+
     loadEvents();
+    return () => {
+      isCancelled = true;
+    };
   }, [locale]);
 
   // Trier les événements : à venir d'abord, puis passés

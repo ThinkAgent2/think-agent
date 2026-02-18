@@ -25,13 +25,26 @@ export default function ChallengesPage() {
 
   // Charger les challenges
   useEffect(() => {
+    let isCancelled = false;
+
     async function loadChallenges() {
       setIsLoading(true);
-      const data = await getChallenges(filters, locale);
-      setChallenges(data);
-      setIsLoading(false);
+      try {
+        const data = await getChallenges(filters, locale);
+        if (!isCancelled) {
+          setChallenges(data);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      }
     }
+
     loadChallenges();
+    return () => {
+      isCancelled = true;
+    };
   }, [filters, locale]);
 
   // Charger les participations de l'utilisateur

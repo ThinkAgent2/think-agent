@@ -66,29 +66,42 @@ export default function ProfilePage() {
 
   // Charger les données
   useEffect(() => {
+    let isCancelled = false;
+
     async function loadData() {
       if (!user) return;
 
       setIsLoading(true);
-      const [participationsData, allBadgesData, userBadgesData, leaderboardData, proposedChallengesData, myIdeasData] = await Promise.all([
-        getUserParticipations(user.id),
-        getAllBadges(locale),
-        getUserBadges(user.id, locale),
-        getLeaderboard(10),
-        getUserChallenges(user.id),
-        getUserIdeas(user.id),
-      ]);
+      try {
+        const [participationsData, allBadgesData, userBadgesData, leaderboardData, proposedChallengesData, myIdeasData] = await Promise.all([
+          getUserParticipations(user.id),
+          getAllBadges(locale),
+          getUserBadges(user.id, locale),
+          getLeaderboard(10),
+          getUserChallenges(user.id),
+          getUserIdeas(user.id),
+        ]);
 
-      setParticipations(participationsData);
-      setAllBadges(allBadgesData);
-      setUserBadges(userBadgesData);
-      setLeaderboard(leaderboardData);
-      setProposedChallenges(proposedChallengesData);
-      setMyIdeas(myIdeasData);
-      setFeaturedBadgeId(user.featured_badge_id || null);
-      setIsLoading(false);
+        if (!isCancelled) {
+          setParticipations(participationsData);
+          setAllBadges(allBadgesData);
+          setUserBadges(userBadgesData);
+          setLeaderboard(leaderboardData);
+          setProposedChallenges(proposedChallengesData);
+          setMyIdeas(myIdeasData);
+          setFeaturedBadgeId(user.featured_badge_id || null);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      }
     }
+
     loadData();
+    return () => {
+      isCancelled = true;
+    };
   }, [user, locale]);
 
   useEffect(() => {

@@ -19,13 +19,26 @@ export default function IdeasPage() {
   const [isVoting, setIsVoting] = useState<string | null>(null);
 
   useEffect(() => {
+    let isCancelled = false;
+
     async function loadIdeas() {
       setIsLoading(true);
-      const data = await getIdeasWithVotes(user?.id ?? null);
-      setIdeas(data.filter((idea) => idea.statut === 'Proposee'));
-      setIsLoading(false);
+      try {
+        const data = await getIdeasWithVotes(user?.id ?? null);
+        if (!isCancelled) {
+          setIdeas(data.filter((idea) => idea.statut === 'Proposee'));
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      }
     }
+
     loadIdeas();
+    return () => {
+      isCancelled = true;
+    };
   }, [user?.id]);
 
   const handleVote = async (idea: IdeaWithVotes) => {

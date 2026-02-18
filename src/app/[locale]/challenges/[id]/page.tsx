@@ -76,24 +76,38 @@ export default function ChallengeDetailPage() {
 
   // Charger les données
   useEffect(() => {
+    let isCancelled = false;
+
     async function loadData() {
       setIsLoading(true);
-      
-      const challengeData = await getChallengeById(challengeId, locale);
-      setChallenge(challengeData);
 
-      if (user && challengeData) {
-        const [participationData, solutionData] = await Promise.all([
-          getParticipation(user.id, challengeId),
-          getSolution(user.id, challengeId),
-        ]);
-        setParticipation(participationData);
-        setSolution(solutionData);
+      try {
+        const challengeData = await getChallengeById(challengeId, locale);
+        if (!isCancelled) {
+          setChallenge(challengeData);
+        }
+
+        if (user && challengeData) {
+          const [participationData, solutionData] = await Promise.all([
+            getParticipation(user.id, challengeId),
+            getSolution(user.id, challengeId),
+          ]);
+          if (!isCancelled) {
+            setParticipation(participationData);
+            setSolution(solutionData);
+          }
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
       }
-
-      setIsLoading(false);
     }
+
     loadData();
+    return () => {
+      isCancelled = true;
+    };
   }, [challengeId, user, locale]);
 
   // Participer au challenge
