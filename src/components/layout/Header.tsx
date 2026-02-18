@@ -61,25 +61,9 @@ export function Header() {
         </div>
 
         {/* Navigation */}
-        <nav className="hidden md:flex items-center gap-6">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-2 text-sm font-medium transition-colors hover:text-accent-cyan ${
-                  isActive ? 'text-accent-cyan' : 'text-muted-foreground'
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-                {item.label}
-              </Link>
-            );
-          })}
-          {user?.role === 'Administrateur' &&
-            adminItems.map((item) => {
+        {user && (
+          <nav className="hidden md:flex items-center gap-6">
+            {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname.startsWith(item.href);
               return (
@@ -95,7 +79,25 @@ export function Header() {
                 </Link>
               );
             })}
-        </nav>
+            {user.role === 'Administrateur' &&
+              adminItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = pathname.startsWith(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-2 text-sm font-medium transition-colors hover:text-accent-cyan ${
+                      isActive ? 'text-accent-cyan' : 'text-muted-foreground'
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+          </nav>
+        )}
 
         {/* User section */}
         <div className="flex items-center gap-4">
