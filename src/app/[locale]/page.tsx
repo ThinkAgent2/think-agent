@@ -7,9 +7,11 @@ import { Badge } from '@/components/ui/badge';
 import { Zap, ArrowRight, Brain, Rocket, Crown } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { useAuth } from '@/lib/auth';
 
 export default function HomePage() {
   const t = useTranslations('home');
+  const { user } = useAuth();
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -48,11 +50,13 @@ export default function HomePage() {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Link href="/login">
-                <Button size="lg" variant="outline" className="border-accent-cyan text-accent-cyan hover:bg-accent-cyan hover:text-black font-bold text-lg px-8 py-6">
-                  {useTranslations('nav')('login')}
-                </Button>
-              </Link>
+              {!user && (
+                <Link href="/login">
+                  <Button size="lg" variant="outline" className="border-accent-cyan text-accent-cyan hover:bg-accent-cyan hover:text-black font-bold text-lg px-8 py-6">
+                    {useTranslations('nav')('login')}
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </section>
