@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, ReactNode } from 'react';
+import { useState, useEffect, useCallback, ReactNode, useMemo } from 'react';
 import { AuthContext } from '@/lib/auth';
 import { getUserByAuthId } from '@/lib/supabase/queries';
 import { createClient } from '@/lib/supabase/client';
@@ -13,7 +13,7 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const loadUser = useCallback(async (authId: string | null) => {
     if (!authId) {
