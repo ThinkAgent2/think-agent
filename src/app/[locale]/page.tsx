@@ -137,12 +137,14 @@ export default function HomePage() {
               {t('cta.description')}
             </p>
 
-            <Link href="/challenges">
-              <Button size="lg" className="bg-exalt-blue hover:bg-exalt-blue/80 text-white font-bold text-lg px-10 py-6">
-                {t('cta.button')}
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
+            {user && (
+              <Link href="/challenges">
+                <Button size="lg" className="bg-exalt-blue hover:bg-exalt-blue/80 text-white font-bold text-lg px-10 py-6">
+                  {t('cta.button')}
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+            )}
           </div>
         </section>
       </main>
