@@ -207,13 +207,13 @@ export default function ProfilePage() {
                 <CardContent className="pt-6">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
                     <div className="flex flex-col items-start gap-3">
-                      <Avatar className="h-20 w-20" size="lg">
+                      <Avatar className="h-20 w-20">
                         {user.avatar_url && <AvatarImage src={user.avatar_url} alt={displayName} />}
                         <AvatarFallback className="bg-exalt-blue text-white text-2xl">
                           {user.nom?.split(' ').map(n => n[0]).join('') || user.email[0].toUpperCase()}
                         </AvatarFallback>
                         {featuredBadgeId && (
-                          <AvatarBadge className="text-xl">
+                          <AvatarBadge className="text-2xl size-10">
                             {badgesWithStatus.find((badge) => badge.id === featuredBadgeId)?.emoji || '🏅'}
                           </AvatarBadge>
                         )}
