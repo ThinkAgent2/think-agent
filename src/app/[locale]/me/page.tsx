@@ -18,7 +18,7 @@ import {
   Medal, Crown, Rocket, Brain, Loader2
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
-import { getUserParticipations, getAllBadges, getUserBadges, getLeaderboard, searchUsers, getUserChallenges, getUserIdeas, deleteIdeaProposal, updateUser } from '@/lib/supabase/queries';
+import { getUserParticipations, getAllBadges, getUserBadges, getLeaderboard, searchUsers, getUserChallenges, getUserIdeas, deleteIdeaProposal, updateUser, deleteChallenge } from '@/lib/supabase/queries';
 import { formatNameFromEmail } from '@/lib/userName';
 import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry, IdeaProposal } from '@/types/database';
 import { IdeaProposalForm } from '@/components/ideas/IdeaProposalForm';
@@ -179,6 +179,16 @@ export default function ProfilePage() {
   const handleIdeaUpdated = (updated: IdeaProposal) => {
     setMyIdeas((prev) => prev.map((item) => (item.id === updated.id ? updated : item)));
     setEditingIdea(null);
+  };
+
+  const handleDeleteProposedChallenge = async (challenge: Challenge) => {
+    if (!confirm(tCommon('confirmDelete'))) return;
+    const result = await deleteChallenge(challenge.id);
+    if (result.success) {
+      setProposedChallenges((prev) => prev.filter((item) => item.id !== challenge.id));
+    } else {
+      alert(result.error || tCommon('genericError'));
+    }
   };
 
   const handleBadgeSelect = async (badgeId: string | null) => {
@@ -408,12 +418,14 @@ export default function ProfilePage() {
                           </p>
                         ) : (
                           proposedChallenges.map((challenge) => (
-                            <Link
+                            <div
                               key={challenge.id}
-                              href={"/challenges/" + challenge.id}
-                              className="block"
+                              className="flex items-center justify-between p-4 rounded-lg border border-border bg-card/50 hover:border-accent-cyan transition-colors"
                             >
-                              <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-card/50 hover:border-accent-cyan transition-colors">
+                              <Link
+                                href={"/challenges/" + challenge.id}
+                                className="flex-1"
+                              >
                                 <div>
                                   <h4 className="font-medium">{challenge.titre}</h4>
                                   <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
@@ -428,11 +440,25 @@ export default function ProfilePage() {
                                     </p>
                                   )}
                                 </div>
-                                <Button variant="ghost" size="sm">
-                                  {tCommon('view')}
+                              </Link>
+                              <div className="flex items-center gap-2">
+                                <Button variant="ghost" size="sm" asChild>
+                                  <Link href={"/challenges/" + challenge.id}>
+                                    {tCommon('view')}
+                                  </Link>
                                 </Button>
+                                {challenge.statut === 'Propose' && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-destructive hover:text-destructive"
+                                    onClick={() => handleDeleteProposedChallenge(challenge)}
+                                  >
+                                    {tCommon('delete')}
+                                  </Button>
+                                )}
                               </div>
-                            </Link>
+                            </div>
                           ))
                         )}
                       </TabsContent>
