@@ -125,7 +125,7 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={logout}
+                onClick={() => logout().then(() => window.location.href = '/')}
                 className="text-muted-foreground hover:text-accent-rose"
                 title={t('logout')}
               >
