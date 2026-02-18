@@ -83,32 +83,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [supabase, loadUser]);
 
   useEffect(() => {
-    async function refreshSessionAndUser() {
-      await supabase.auth.refreshSession();
-      await refreshUser();
-    }
-
     async function handleVisibility() {
       if (document.visibilityState === 'visible') {
-        await refreshSessionAndUser();
+        await refreshUser();
       }
     }
 
     async function handleFocus() {
-      await refreshSessionAndUser();
+      await refreshUser();
     }
-
-    const intervalId = window.setInterval(refreshSessionAndUser, 60_000);
 
     document.addEventListener('visibilitychange', handleVisibility);
     window.addEventListener('focus', handleFocus);
 
     return () => {
-      window.clearInterval(intervalId);
       document.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('focus', handleFocus);
     };
-  }, [refreshUser, supabase]);
+  }, [refreshUser]);
 
   return (
     <AuthContext.Provider value={{ user, isLoading, login, logout, refreshUser }}>
