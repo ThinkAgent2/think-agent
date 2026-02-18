@@ -28,19 +28,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
     let isMounted = true;
 
     async function init() {
-      const { data } = await supabase.auth.getSession();
-      const authId = data.session?.user?.id ?? null;
-      if (!isMounted) return;
-      await loadUser(authId);
-      setIsLoading(false);
+      try {
+        const { data } = await supabase.auth.getSession();
+        const authId = data.session?.user?.id ?? null;
+        if (!isMounted) return;
+        await loadUser(authId);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
     }
 
     init();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      const authId = session?.user?.id ?? null;
-      await loadUser(authId);
-      setIsLoading(false);
+      try {
+        const authId = session?.user?.id ?? null;
+        await loadUser(authId);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
     });
 
     return () => {
