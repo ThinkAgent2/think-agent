@@ -26,6 +26,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     let isMounted = true;
+    const timeoutId = window.setTimeout(() => {
+      if (isMounted) setIsLoading(false);
+    }, 3000);
 
     async function init() {
       try {
@@ -51,6 +54,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     return () => {
       isMounted = false;
+      window.clearTimeout(timeoutId);
       authListener.subscription.unsubscribe();
     };
   }, [supabase, loadUser]);
