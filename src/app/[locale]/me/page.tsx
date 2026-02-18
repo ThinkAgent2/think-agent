@@ -23,7 +23,6 @@ import { formatNameFromEmail } from '@/lib/userName';
 import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry, IdeaProposal } from '@/types/database';
 import { IdeaProposalForm } from '@/components/ideas/IdeaProposalForm';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
-import { setStoredUser } from '@/lib/auth';
 
 const levelConfig: Record<string, { color: string; icon: typeof Brain; nextLevel: string | null; xpNeeded: number | null }> = {
   Explorer: { color: 'bg-accent-vert text-black', icon: Brain, nextLevel: 'Crafter', xpNeeded: 150 },
@@ -188,7 +187,6 @@ export default function ProfilePage() {
     const updated = await updateUser(user.id, { featured_badge_id: badgeId });
     if (updated) {
       setFeaturedBadgeId(badgeId);
-      setStoredUser(updated);
       await refreshUser();
     }
     setIsUpdatingBadge(false);
@@ -222,7 +220,6 @@ export default function ProfilePage() {
                       <AvatarUpload
                         user={user}
                         onUpdated={(updated) => {
-                          setStoredUser(updated);
                           setFeaturedBadgeId(updated.featured_badge_id || null);
                         }}
                       />
