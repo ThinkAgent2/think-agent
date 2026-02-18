@@ -5,19 +5,18 @@ import { useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Zap, ArrowLeft, Mail, Loader2 } from 'lucide-react';
+import { Zap, ArrowLeft, Loader2 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 
 export default function LoginPage() {
   const router = useRouter();
   const locale = useLocale();
   const { user, login, isLoading: authLoading } = useAuth();
-  const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const t = useTranslations('login');
+  const tCommon = useTranslations('common');
 
   // Rediriger si déjà connecté
   useEffect(() => {
@@ -29,24 +28,10 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
-    const trimmedEmail = email.trim().toLowerCase();
-    
-    if (!trimmedEmail || !trimmedEmail.includes('@')) {
-      setError(t('invalidEmail'));
-      return;
-    }
-
     setIsLoading(true);
 
     try {
-      const loggedInUser = await login(trimmedEmail);
-      
-      if (loggedInUser) {
-        router.push(`/${locale}/challenges`);
-      } else {
-        setError(t('genericError'));
-      }
+      await login();
     } catch {
       setError(t('genericError'));
     } finally {
@@ -74,7 +59,7 @@ export default function LoginPage() {
         className="absolute top-8 left-8 flex items-center gap-2 text-sm text-muted-foreground hover:text-accent-cyan transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
-        {useTranslations('common')('back')}
+        {tCommon('back')}
       </Link>
 
       {/* Card */}
@@ -97,23 +82,9 @@ export default function LoginPage() {
 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  type="email"
-                  placeholder={t('placeholder')}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 bg-background border-border focus:border-accent-cyan"
-                  disabled={isLoading}
-                  autoFocus
-                />
-              </div>
-              {error && (
-                <p className="text-sm text-destructive">{error}</p>
-              )}
-            </div>
+            {error && (
+              <p className="text-sm text-destructive">{error}</p>
+            )}
 
             <Button
               type="submit"
@@ -130,11 +101,6 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
-
-          <p className="mt-6 text-center text-xs text-muted-foreground">
-            {t('noPassword')}<br />
-            {t('autoCreate')}
-          </p>
         </CardContent>
       </Card>
 

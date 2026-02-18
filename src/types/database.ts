@@ -47,6 +47,7 @@ export interface User {
   metier_id: string | null;
   marque_id: string | null;
   localisation: string | null;
+  auth_id?: string | null;
   avatar_url?: string | null;
   featured_badge_id?: string | null;
   niveau_actuel: UserLevel;

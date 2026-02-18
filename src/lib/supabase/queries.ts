@@ -46,31 +46,40 @@ export async function getUserByEmail(email: string): Promise<User | null> {
   return data;
 }
 
-export async function createUser(email: string): Promise<User | null> {
-  const inferredName = formatNameFromEmail(email);
+export async function getUserByAuthId(authId: string): Promise<User | null> {
   const { data, error } = await supabase
     .from('users')
-    .insert({ email, nom: inferredName })
-    .select()
+    .select('*')
+    .eq('auth_id', authId)
     .single();
 
-  if (error) {
-    console.error('Error creating user:', error);
-    return null;
+  if (error && error.code !== 'PGRST116') {
+    console.error('Error fetching user by auth id:', error);
   }
+
+  if (data) {
+    return await maybeUpdateUserName(data);
+  }
+
   return data;
 }
 
-export async function getOrCreateUser(email: string): Promise<User | null> {
-  // Essayer de récupérer l'utilisateur
-  let user = await getUserByEmail(email);
-  
-  // S'il n'existe pas, le créer
-  if (!user) {
-    user = await createUser(email);
+export async function searchUsers(
+  searchTerm: string,
+  limit = 5
+): Promise<Array<{ id: string; nom: string; email: string }>> {
+  const { data, error } = await supabase
+    .from('users')
+    .select('id, nom, email')
+    .or(`nom.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`)
+    .limit(limit);
+
+  if (error) {
+    console.error('Error searching users:', error);
+    return [];
   }
-  
-  return user;
+
+  return data || [];
 }
 
 export async function updateUser(userId: string, updates: Partial<User>): Promise<User | null> {
@@ -527,32 +536,6 @@ export async function updateDojoEvent(
 // ==========================================
 // LEADERBOARD
 // ==========================================
-
-export async function searchUsers(term: string, limit: number = 5): Promise<Array<{ id: string; nom: string; email: string }>> {
-  const trimmed = term.trim();
-  if (!trimmed) return [];
-
-  const { data, error } = await supabase
-    .from('users')
-    .select('id, nom, email')
-    .or(`nom.ilike.%${trimmed}%,email.ilike.%${trimmed}%`)
-    .limit(limit);
-
-  if (error) {
-    console.error('Error searching users:', error);
-    return [];
-  }
-
-  const results = await Promise.all(
-    (data || []).map(async (user) => await maybeUpdateUserName(user as User))
-  );
-
-  return results.map((user) => ({
-    id: user.id,
-    nom: user.nom || formatNameFromEmail(user.email) || 'Anonyme',
-    email: user.email,
-  }));
-}
 
 export async function getLeaderboard(limit: number = 10): Promise<LeaderboardEntry[]> {
   const { data, error } = await supabase

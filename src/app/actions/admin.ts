@@ -1,6 +1,7 @@
 'use server';
 
 import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
 
 interface DeleteChallengeResult {
   success: boolean;
@@ -12,17 +13,22 @@ interface DeleteChallengeResult {
  * Vérifie que l'utilisateur est admin avant de supprimer
  */
 export async function deleteChallengeAdmin(
-  challengeId: string,
-  userEmail: string
+  challengeId: string
 ): Promise<DeleteChallengeResult> {
   try {
     const supabase = createAdminClient();
+    const supabaseAuth = await createClient();
+
+    const { data: authData, error: authError } = await supabaseAuth.auth.getUser();
+    if (authError || !authData?.user) {
+      return { success: false, error: 'Non authentifié' };
+    }
 
     // Vérifier que l'utilisateur est admin
     const { data: user, error: userError } = await supabase
       .from('users')
       .select('role')
-      .eq('email', userEmail)
+      .eq('auth_id', authData.user.id)
       .single();
 
     if (userError || !user) {

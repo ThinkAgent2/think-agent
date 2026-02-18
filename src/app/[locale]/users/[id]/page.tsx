@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { getAllBadges, getLeaderboard, getUserBadges, getUserById, getUserParticipations, getUserChallenges, searchUsers, getUserValidatedIdeas } from '@/lib/supabase/queries';
 import { formatNameFromEmail } from '@/lib/userName';
+import { useAuth } from '@/lib/auth';
 import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry, User, IdeaProposal } from '@/types/database';
 
 const levelConfig: Record<string, { color: string; icon: typeof Brain; nextLevel: string | null; xpNeeded: number | null }> = {
@@ -44,6 +45,7 @@ export default function UserProfilePage() {
   const [isSearchingUsers, setIsSearchingUsers] = useState(false);
   const [proposedChallenges, setProposedChallenges] = useState<Challenge[]>([]);
   const [validatedIdeas, setValidatedIdeas] = useState<IdeaProposal[]>([]);
+  const { user: authUser } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
 
   const t = useTranslations('profile');
@@ -72,9 +74,7 @@ export default function UserProfilePage() {
         return;
       }
 
-      const currentUserRaw = window.localStorage.getItem('think_agent_user');
-      const currentUser = currentUserRaw ? JSON.parse(currentUserRaw) : null;
-      if (currentUser?.id && currentUser.id === userData.id) {
+      if (authUser?.id && authUser.id === userData.id) {
         router.push(`/${locale}/me`);
         return;
       }
