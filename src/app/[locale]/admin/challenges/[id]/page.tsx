@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/client';
+import { getAdminChallengeStats } from '@/app/actions/admin.stats';
 import type { Challenge, Solution, User } from '@/types/database';
 import { formatNameFromEmail } from '@/lib/userName';
 
@@ -46,33 +47,13 @@ export default function AdminChallengeStatsPage() {
         .eq('id', id)
         .single();
 
-      const { data: solutionsData } = await supabase
-        .from('solutions')
-        .select(`*, user:users(id, email, nom)`)
-        .eq('challenge_id', id)
-        .order('created_at', { ascending: false });
-
-      const { data: participantsData, count: participantsTotal } = await supabase
-        .from('participations')
-        .select(`user_id, statut, user:users(id, email, nom)`, { count: 'exact' })
-        .eq('challenge_id', id)
-        .order('created_at', { ascending: false });
+      const statsData = await getAdminChallengeStats(String(id));
 
       if (!isCancelled) {
-        const normalizedParticipants = (participantsData ?? []).map((participant) => {
-          const rawUser = (participant as { user?: unknown }).user;
-          const user = Array.isArray(rawUser) ? rawUser[0] ?? null : (rawUser ?? null);
-          return {
-            statut: (participant as { statut: string }).statut,
-            user_id: (participant as { user_id?: string }).user_id,
-            user: user as Pick<User, 'id' | 'email' | 'nom'> | null,
-          };
-        });
-
         setChallenge((challengeData as Challenge) ?? null);
-        setSolutions((solutionsData as SolutionRow[]) ?? []);
-        setParticipants(normalizedParticipants);
-        setParticipantsCount(participantsTotal ?? 0);
+        setSolutions(statsData?.solutions ?? []);
+        setParticipants(statsData?.participants ?? []);
+        setParticipantsCount(statsData?.participantsCount ?? 0);
         setIsLoading(false);
       }
     }
