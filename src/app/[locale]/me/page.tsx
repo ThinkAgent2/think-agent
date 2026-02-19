@@ -156,8 +156,12 @@ export default function ProfilePage() {
   const displayName = sanitizedName || formatNameFromEmail(user.email) || 'Anonyme';
   
   const inProgress = participations.filter(p => p.statut === 'En_cours');
-  const completed = participations.filter(p => p.statut === 'Terminé');
   const solutionsByChallenge = new Map(solutions.map((solution) => [solution.challenge_id, solution]));
+  const completed = participations.filter((p) => {
+    if (p.statut !== 'Terminé') return false;
+    const solution = solutionsByChallenge.get(p.challenge_id);
+    return solution?.statut === 'Évaluée' && (solution.note ?? 0) >= 3;
+  });
 
   // Progression par niveau (basée sur challenges terminés)
   const levelThresholds: Record<'Explorer' | 'Crafter' | 'Architecte', number> = {
