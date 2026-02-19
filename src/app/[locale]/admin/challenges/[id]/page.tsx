@@ -39,9 +39,9 @@ export default function AdminChallengeStatsPage() {
     let isCancelled = false;
 
     if (typeof window !== 'undefined') {
-      const from = document.referrer;
-      if (from && from.includes('/users/')) {
-        sessionStorage.setItem('statsFrom', from);
+      const lastRoute = sessionStorage.getItem('lastRoute');
+      if (lastRoute) {
+        sessionStorage.setItem('statsFrom', lastRoute);
       }
     }
 
@@ -122,7 +122,6 @@ export default function AdminChallengeStatsPage() {
         <div className="container mx-auto px-4 max-w-5xl space-y-6">
           <button
             onClick={() => {
-              sessionStorage.setItem('lastRoute', window.location.pathname + window.location.search);
               const from = sessionStorage.getItem('statsFrom');
               if (from) {
                 window.location.href = from;
