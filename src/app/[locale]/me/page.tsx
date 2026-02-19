@@ -18,7 +18,7 @@ import {
   Medal, Crown, Rocket, Brain, Loader2
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
-import { getUserParticipations, getAllBadges, getUserBadges, getLeaderboard, searchUsers, getUserChallenges, getUserIdeas, deleteIdeaProposal, updateUser, deleteChallenge } from '@/lib/supabase/queries';
+import { getUserParticipations, getAllBadges, getUserBadges, getLeaderboard, searchUsers, getUserChallenges, getUserIdeas, deleteIdeaProposal, updateUser, deleteChallenge, getUserRankAndTotal } from '@/lib/supabase/queries';
 import { formatNameFromEmail } from '@/lib/userName';
 import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry, IdeaProposal } from '@/types/database';
 import { IdeaProposalForm } from '@/components/ideas/IdeaProposalForm';
@@ -48,6 +48,7 @@ export default function ProfilePage() {
   const [editingIdea, setEditingIdea] = useState<IdeaProposal | null>(null);
   const [featuredBadgeId, setFeaturedBadgeId] = useState<string | null>(null);
   const [isUpdatingBadge, setIsUpdatingBadge] = useState(false);
+  const [rankInfo, setRankInfo] = useState<{ rank: number; total: number } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const t = useTranslations('profile');
@@ -73,13 +74,14 @@ export default function ProfilePage() {
 
       setIsLoading(true);
       try {
-        const [participationsData, allBadgesData, userBadgesData, leaderboardData, proposedChallengesData, myIdeasData] = await Promise.all([
+        const [participationsData, allBadgesData, userBadgesData, leaderboardData, proposedChallengesData, myIdeasData, rankData] = await Promise.all([
           getUserParticipations(user.id),
           getAllBadges(locale),
           getUserBadges(user.id, locale),
           getLeaderboard(10),
           getUserChallenges(user.id),
           getUserIdeas(user.id),
+          getUserRankAndTotal(user.id, user.points_totaux),
         ]);
 
         if (!isCancelled) {
@@ -90,6 +92,7 @@ export default function ProfilePage() {
           setProposedChallenges(proposedChallengesData);
           setMyIdeas(myIdeasData);
           setFeaturedBadgeId(user.featured_badge_id || null);
+          setRankInfo(rankData);
         }
       } finally {
         if (!isCancelled) {
@@ -272,6 +275,12 @@ export default function ProfilePage() {
                           <Target className="h-4 w-4" />
                           <span>{inProgress.length} {t('inProgress')}</span>
                         </div>
+                        {rankInfo && (
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <Trophy className="h-4 w-4 text-accent-jaune" />
+                            <span>Classement global: {rankInfo.rank} / {rankInfo.total}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

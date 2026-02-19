@@ -570,6 +570,29 @@ export async function getLeaderboard(limit: number = 10): Promise<LeaderboardEnt
   });
 }
 
+export async function getUserRankAndTotal(userId: string, pointsTotaux: number): Promise<{ rank: number; total: number } | null> {
+  const { count: total, error: countError } = await supabase
+    .from('users')
+    .select('*', { count: 'exact', head: true });
+
+  if (countError || total === null) {
+    console.error('Error fetching total users:', countError);
+    return null;
+  }
+
+  const { count: betterCount, error: rankError } = await supabase
+    .from('users')
+    .select('*', { count: 'exact', head: true })
+    .gt('points_totaux', pointsTotaux);
+
+  if (rankError || betterCount === null) {
+    console.error('Error fetching user rank:', rankError);
+    return null;
+  }
+
+  return { rank: betterCount + 1, total };
+}
+
 // ==========================================
 // RÉFÉRENCES
 // ==========================================
