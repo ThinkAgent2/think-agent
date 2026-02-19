@@ -278,7 +278,7 @@
     "you": "(you)",
     "currentProfile": "(profile)",
     "globalRank": "Global ranking: {rank} / {total}"
-  }
+  },
   "admin": {
     "validation": {
       "title": "Challenge validation",
