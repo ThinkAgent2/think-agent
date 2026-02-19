@@ -33,12 +33,12 @@ export async function getAdminChallengeStats(
     const [{ data: solutionsData, error: solutionsError }, { data: participantsData, count: participantsCount, error: participantsError }] = await Promise.all([
       supabase
         .from('solutions')
-        .select(`*, user:users(id, email, nom)`)
+        .select(`*, user:users!solutions_user_id_fkey(id, email, nom)`)
         .eq('challenge_id', challengeId)
         .order('created_at', { ascending: false }),
       supabase
         .from('participations')
-        .select(`user_id, statut, user:users(id, email, nom)`, { count: 'exact' })
+        .select(`user_id, statut, user:users!participations_user_id_fkey(id, email, nom)`, { count: 'exact' })
         .eq('challenge_id', challengeId)
         .order('created_at', { ascending: false }),
     ]);
