@@ -209,12 +209,9 @@ export default function ChallengeDetailPage() {
           {/* Back link */}
           <button
             onClick={() => {
-              const stack = JSON.parse(sessionStorage.getItem('navStack') || '[]');
-              const previous = stack.length > 1 ? stack[stack.length - 2] : null;
-              if (previous && previous !== pathname) {
-                stack.pop();
-                sessionStorage.setItem('navStack', JSON.stringify(stack));
-                router.push(previous);
+              const lastRoute = sessionStorage.getItem('lastRoute');
+              if (lastRoute && lastRoute !== pathname) {
+                router.push(lastRoute);
               } else {
                 router.back();
               }
