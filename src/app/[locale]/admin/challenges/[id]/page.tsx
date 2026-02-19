@@ -83,6 +83,14 @@ export default function AdminChallengeStatsPage() {
     };
   }, [id]);
 
+  const solutionsByUserId = useMemo(() => {
+    const map = new Map<string, Solution>();
+    solutions.forEach((solution) => {
+      map.set(solution.user_id, solution);
+    });
+    return map;
+  }, [solutions]);
+
   const stats = useMemo(() => {
     const submitted = solutions.filter((s) => s.statut === 'Soumise').length;
     const evaluated = solutions.filter((s) => s.statut === 'Évaluée').length;
@@ -197,7 +205,8 @@ export default function AdminChallengeStatsPage() {
                 <div className="space-y-2">
                   {participants.map((participant, index) => {
                     const name = participant.user?.nom || (participant.user?.email ? formatNameFromEmail(participant.user.email) : '—');
-                    const solution = solutions.find((s) => s.user_id === participant.user_id || s.user_id === participant.user?.id);
+                    const userId = participant.user_id || participant.user?.id;
+                    const solution = userId ? solutionsByUserId.get(userId) : undefined;
                     const statusLabel = solution
                       ? solution.statut === 'Soumise'
                         ? t('submitted')
@@ -209,9 +218,15 @@ export default function AdminChallengeStatsPage() {
                         : t('submitted');
 
                     return (
-                      <div key={`${(participant as { user_id?: string }).user_id ?? 'unknown'}-${index}`} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border px-3 py-2 text-sm">
+                      <div key={`${userId ?? 'unknown'}-${index}`} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border px-3 py-2 text-sm">
                         <div className="min-w-0">
-                          <p className="font-medium truncate">{name}</p>
+                          {userId ? (
+                            <Link href={`/users/${userId}`} className="font-medium truncate hover:text-accent-cyan">
+                              {name}
+                            </Link>
+                          ) : (
+                            <p className="font-medium truncate">{name}</p>
+                          )}
                           <p className="text-xs text-muted-foreground truncate">{participant.user?.email}</p>
                         </div>
                         <div className="flex items-center gap-2">

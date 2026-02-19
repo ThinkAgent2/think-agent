@@ -240,6 +240,8 @@
     "featuredBadge": "Displayed badge",
     "featuredBadgeClear": "Remove badge",
     "allBadges": "All badges",
+    "challengeFailed": "Challenge failed",
+    "challengeCompleted": "Challenge validated",
     "avatar": {
       "upload": "Change photo",
       "uploading": "Uploading...",
