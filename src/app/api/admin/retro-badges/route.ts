@@ -109,7 +109,8 @@ export async function POST() {
       };
 
       (challengesData || []).forEach((challenge) => {
-        totalByLevel[challenge.niveau_associe]++;
+        const level = (challenge.niveau_associe as UserLevel) || 'Explorer';
+        totalByLevel[level]++;
       });
 
       const shouldAward = (badge: { conditions: Record<string, unknown> }): boolean => {
