@@ -588,17 +588,18 @@ export default function ChallengeDetailPage() {
                           isPublished ? t('participate') : t('pendingPublication')
                         )}
                       </Button>
-                      {isAdmin && (
-                        <Link href={`/admin/challenges/${challenge.id}`}>
-                          <Button variant="outline" size="sm" className="w-full">
-                            {t('viewStats')}
-                          </Button>
-                        </Link>
-                      )}
                     </div>
                   )}
                 </CardContent>
               </Card>
+
+              {isAdmin && challenge && (
+                <Link href={`/admin/challenges/${challenge.id}`}>
+                  <Button variant="outline" size="sm" className="w-full">
+                    {t('viewStats')}
+                  </Button>
+                </Link>
+              )}
 
               {/* Outils recommandés */}
               {challenge.outils_recommandes && challenge.outils_recommandes.length > 0 && (

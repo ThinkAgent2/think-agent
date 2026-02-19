@@ -103,7 +103,7 @@ export default function AdminChallengeStatsPage() {
       <main className="flex-1 py-8">
         <div className="container mx-auto px-4 max-w-5xl space-y-6">
           <Link
-            href="/admin/challenges"
+            href={`/challenges/${id}`}
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent-cyan transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
