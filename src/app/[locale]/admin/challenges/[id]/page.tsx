@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
@@ -15,6 +15,7 @@ import { createClient } from '@/lib/supabase/client';
 import { getAdminChallengeStats } from '@/app/actions/admin.stats';
 import type { Challenge, Solution, User } from '@/types/database';
 import { formatNameFromEmail } from '@/lib/userName';
+import { localizeChallenge } from '@/lib/supabase/localization';
 
 interface SolutionRow extends Solution {
   user: Pick<User, 'id' | 'email' | 'nom'> | null;
@@ -23,6 +24,7 @@ interface SolutionRow extends Solution {
 export default function AdminChallengeStatsPage() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const locale = useLocale();
   const t = useTranslations('challenges.stats');
   const tCommon = useTranslations('common');
   const [isLoading, setIsLoading] = useState(true);
@@ -50,7 +52,8 @@ export default function AdminChallengeStatsPage() {
       const statsData = await getAdminChallengeStats(String(id));
 
       if (!isCancelled) {
-        setChallenge((challengeData as Challenge) ?? null);
+        const localizedChallenge = challengeData ? localizeChallenge(challengeData as Challenge, locale) : null;
+        setChallenge(localizedChallenge);
         setSolutions(statsData?.solutions ?? []);
         setParticipants(statsData?.participants ?? []);
         setParticipantsCount(statsData?.participantsCount ?? 0);
