@@ -177,14 +177,12 @@ export default function UserProfilePage() {
           <div className="mb-6">
             <button
               onClick={() => {
-                const from = sessionStorage.getItem('statsFrom');
-                if (from) {
-                  window.location.href = from;
-                  return;
-                }
-                const lastRoute = sessionStorage.getItem('lastRoute');
-                if (lastRoute && lastRoute !== window.location.pathname) {
-                  router.push(lastRoute);
+                const stack = JSON.parse(sessionStorage.getItem('navStack') || '[]');
+                const previous = stack.length > 1 ? stack[stack.length - 2] : null;
+                if (previous && previous !== window.location.pathname) {
+                  stack.pop();
+                  sessionStorage.setItem('navStack', JSON.stringify(stack));
+                  router.push(previous);
                 } else {
                   router.back();
                 }

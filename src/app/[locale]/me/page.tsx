@@ -38,7 +38,13 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      sessionStorage.setItem('lastRoute', window.location.pathname + window.location.search);
+      const current = window.location.pathname + window.location.search;
+      const stack = JSON.parse(sessionStorage.getItem('navStack') || '[]');
+      if (stack[stack.length - 1] !== current) {
+        stack.push(current);
+        sessionStorage.setItem('navStack', JSON.stringify(stack));
+      }
+      sessionStorage.setItem('lastRoute', current);
     }
   }, []);
   const [activeTab, setActiveTab] = useState('en-cours');

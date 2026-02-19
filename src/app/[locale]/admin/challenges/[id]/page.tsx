@@ -122,14 +122,12 @@ export default function AdminChallengeStatsPage() {
         <div className="container mx-auto px-4 max-w-5xl space-y-6">
           <button
             onClick={() => {
-              const from = sessionStorage.getItem('statsFrom');
-              if (from) {
-                window.location.href = from;
-                return;
-              }
-              const lastRoute = sessionStorage.getItem('lastRoute');
-              if (lastRoute && lastRoute !== window.location.pathname) {
-                window.location.href = lastRoute;
+              const stack = JSON.parse(sessionStorage.getItem('navStack') || '[]');
+              const previous = stack.length > 1 ? stack[stack.length - 2] : null;
+              if (previous && previous !== window.location.pathname) {
+                stack.pop();
+                sessionStorage.setItem('navStack', JSON.stringify(stack));
+                window.location.href = previous;
                 return;
               }
               window.history.back();
