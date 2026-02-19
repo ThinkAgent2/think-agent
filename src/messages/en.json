@@ -257,10 +257,12 @@
   "leaderboard": {
     "title": "Leaderboard",
     "global": "Global Top 10",
+    "recent": "Last 30 days",
     "entity": "Top 10 by entity",
     "circle": "Top 10 by circle",
     "scope": {
       "global": "Global",
+      "recent": "30 days",
       "entity": "Entity",
       "circle": "Circle"
     },
@@ -269,7 +271,7 @@
     "noRanking": "No ranking yet",
     "you": "(you)",
     "currentProfile": "(profile)"
-  },
+  }
   "admin": {
     "validation": {
       "title": "Challenge validation",

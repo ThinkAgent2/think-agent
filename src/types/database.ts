@@ -203,4 +203,5 @@ export interface LeaderboardEntry {
   points_totaux: number;
   marque: string | null;
   rank: number;
+  points_30j?: number;
 }

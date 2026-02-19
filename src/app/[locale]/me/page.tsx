@@ -18,7 +18,7 @@ import {
   Medal, Crown, Rocket, Brain, Loader2
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
-import { getUserParticipations, getAllBadges, getUserBadges, getLeaderboard, searchUsers, getUserChallenges, getUserIdeas, deleteIdeaProposal, updateUser, deleteChallenge, getUserRankAndTotal, getUserSolutions } from '@/lib/supabase/queries';
+import { getUserParticipations, getAllBadges, getUserBadges, getLeaderboard, getLeaderboardRecent, searchUsers, getUserChallenges, getUserIdeas, deleteIdeaProposal, updateUser, deleteChallenge, getUserRankAndTotal, getUserSolutions } from '@/lib/supabase/queries';
 import { formatNameFromEmail } from '@/lib/userName';
 import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry, IdeaProposal, Solution } from '@/types/database';
 import { IdeaProposalForm } from '@/components/ideas/IdeaProposalForm';
@@ -39,7 +39,8 @@ export default function ProfilePage() {
   const [allBadges, setAllBadges] = useState<BadgeType[]>([]);
   const [userBadges, setUserBadges] = useState<BadgeType[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [leaderboardScope, setLeaderboardScope] = useState<'global' | 'entite' | 'cercle'>('global');
+  const [leaderboardRecent, setLeaderboardRecent] = useState<LeaderboardEntry[]>([]);
+  const [leaderboardScope, setLeaderboardScope] = useState<'global' | 'recent' | 'entite' | 'cercle'>('global');
   const [userSearchTerm, setUserSearchTerm] = useState('');
   const [userSearchResults, setUserSearchResults] = useState<Array<{ id: string; nom: string; email: string }>>([]);
   const [isSearchingUsers, setIsSearchingUsers] = useState(false);
@@ -75,11 +76,12 @@ export default function ProfilePage() {
 
       setIsLoading(true);
       try {
-        const [participationsData, allBadgesData, userBadgesData, leaderboardData, proposedChallengesData, myIdeasData, rankData, solutionsData] = await Promise.all([
+        const [participationsData, allBadgesData, userBadgesData, leaderboardData, leaderboardRecentData, proposedChallengesData, myIdeasData, rankData, solutionsData] = await Promise.all([
           getUserParticipations(user.id),
           getAllBadges(locale),
           getUserBadges(user.id, locale),
           getLeaderboard(10),
+          getLeaderboardRecent(10),
           getUserChallenges(user.id),
           getUserIdeas(user.id),
           getUserRankAndTotal(user.id, user.points_totaux),
@@ -91,6 +93,7 @@ export default function ProfilePage() {
           setAllBadges(allBadgesData);
           setUserBadges(userBadgesData);
           setLeaderboard(leaderboardData);
+          setLeaderboardRecent(leaderboardRecentData);
           setProposedChallenges(proposedChallengesData);
           setMyIdeas(myIdeasData);
           setFeaturedBadgeId(user.featured_badge_id || null);
@@ -646,6 +649,8 @@ export default function ProfilePage() {
                       <CardDescription>
                         {leaderboardScope === 'global'
                           ? tLeaderboard('global')
+                          : leaderboardScope === 'recent'
+                          ? tLeaderboard('recent')
                           : leaderboardScope === 'entite'
                           ? tLeaderboard('entity')
                           : tLeaderboard('circle')}
@@ -653,10 +658,11 @@ export default function ProfilePage() {
                     </div>
                     <select
                       value={leaderboardScope}
-                      onChange={(event) => setLeaderboardScope(event.target.value as 'global' | 'entite' | 'cercle')}
+                      onChange={(event) => setLeaderboardScope(event.target.value as 'global' | 'recent' | 'entite' | 'cercle')}
                       className="rounded-md border border-border bg-background px-2 py-1 text-xs text-muted-foreground focus:border-accent-cyan focus:outline-none"
                     >
                       <option value="global">{tLeaderboard('scope.global')}</option>
+                      <option value="recent">{tLeaderboard('scope.recent')}</option>
                       <option value="entite">{tLeaderboard('scope.entity')}</option>
                       <option value="cercle">{tLeaderboard('scope.circle')}</option>
                     </select>
@@ -701,13 +707,13 @@ export default function ProfilePage() {
                     <div className="flex justify-center py-4">
                       <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
                     </div>
-                  ) : leaderboard.length === 0 ? (
+                  ) : (leaderboardScope === 'recent' ? leaderboardRecent : leaderboard).length === 0 ? (
                     <p className="text-sm text-muted-foreground text-center py-4">
                       {tLeaderboard('noRanking')}
                     </p>
                   ) : (
                     <div className="space-y-2">
-                      {leaderboard.map((entry, index) => {
+                      {(leaderboardScope === 'recent' ? leaderboardRecent : leaderboard).map((entry, index) => {
                         const isCurrentUser = entry.user_id === user.id;
                         const href = isCurrentUser ? '/me' : `/users/${entry.user_id}`;
                         return (
@@ -734,7 +740,7 @@ export default function ProfilePage() {
                               <p className="text-xs text-muted-foreground">{entry.marque || '-'}</p>
                             </div>
                             <span className="text-sm font-semibold text-accent-jaune">
-                              {entry.points_totaux}
+                              {leaderboardScope === 'recent' ? entry.points_30j ?? 0 : entry.points_totaux}
                             </span>
                           </Link>
                         );

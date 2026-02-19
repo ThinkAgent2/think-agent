@@ -257,10 +257,12 @@
   "leaderboard": {
     "title": "Leaderboard",
     "global": "Top 10 global",
+    "recent": "30 derniers jours",
     "entity": "Top 10 par entité",
     "circle": "Top 10 par cercle",
     "scope": {
       "global": "Global",
+      "recent": "30 jours",
       "entity": "Entité",
       "circle": "Cercle"
     },

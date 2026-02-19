@@ -618,6 +618,59 @@ export async function getLeaderboard(limit: number = 10): Promise<LeaderboardEnt
   });
 }
 
+export async function getLeaderboardRecent(limit: number = 10): Promise<LeaderboardEntry[]> {
+  const since = new Date();
+  since.setDate(since.getDate() - 30);
+
+  const { data, error } = await supabase
+    .from('solutions')
+    .select(`
+      user_id,
+      challenge:challenges(xp),
+      user:users(id, nom, email, niveau_actuel, points_totaux)
+    `)
+    .eq('statut', 'Évaluée')
+    .gte('created_at', since.toISOString());
+
+  if (error) {
+    console.error('Error fetching recent leaderboard:', error);
+    return [];
+  }
+
+  const totals = new Map<string, { xp: number; user: { id: string; nom: string | null; email: string; niveau_actuel: UserLevel; points_totaux: number } }>();
+
+  (data || []).forEach((row) => {
+    const user = (row as { user: { id: string; nom: string | null; email: string; niveau_actuel: UserLevel; points_totaux: number } | null }).user;
+    const challenge = (row as { challenge: { xp: number } | null }).challenge;
+    if (!user || !challenge) return;
+
+    const existing = totals.get(user.id);
+    const xpToAdd = challenge.xp || 0;
+    totals.set(user.id, {
+      xp: (existing?.xp || 0) + xpToAdd,
+      user,
+    });
+  });
+
+  const leaderboard = Array.from(totals.values())
+    .sort((a, b) => b.xp - a.xp)
+    .slice(0, limit)
+    .map((entry, index) => {
+      const inferredName = formatNameFromEmail(entry.user.email);
+      return {
+        user_id: entry.user.id,
+        nom: entry.user.nom || inferredName || 'Anonyme',
+        niveau_actuel: entry.user.niveau_actuel,
+        points_totaux: entry.user.points_totaux,
+        points_30j: entry.xp,
+        marque: null,
+        rank: index + 1,
+      };
+    });
+
+  return leaderboard;
+}
+
 export async function getUserRankAndTotal(userId: string, pointsTotaux: number): Promise<{ rank: number; total: number } | null> {
   const { count: total, error: countError } = await supabase
     .from('users')
