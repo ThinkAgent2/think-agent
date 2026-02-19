@@ -43,21 +43,21 @@ export function ChallengeCard({ challenge, participation, solution }: ChallengeC
     <Card className={`group relative overflow-hidden transition-all duration-300 bg-card ${statusBorder} ${config.glow} transition-glow`}>
       {/* Status indicator */}
       {isPending && (
-        <div className="absolute top-3 left-3 z-10">
+        <div className="absolute top-2 left-2 z-10">
           <div className="h-7 w-7 rounded-full bg-accent-jaune/15 border border-accent-jaune/50 flex items-center justify-center">
             <Clock className="h-4 w-4 text-accent-jaune" />
           </div>
         </div>
       )}
       {isValidated && (
-        <div className="absolute top-3 left-3 z-10">
+        <div className="absolute top-2 left-2 z-10">
           <div className="h-7 w-7 rounded-full bg-accent-vert/15 border border-accent-vert/50 flex items-center justify-center">
             <CheckCircle className="h-4 w-4 text-accent-vert" />
           </div>
         </div>
       )}
       {isFailed && (
-        <div className="absolute top-3 left-3 z-10">
+        <div className="absolute top-2 left-2 z-10">
           <div className="h-7 w-7 rounded-full bg-destructive/15 border border-destructive/50 flex items-center justify-center">
             <XCircle className="h-4 w-4 text-destructive" />
           </div>
