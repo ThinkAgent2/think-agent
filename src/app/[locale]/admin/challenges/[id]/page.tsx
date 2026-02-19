@@ -113,13 +113,18 @@ export default function AdminChallengeStatsPage() {
       <Header />
       <main className="flex-1 py-8">
         <div className="container mx-auto px-4 max-w-5xl space-y-6">
-          <Link
-            href={`/challenges/${id}`}
+          <button
+            onClick={() => {
+              const lastRoute = sessionStorage.getItem('lastRoute');
+              if (lastRoute) {
+                window.location.href = lastRoute;
+              }
+            }}
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent-cyan transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             {tCommon('back')}
-          </Link>
+          </button>
 
           <div>
             <h1 className="text-3xl font-bold mb-2">{t('title')}</h1>

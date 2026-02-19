@@ -17,6 +17,12 @@ export default function ChallengesPage() {
   const { user } = useAuth();
   const locale = useLocale();
   const [challenges, setChallenges] = useState<Challenge[]>([]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('lastRoute', window.location.pathname + window.location.search);
+    }
+  }, []);
   const [participations, setParticipations] = useState<Participation[]>([]);
   const [solutions, setSolutions] = useState<Solution[]>([]);
   const [filters, setFilters] = useState<Filters>({});

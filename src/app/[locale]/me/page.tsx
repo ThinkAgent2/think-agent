@@ -34,6 +34,12 @@ export default function ProfilePage() {
   const router = useRouter();
   const locale = useLocale();
   const { user, isLoading: authLoading, refreshUser } = useAuth();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('lastRoute', window.location.pathname + window.location.search);
+    }
+  }, []);
   const [activeTab, setActiveTab] = useState('en-cours');
   const [participations, setParticipations] = useState<(Participation & { challenge?: Challenge })[]>([]);
   const [allBadges, setAllBadges] = useState<BadgeType[]>([]);
