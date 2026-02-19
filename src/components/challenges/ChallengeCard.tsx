@@ -6,12 +6,12 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Star, Users, Zap, CheckCircle } from 'lucide-react';
-import type { Challenge, Participation } from '@/types/database';
+import type { Challenge, Participation, Solution } from '@/types/database';
 
 interface ChallengeCardProps {
   challenge: Challenge;
   participation?: Participation;
-  isPending?: boolean;
+  solution?: Solution;
 }
 
 const levelConfig = {
@@ -20,17 +20,29 @@ const levelConfig = {
   Architecte: { color: 'bg-accent-rose text-white', glow: 'hover:glow-rose' },
 };
 
-export function ChallengeCard({ challenge, participation, isPending }: ChallengeCardProps) {
+export function ChallengeCard({ challenge, participation, solution }: ChallengeCardProps) {
   const config = levelConfig[challenge.niveau_associe];
   const isCompleted = participation?.statut === 'Terminé';
   const isInProgress = participation?.statut === 'En_cours';
+  const isPending = solution?.statut === 'Soumise';
+  const isEvaluated = solution?.statut === 'Évaluée';
+  const isValidated = isEvaluated && (solution?.note ?? 0) >= 3;
+  const isFailed = isEvaluated && (solution?.note ?? 0) < 3;
   const t = useTranslations('challenges.card');
   const tCommon = useTranslations('common');
 
   return (
     <Card className={`group relative overflow-hidden transition-all duration-300 bg-card border-border ${config.glow} transition-glow`}>
       {/* Status indicator */}
-      {isCompleted && (
+      {isPending && (
+        <div className="absolute top-3 right-3 z-10">
+          <span className="inline-flex items-center gap-1 rounded-full bg-accent-jaune/20 text-accent-jaune border border-accent-jaune px-2 py-1 text-[10px] font-semibold">
+            <CheckCircle className="h-3 w-3" />
+            {t('status.pending')}
+          </span>
+        </div>
+      )}
+      {isValidated && (
         <div className="absolute top-3 right-3 z-10">
           <span className="inline-flex items-center gap-1 rounded-full bg-accent-vert/20 text-accent-vert border border-accent-vert px-2 py-1 text-[10px] font-semibold">
             <CheckCircle className="h-3 w-3" />
@@ -38,11 +50,11 @@ export function ChallengeCard({ challenge, participation, isPending }: Challenge
           </span>
         </div>
       )}
-      {!isCompleted && isPending && (
+      {isFailed && (
         <div className="absolute top-3 right-3 z-10">
-          <span className="inline-flex items-center gap-1 rounded-full bg-accent-jaune/20 text-accent-jaune border border-accent-jaune px-2 py-1 text-[10px] font-semibold">
+          <span className="inline-flex items-center gap-1 rounded-full bg-destructive/20 text-destructive border border-destructive px-2 py-1 text-[10px] font-semibold">
             <CheckCircle className="h-3 w-3" />
-            {t('status.pending')}
+            {t('status.failed')}
           </span>
         </div>
       )}

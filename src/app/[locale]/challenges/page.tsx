@@ -20,7 +20,7 @@ export default function ChallengesPage() {
   const [participations, setParticipations] = useState<Participation[]>([]);
   const [solutions, setSolutions] = useState<Solution[]>([]);
   const [filters, setFilters] = useState<Filters>({});
-  const [completionFilter, setCompletionFilter] = useState<'all' | 'completed' | 'incomplete' | 'pending'>('all');
+  const [completionFilter, setCompletionFilter] = useState<'all' | 'pending' | 'evaluated'>('all');
   const [isLoading, setIsLoading] = useState(true);
   const t = useTranslations('challenges');
   const tCommon = useTranslations('common');
@@ -69,24 +69,22 @@ export default function ChallengesPage() {
     return participations.find(p => p.challenge_id === challengeId);
   };
 
-  const isCompleted = (challengeId: string) =>
-    participations.some((p) => p.challenge_id === challengeId && p.statut === 'Terminé');
-
-  const isIncomplete = (challengeId: string) =>
-    !participations.some((p) => p.challenge_id === challengeId && p.statut === 'Terminé');
+  const getSolution = (challengeId: string) =>
+    solutions.find((s) => s.challenge_id === challengeId);
 
   const isPending = (challengeId: string) => {
-    const solution = solutions.find((s) => s.challenge_id === challengeId);
+    const solution = getSolution(challengeId);
     return Boolean(solution && solution.statut === 'Soumise');
   };
 
-  const isCompletedParticipation = (challengeId: string) =>
-    participations.some((p) => p.challenge_id === challengeId && p.statut === 'Terminé');
+  const isEvaluated = (challengeId: string) => {
+    const solution = getSolution(challengeId);
+    return Boolean(solution && solution.statut === 'Évaluée');
+  };
 
   const filteredChallenges = challenges.filter((challenge) => {
-    if (completionFilter === 'completed') return isCompleted(challenge.id);
-    if (completionFilter === 'incomplete') return isIncomplete(challenge.id);
     if (completionFilter === 'pending') return isPending(challenge.id);
+    if (completionFilter === 'evaluated') return isEvaluated(challenge.id);
     return true;
   });
 
@@ -145,14 +143,6 @@ export default function ChallengesPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className={`px-3 ${completionFilter === 'completed' ? 'bg-accent-jaune text-black border-accent-jaune' : 'border-border hover:border-accent-cyan'}`}
-                    onClick={() => setCompletionFilter('completed')}
-                  >
-                    {t('filters.statusCompleted')}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
                     className={`px-3 ${completionFilter === 'pending' ? 'bg-accent-jaune text-black border-accent-jaune' : 'border-border hover:border-accent-cyan'}`}
                     onClick={() => setCompletionFilter('pending')}
                   >
@@ -161,10 +151,10 @@ export default function ChallengesPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className={`px-3 ${completionFilter === 'incomplete' ? 'bg-accent-jaune text-black border-accent-jaune' : 'border-border hover:border-accent-cyan'}`}
-                    onClick={() => setCompletionFilter('incomplete')}
+                    className={`px-3 ${completionFilter === 'evaluated' ? 'bg-accent-jaune text-black border-accent-jaune' : 'border-border hover:border-accent-cyan'}`}
+                    onClick={() => setCompletionFilter('evaluated')}
                   >
-                    {t('filters.statusIncomplete')}
+                    {t('filters.statusEvaluated')}
                   </Button>
                 </div>
               </div>
@@ -199,7 +189,7 @@ export default function ChallengesPage() {
                             key={challenge.id}
                             challenge={challenge}
                             participation={getParticipation(challenge.id)}
-                            isPending={isPending(challenge.id) && !isCompletedParticipation(challenge.id)}
+                            solution={getSolution(challenge.id)}
                           />
                         ))}
                       </div>
@@ -219,7 +209,7 @@ export default function ChallengesPage() {
                             key={challenge.id}
                             challenge={challenge}
                             participation={getParticipation(challenge.id)}
-                            isPending={isPending(challenge.id) && !isCompletedParticipation(challenge.id)}
+                            solution={getSolution(challenge.id)}
                           />
                         ))}
                       </div>
@@ -239,7 +229,7 @@ export default function ChallengesPage() {
                             key={challenge.id}
                             challenge={challenge}
                             participation={getParticipation(challenge.id)}
-                            isPending={isPending(challenge.id) && !isCompletedParticipation(challenge.id)}
+                            solution={getSolution(challenge.id)}
                           />
                         ))}
                       </div>

@@ -86,14 +86,14 @@
       "difficulty": "Difficulty",
       "status": "Status",
       "statusAll": "All",
-      "statusCompleted": "Completed",
-      "statusPending": "Pending validation",
-      "statusIncomplete": "Not completed",
+      "statusPending": "In progress",
+      "statusEvaluated": "Evaluated",
       "clearFilters": "Clear filters"
     },
     "status": {
       "completed": "Validated",
-      "pending": "Pending validation"
+      "pending": "In progress",
+      "failed": "Failed"
     },
     "empty": "No challenge matches your criteria.",
     "card": {
