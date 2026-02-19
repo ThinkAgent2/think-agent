@@ -640,15 +640,18 @@ export async function getLeaderboardRecent(limit: number = 10): Promise<Leaderbo
   const totals = new Map<string, { xp: number; user: { id: string; nom: string | null; email: string; niveau_actuel: UserLevel; points_totaux: number } }>();
 
   (data || []).forEach((row) => {
-    const user = (row as { user: { id: string; nom: string | null; email: string; niveau_actuel: UserLevel; points_totaux: number } | null }).user;
-    const challenge = (row as { challenge: { xp: number } | null }).challenge;
+    const rawUser = (row as { user?: unknown }).user;
+    const user = Array.isArray(rawUser) ? rawUser[0] ?? null : (rawUser ?? null);
+    const rawChallenge = (row as { challenge?: unknown }).challenge;
+    const challenge = Array.isArray(rawChallenge) ? rawChallenge[0] ?? null : (rawChallenge ?? null);
+
     if (!user || !challenge) return;
 
-    const existing = totals.get(user.id);
-    const xpToAdd = challenge.xp || 0;
-    totals.set(user.id, {
+    const existing = totals.get((user as { id: string }).id);
+    const xpToAdd = (challenge as { xp: number }).xp || 0;
+    totals.set((user as { id: string }).id, {
       xp: (existing?.xp || 0) + xpToAdd,
-      user,
+      user: user as { id: string; nom: string | null; email: string; niveau_actuel: UserLevel; points_totaux: number },
     });
   });
 
