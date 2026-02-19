@@ -177,6 +177,12 @@ export default function UserProfilePage() {
           <div className="mb-6">
             <button
               onClick={() => {
+                const from = sessionStorage.getItem('statsFrom');
+                if (from && from !== window.location.pathname) {
+                  sessionStorage.removeItem('statsFrom');
+                  window.location.href = from;
+                  return;
+                }
                 const lastRoute = sessionStorage.getItem('lastRoute');
                 if (lastRoute && lastRoute !== window.location.pathname) {
                   router.push(lastRoute);
