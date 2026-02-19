@@ -30,17 +30,25 @@ export async function getAdminChallengeStats(
       return null;
     }
 
-    const { data: solutionsData } = await supabase
-      .from('solutions')
-      .select(`*, user:users(id, email, nom)`)
-      .eq('challenge_id', challengeId)
-      .order('created_at', { ascending: false });
+    const [{ data: solutionsData, error: solutionsError }, { data: participantsData, count: participantsCount, error: participantsError }] = await Promise.all([
+      supabase
+        .from('solutions')
+        .select(`*, user:users(id, email, nom)`)
+        .eq('challenge_id', challengeId)
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('participations')
+        .select(`user_id, statut, user:users(id, email, nom)`, { count: 'exact' })
+        .eq('challenge_id', challengeId)
+        .order('created_at', { ascending: false }),
+    ]);
 
-    const { data: participantsData, count: participantsCount } = await supabase
-      .from('participations')
-      .select(`user_id, statut, user:users(id, email, nom)`, { count: 'exact' })
-      .eq('challenge_id', challengeId)
-      .order('created_at', { ascending: false });
+    if (solutionsError) {
+      console.error('Admin stats: error fetching solutions', solutionsError);
+    }
+    if (participantsError) {
+      console.error('Admin stats: error fetching participations', participantsError);
+    }
 
     const normalizedParticipants = (participantsData ?? []).map((participant) => {
       const rawUser = (participant as { user?: unknown }).user;
