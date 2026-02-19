@@ -27,6 +27,7 @@ export default function AdminChallengeStatsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [solutions, setSolutions] = useState<SolutionRow[]>([]);
+  const [participantsCount, setParticipantsCount] = useState(0);
 
   const isAdmin = user?.role === 'Administrateur';
 
@@ -50,9 +51,15 @@ export default function AdminChallengeStatsPage() {
         .eq('challenge_id', id)
         .order('created_at', { ascending: false });
 
+      const { count: participantsTotal } = await supabase
+        .from('participations')
+        .select('*', { count: 'exact', head: true })
+        .eq('challenge_id', id);
+
       if (!isCancelled) {
         setChallenge((challengeData as Challenge) ?? null);
         setSolutions((solutionsData as SolutionRow[]) ?? []);
+        setParticipantsCount(participantsTotal ?? 0);
         setIsLoading(false);
       }
     }
@@ -64,13 +71,12 @@ export default function AdminChallengeStatsPage() {
   }, [id]);
 
   const stats = useMemo(() => {
-    const totalAttempts = solutions.length;
     const submitted = solutions.filter((s) => s.statut === 'Soumise').length;
     const evaluated = solutions.filter((s) => s.statut === 'Évaluée').length;
     const validated = solutions.filter((s) => s.statut === 'Évaluée' && (s.note ?? 0) >= 3).length;
     const failed = solutions.filter((s) => s.statut === 'Évaluée' && (s.note ?? 0) < 3).length;
     const successRate = evaluated > 0 ? Math.round((validated / evaluated) * 100) : 0;
-    return { totalAttempts, submitted, evaluated, validated, failed, successRate };
+    return { submitted, evaluated, validated, failed, successRate };
   }, [solutions]);
 
   if (!isAdmin) {
@@ -133,7 +139,7 @@ export default function AdminChallengeStatsPage() {
               <CardHeader>
                 <CardTitle className="text-base">{t('totalAttempts')}</CardTitle>
               </CardHeader>
-              <CardContent className="text-3xl font-bold">{stats.totalAttempts}</CardContent>
+              <CardContent className="text-3xl font-bold">{participantsCount}</CardContent>
             </Card>
             <Card>
               <CardHeader>
