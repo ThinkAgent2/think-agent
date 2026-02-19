@@ -183,7 +183,7 @@ export default function UserProfilePage() {
                   return;
                 }
                 const lastRoute = sessionStorage.getItem('lastRoute');
-                if (lastRoute) {
+                if (lastRoute && lastRoute !== window.location.pathname) {
                   router.push(lastRoute);
                 } else {
                   router.back();

@@ -128,9 +128,11 @@ export default function AdminChallengeStatsPage() {
                 return;
               }
               const lastRoute = sessionStorage.getItem('lastRoute');
-              if (lastRoute) {
+              if (lastRoute && lastRoute !== window.location.pathname) {
                 window.location.href = lastRoute;
+                return;
               }
+              window.history.back();
             }}
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent-cyan transition-colors"
           >
