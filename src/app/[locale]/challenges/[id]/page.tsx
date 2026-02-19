@@ -53,7 +53,7 @@ export default function ChallengeDetailPage() {
   const { user } = useAuth();
   const challengeId = params.id as string;
   const t = useTranslations('challenges.detail');
-  const tSubmit = useTranslations('submit');
+  const tSubmit = useTranslations('challenges.submit');
   const tCommon = useTranslations('common');
   const tVortex = useTranslations('vortex');
   const tNav = useTranslations('nav');
