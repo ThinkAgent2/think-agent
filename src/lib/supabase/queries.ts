@@ -1056,7 +1056,8 @@ async function awardConditionalBadges(
 
     if (typeof conditions.level_reached === 'string' && user) {
       const required = conditions.level_reached as UserLevel;
-      return LEVEL_ORDER[user.niveau_actuel] >= LEVEL_ORDER[required];
+      const currentLevel = user.niveau_actuel as UserLevel;
+      return LEVEL_ORDER[currentLevel] >= LEVEL_ORDER[required];
     }
 
     if (conditions.duo_challenge === true) {
