@@ -18,7 +18,6 @@ import {
   Medal, Crown, Rocket, Brain, Loader2
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
-import { createClient } from '@/lib/supabase/client';
 import { getUserParticipations, getAllBadges, getUserBadges, getLeaderboard, searchUsers, getUserChallenges, getUserIdeas, deleteIdeaProposal, updateUser, deleteChallenge } from '@/lib/supabase/queries';
 import { formatNameFromEmail } from '@/lib/userName';
 import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry, IdeaProposal } from '@/types/database';
@@ -50,7 +49,6 @@ export default function ProfilePage() {
   const [featuredBadgeId, setFeaturedBadgeId] = useState<string | null>(null);
   const [isUpdatingBadge, setIsUpdatingBadge] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [ssoDebug, setSsoDebug] = useState<object | null>(null);
 
   const t = useTranslations('profile');
   const tBadges = useTranslations('badges');
@@ -75,18 +73,6 @@ export default function ProfilePage() {
 
       setIsLoading(true);
       try {
-        const supabase = createClient();
-        const { data: sessionData } = await supabase.auth.getSession();
-        if (!isCancelled) {
-          setSsoDebug({
-            id: sessionData.session?.user?.id,
-            email: sessionData.session?.user?.email,
-            user_metadata: sessionData.session?.user?.user_metadata,
-            app_metadata: sessionData.session?.user?.app_metadata,
-            identities: sessionData.session?.user?.identities,
-          });
-        }
-
         const [participationsData, allBadgesData, userBadgesData, leaderboardData, proposedChallengesData, myIdeasData] = await Promise.all([
           getUserParticipations(user.id),
           getAllBadges(locale),
@@ -287,15 +273,6 @@ export default function ProfilePage() {
                           <span>{inProgress.length} {t('inProgress')}</span>
                         </div>
                       </div>
-
-                      {ssoDebug && (
-                        <div className="mt-4 rounded-md border border-accent-cyan/40 bg-accent-cyan/10 p-3 text-xs">
-                          <p className="mb-2 font-semibold text-accent-cyan">SSO Debug (temp)</p>
-                          <pre className="whitespace-pre-wrap break-all">
-                            {JSON.stringify(ssoDebug, null, 2)}
-                          </pre>
-                        </div>
-                      )}
                     </div>
                   </div>
 
