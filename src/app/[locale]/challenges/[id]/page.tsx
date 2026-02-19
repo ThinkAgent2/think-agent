@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { Header } from '@/components/layout/Header';
@@ -49,6 +49,7 @@ const THEMATIQUE_LABELS: Record<Thematique, { emoji: string; label: string }> = 
 
 export default function ChallengeDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const locale = useLocale();
   const { user } = useAuth();
   const challengeId = params.id as string;
@@ -205,13 +206,13 @@ export default function ChallengeDetailPage() {
       <main className="flex-1 py-8">
         <div className="container mx-auto px-4 max-w-4xl">
           {/* Back link */}
-          <Link
-            href="/challenges"
+          <button
+            onClick={() => router.back()}
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent-cyan transition-colors mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
             {t('backToCatalog')}
-          </Link>
+          </button>
 
           {/* Mode édition */}
           {isEditing && challenge ? (
