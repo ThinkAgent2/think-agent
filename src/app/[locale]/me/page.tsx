@@ -18,9 +18,9 @@ import {
   Medal, Crown, Rocket, Brain, Loader2
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
-import { getUserParticipations, getAllBadges, getUserBadges, getLeaderboard, searchUsers, getUserChallenges, getUserIdeas, deleteIdeaProposal, updateUser, deleteChallenge, getUserRankAndTotal } from '@/lib/supabase/queries';
+import { getUserParticipations, getAllBadges, getUserBadges, getLeaderboard, searchUsers, getUserChallenges, getUserIdeas, deleteIdeaProposal, updateUser, deleteChallenge, getUserRankAndTotal, getUserSolutions } from '@/lib/supabase/queries';
 import { formatNameFromEmail } from '@/lib/userName';
-import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry, IdeaProposal } from '@/types/database';
+import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry, IdeaProposal, Solution } from '@/types/database';
 import { IdeaProposalForm } from '@/components/ideas/IdeaProposalForm';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
 
@@ -49,6 +49,7 @@ export default function ProfilePage() {
   const [featuredBadgeId, setFeaturedBadgeId] = useState<string | null>(null);
   const [isUpdatingBadge, setIsUpdatingBadge] = useState(false);
   const [rankInfo, setRankInfo] = useState<{ rank: number; total: number } | null>(null);
+  const [solutions, setSolutions] = useState<Solution[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const t = useTranslations('profile');
@@ -74,7 +75,7 @@ export default function ProfilePage() {
 
       setIsLoading(true);
       try {
-        const [participationsData, allBadgesData, userBadgesData, leaderboardData, proposedChallengesData, myIdeasData, rankData] = await Promise.all([
+        const [participationsData, allBadgesData, userBadgesData, leaderboardData, proposedChallengesData, myIdeasData, rankData, solutionsData] = await Promise.all([
           getUserParticipations(user.id),
           getAllBadges(locale),
           getUserBadges(user.id, locale),
@@ -82,6 +83,7 @@ export default function ProfilePage() {
           getUserChallenges(user.id),
           getUserIdeas(user.id),
           getUserRankAndTotal(user.id, user.points_totaux),
+          getUserSolutions(user.id),
         ]);
 
         if (!isCancelled) {
@@ -93,6 +95,7 @@ export default function ProfilePage() {
           setMyIdeas(myIdeasData);
           setFeaturedBadgeId(user.featured_badge_id || null);
           setRankInfo(rankData);
+          setSolutions(solutionsData);
         }
       } finally {
         if (!isCancelled) {
@@ -151,6 +154,7 @@ export default function ProfilePage() {
   
   const inProgress = participations.filter(p => p.statut === 'En_cours');
   const completed = participations.filter(p => p.statut === 'Terminé');
+  const solutionsByChallenge = new Map(solutions.map((solution) => [solution.challenge_id, solution]));
 
   // Progression par niveau (basée sur challenges terminés)
   const levelThresholds: Record<'Explorer' | 'Crafter' | 'Architecte', number> = {
@@ -404,26 +408,38 @@ export default function ProfilePage() {
                               href={"/challenges/" + participation.challenge_id}
                               className="block"
                             >
-                              <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-card/50 hover:border-accent-vert transition-colors">
-                                <div className="flex items-center gap-3">
-                                  <CheckCircle className="h-5 w-5 text-accent-vert" />
-                                  <div>
-                                    <h4 className="font-medium">{challenge?.titre || 'Challenge'}</h4>
-                                    <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
-                                      <Badge variant="outline" className="text-xs">
-                                        {challenge?.niveau_associe}
-                                      </Badge>
-                                      <span className="flex items-center gap-1 text-accent-vert">
-                                        <Zap className="h-3 w-3" />
-                                        +{challenge?.xp} {tCommon('xp')}
-                                      </span>
+                              {(() => {
+                                const solution = solutionsByChallenge.get(participation.challenge_id);
+                                const isFailed = solution?.statut === 'Évaluée' && (solution.note ?? 0) < 3;
+                                const isValidated = solution?.statut === 'Évaluée' && (solution.note ?? 0) >= 3;
+                                return (
+                                  <div className={`flex items-center justify-between p-4 rounded-lg border ${isFailed ? 'border-destructive/60' : 'border-border'} bg-card/50 hover:border-accent-vert transition-colors`}>
+                                    <div className="flex items-center gap-3">
+                                      {isFailed ? (
+                                        <XCircle className="h-5 w-5 text-destructive" />
+                                      ) : (
+                                        <CheckCircle className="h-5 w-5 text-accent-vert" />
+                                      )}
+                                      <div>
+                                        <h4 className="font-medium">{challenge?.titre || 'Challenge'}</h4>
+                                        <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
+                                          <Badge variant="outline" className="text-xs">
+                                            {challenge?.niveau_associe}
+                                          </Badge>
+                                          {isFailed ? (
+                                            <span className="text-destructive text-xs">{t('challengeFailed')}</span>
+                                          ) : isValidated ? (
+                                            <span className="text-accent-vert text-xs">{t('challengeCompleted')}</span>
+                                          ) : null}
+                                        </div>
+                                      </div>
                                     </div>
+                                    <Button variant="ghost" size="sm">
+                                      {tChallenges('review')}
+                                    </Button>
                                   </div>
-                                </div>
-                                <Button variant="ghost" size="sm">
-                                  {tChallenges('review')}
-                                </Button>
-                              </div>
+                                );
+                              })()}
                             </Link>
                           ))
                         )}

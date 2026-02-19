@@ -27,7 +27,7 @@ export default function AdminChallengeStatsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [solutions, setSolutions] = useState<SolutionRow[]>([]);
-  const [participants, setParticipants] = useState<Array<{ user: Pick<User, 'id' | 'email' | 'nom'> | null; statut: string }>>([]);
+  const [participants, setParticipants] = useState<Array<{ user: Pick<User, 'id' | 'email' | 'nom'> | null; user_id?: string; statut: string }>>([]);
   const [participantsCount, setParticipantsCount] = useState(0);
 
   const isAdmin = user?.role === 'Administrateur';
@@ -54,7 +54,7 @@ export default function AdminChallengeStatsPage() {
 
       const { data: participantsData, count: participantsTotal } = await supabase
         .from('participations')
-        .select(`statut, user:users(id, email, nom)`, { count: 'exact' })
+        .select(`user_id, statut, user:users(id, email, nom)`, { count: 'exact' })
         .eq('challenge_id', id)
         .order('created_at', { ascending: false });
 
@@ -64,6 +64,7 @@ export default function AdminChallengeStatsPage() {
           const user = Array.isArray(rawUser) ? rawUser[0] ?? null : (rawUser ?? null);
           return {
             statut: (participant as { statut: string }).statut,
+            user_id: (participant as { user_id?: string }).user_id,
             user: user as Pick<User, 'id' | 'email' | 'nom'> | null,
           };
         });
@@ -196,7 +197,7 @@ export default function AdminChallengeStatsPage() {
                 <div className="space-y-2">
                   {participants.map((participant, index) => {
                     const name = participant.user?.nom || (participant.user?.email ? formatNameFromEmail(participant.user.email) : '—');
-                    const solution = solutions.find((s) => s.user_id === participant.user?.id);
+                    const solution = solutions.find((s) => s.user_id === participant.user_id || s.user_id === participant.user?.id);
                     const statusLabel = solution
                       ? solution.statut === 'Soumise'
                         ? t('submitted')
@@ -208,7 +209,7 @@ export default function AdminChallengeStatsPage() {
                         : t('submitted');
 
                     return (
-                      <div key={`${participant.user?.id ?? 'unknown'}-${index}`} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border px-3 py-2 text-sm">
+                      <div key={`${(participant as { user_id?: string }).user_id ?? 'unknown'}-${index}`} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border px-3 py-2 text-sm">
                         <div className="min-w-0">
                           <p className="font-medium truncate">{name}</p>
                           <p className="text-xs text-muted-foreground truncate">{participant.user?.email}</p>
