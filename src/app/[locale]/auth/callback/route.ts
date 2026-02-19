@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { routing } from '@/i18n/routing';
 
 export async function GET(request: Request) {
@@ -23,6 +24,30 @@ export async function GET(request: Request) {
         : forwardedHost
           ? `https://${forwardedHost}`
           : origin;
+
+      const { data: authData } = await supabase.auth.getUser();
+      if (authData?.user) {
+        const admin = createAdminClient();
+        const { data: existingUser } = await admin
+          .from('users')
+          .select('id')
+          .eq('auth_id', authData.user.id)
+          .maybeSingle();
+
+        if (!existingUser) {
+          await admin
+            .from('users')
+            .insert({
+              auth_id: authData.user.id,
+              email: authData.user.email,
+              nom: authData.user.user_metadata?.full_name || authData.user.user_metadata?.name || null,
+              niveau_actuel: 'Explorer',
+              role: 'Utilisateur',
+              points_totaux: 0,
+            });
+        }
+      }
+
       const defaultLocale = routing.defaultLocale || 'fr';
       return NextResponse.redirect(`${base}/${defaultLocale}${next}`);
     }
