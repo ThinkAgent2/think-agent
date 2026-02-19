@@ -1014,13 +1014,15 @@ async function awardConditionalBadges(
   since.setDate(since.getDate() - 30);
 
   (validatedSolutions || []).forEach((row) => {
-    const challenge = (row as { challenge?: { niveau_associe: UserLevel; participants: string } | null }).challenge;
+    const rawChallenge = (row as { challenge?: unknown }).challenge;
+    const challenge = Array.isArray(rawChallenge) ? rawChallenge[0] ?? null : (rawChallenge ?? null);
     if (!challenge) return;
+
     if (!validatedChallengeIds.has(row.challenge_id)) {
       validatedChallengeIds.add(row.challenge_id);
-      validatedByLevel[challenge.niveau_associe]++;
+      validatedByLevel[(challenge as { niveau_associe: UserLevel }).niveau_associe]++;
     }
-    if (challenge.participants === 'Duo') {
+    if ((challenge as { participants: string }).participants === 'Duo') {
       hasDuoChallenge = true;
     }
     if (new Date(row.created_at) >= since) {
