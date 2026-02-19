@@ -157,11 +157,7 @@ export default function ProfilePage() {
   
   const inProgress = participations.filter(p => p.statut === 'En_cours');
   const solutionsByChallenge = new Map(solutions.map((solution) => [solution.challenge_id, solution]));
-  const completed = participations.filter((p) => {
-    if (p.statut !== 'Terminé') return false;
-    const solution = solutionsByChallenge.get(p.challenge_id);
-    return solution?.statut === 'Évaluée' && (solution.note ?? 0) >= 3;
-  });
+  const completed = participations.filter((p) => p.statut === 'Terminé');
 
   // Progression par niveau (basée sur challenges terminés)
   const levelThresholds: Record<'Explorer' | 'Crafter' | 'Architecte', number> = {
@@ -417,16 +413,27 @@ export default function ProfilePage() {
                             >
                               {(() => {
                                 const solution = solutionsByChallenge.get(participation.challenge_id);
+                                const isPending = solution?.statut === 'Soumise';
                                 const isFailed = solution?.statut === 'Évaluée' && (solution.note ?? 0) < 3;
                                 const isValidated = solution?.statut === 'Évaluée' && (solution.note ?? 0) >= 3;
+                                const borderClass = isFailed
+                                  ? 'border-destructive/60'
+                                  : isPending
+                                  ? 'border-accent-jaune/60'
+                                  : 'border-border';
+
+                                const icon = isFailed ? (
+                                  <XCircle className="h-5 w-5 text-destructive" />
+                                ) : isPending ? (
+                                  <Clock className="h-5 w-5 text-accent-jaune" />
+                                ) : (
+                                  <CheckCircle className="h-5 w-5 text-accent-vert" />
+                                );
+
                                 return (
-                                  <div className={`flex items-center justify-between p-4 rounded-lg border ${isFailed ? 'border-destructive/60' : 'border-border'} bg-card/50 hover:border-accent-vert transition-colors`}>
+                                  <div className={`flex items-center justify-between p-4 rounded-lg border ${borderClass} bg-card/50 hover:border-accent-vert transition-colors`}>
                                     <div className="flex items-center gap-3">
-                                      {isFailed ? (
-                                        <XCircle className="h-5 w-5 text-destructive" />
-                                      ) : (
-                                        <CheckCircle className="h-5 w-5 text-accent-vert" />
-                                      )}
+                                      {icon}
                                       <div>
                                         <h4 className="font-medium">{challenge?.titre || 'Challenge'}</h4>
                                         <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
@@ -437,6 +444,8 @@ export default function ProfilePage() {
                                             <span className="text-destructive text-xs">{t('challengeFailed')}</span>
                                           ) : isValidated ? (
                                             <span className="text-accent-vert text-xs">{t('challengeCompleted')}</span>
+                                          ) : isPending ? (
+                                            <span className="text-accent-jaune text-xs">{t('challengePending')}</span>
                                           ) : null}
                                         </div>
                                       </div>
