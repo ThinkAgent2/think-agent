@@ -247,6 +247,7 @@
     "allBadges": "Tous les badges",
     "challengeFailed": "Challenge échoué",
     "challengeCompleted": "Challenge validé",
+    "challengePending": "En cours de validation",
     "avatar": {
       "upload": "Changer la photo",
       "uploading": "Upload...",
