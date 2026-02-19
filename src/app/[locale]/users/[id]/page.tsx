@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { getAllBadges, getLeaderboard, getUserBadges, getUserById, getUserParticipations, getUserChallenges, searchUsers, getUserValidatedIdeas } from '@/lib/supabase/queries';
 import { formatNameFromEmail } from '@/lib/userName';
+import { localizeChallenge } from '@/lib/supabase/localization';
 import { useAuth } from '@/lib/auth';
 import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry, User, IdeaProposal } from '@/types/database';
 
@@ -79,8 +80,13 @@ export default function UserProfilePage() {
         return;
       }
 
+      const localizedParticipations = participationsData.map((participation) => ({
+        ...participation,
+        challenge: participation.challenge ? localizeChallenge(participation.challenge, locale) : participation.challenge,
+      }));
+
       setUser(userData);
-      setParticipations(participationsData);
+      setParticipations(localizedParticipations);
       setAllBadges(allBadgesData);
       setUserBadges(userBadgesData);
       setLeaderboard(leaderboardData);
