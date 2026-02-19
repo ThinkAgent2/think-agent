@@ -231,7 +231,15 @@ export default function AdminChallengeStatsPage() {
                       <div key={`${userId ?? 'unknown'}-${index}`} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border px-3 py-2 text-sm">
                         <div className="min-w-0">
                           {userId ? (
-                            <Link href={`/users/${userId}`} className="font-medium truncate hover:text-accent-cyan">
+                            <Link
+                              href={`/users/${userId}`}
+                              onClick={() => {
+                                if (typeof window !== 'undefined') {
+                                  sessionStorage.setItem('statsFrom', window.location.pathname + window.location.search);
+                                }
+                              }}
+                              className="font-medium truncate hover:text-accent-cyan"
+                            >
                               {name}
                             </Link>
                           ) : (
