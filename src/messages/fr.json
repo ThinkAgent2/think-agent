@@ -252,7 +252,8 @@
     }
   },
   "badges": {
-    "title": "Badges"
+    "title": "Badges",
+    "howToEarnDefault": "Termine des challenges et débloque ce badge en remplissant ses conditions."
   },
   "leaderboard": {
     "title": "Leaderboard",

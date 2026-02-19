@@ -252,7 +252,8 @@
     }
   },
   "badges": {
-    "title": "Badges"
+    "title": "Badges",
+    "howToEarnDefault": "Complete challenges and meet its conditions to unlock this badge."
   },
   "leaderboard": {
     "title": "Leaderboard",

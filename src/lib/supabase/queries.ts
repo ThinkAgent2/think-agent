@@ -626,11 +626,12 @@ export async function getLeaderboardRecent(limit: number = 10): Promise<Leaderbo
     .from('solutions')
     .select(`
       user_id,
-      challenge:challenges(xp),
-      user:users(id, nom, email, niveau_actuel, points_totaux)
+      challenge:challenges!solutions_challenge_id_fkey(xp),
+      user:users!solutions_user_id_fkey(id, nom, email, niveau_actuel, points_totaux)
     `)
     .eq('statut', 'Évaluée')
-    .gte('created_at', since.toISOString());
+    .gte('updated_at', since.toISOString())
+    .gte('note', 3);
 
   if (error) {
     console.error('Error fetching recent leaderboard:', error);
