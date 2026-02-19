@@ -39,9 +39,14 @@ export default function AdminChallengeStatsPage() {
     let isCancelled = false;
 
     if (typeof window !== 'undefined') {
-      const lastRoute = sessionStorage.getItem('lastRoute');
-      if (lastRoute) {
-        sessionStorage.setItem('statsFrom', lastRoute);
+      const ref = document.referrer;
+      if (ref && ref.includes('/challenges/')) {
+        try {
+          const url = new URL(ref);
+          sessionStorage.setItem('lastRoute', url.pathname + url.search);
+        } catch {
+          sessionStorage.setItem('lastRoute', ref);
+        }
       }
     }
 
