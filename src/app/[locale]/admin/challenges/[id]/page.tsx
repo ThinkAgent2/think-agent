@@ -27,6 +27,7 @@ export default function AdminChallengeStatsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [solutions, setSolutions] = useState<SolutionRow[]>([]);
+  const [participants, setParticipants] = useState<Array<{ user: Pick<User, 'id' | 'email' | 'nom'> | null; statut: string }>>([]);
   const [participantsCount, setParticipantsCount] = useState(0);
 
   const isAdmin = user?.role === 'Administrateur';
@@ -51,14 +52,16 @@ export default function AdminChallengeStatsPage() {
         .eq('challenge_id', id)
         .order('created_at', { ascending: false });
 
-      const { count: participantsTotal } = await supabase
+      const { data: participantsData, count: participantsTotal } = await supabase
         .from('participations')
-        .select('*', { count: 'exact', head: true })
-        .eq('challenge_id', id);
+        .select(`statut, user:users(id, email, nom)`, { count: 'exact' })
+        .eq('challenge_id', id)
+        .order('created_at', { ascending: false });
 
       if (!isCancelled) {
         setChallenge((challengeData as Challenge) ?? null);
         setSolutions((solutionsData as SolutionRow[]) ?? []);
+        setParticipants((participantsData as Array<{ user: Pick<User, 'id' | 'email' | 'nom'> | null; statut: string }>) ?? []);
         setParticipantsCount(participantsTotal ?? 0);
         setIsLoading(false);
       }
@@ -178,26 +181,34 @@ export default function AdminChallengeStatsPage() {
               <CardTitle>{t('listTitle')}</CardTitle>
             </CardHeader>
             <CardContent>
-              {solutions.length === 0 ? (
+              {participants.length === 0 ? (
                 <p className="text-sm text-muted-foreground">{tCommon('noResults')}</p>
               ) : (
                 <div className="space-y-2">
-                  {solutions.map((solution) => {
-                    const name = solution.user?.nom || (solution.user?.email ? formatNameFromEmail(solution.user.email) : '—');
-                    const statusLabel = solution.statut === 'Soumise'
-                      ? t('submitted')
-                      : (solution.note ?? 0) >= 3
-                        ? t('validated')
-                        : t('failed');
+                  {participants.map((participant, index) => {
+                    const name = participant.user?.nom || (participant.user?.email ? formatNameFromEmail(participant.user.email) : '—');
+                    const solution = solutions.find((s) => s.user_id === participant.user?.id);
+                    const statusLabel = solution
+                      ? solution.statut === 'Soumise'
+                        ? t('submitted')
+                        : (solution.note ?? 0) >= 3
+                          ? t('validated')
+                          : t('failed')
+                      : participant.statut === 'En_cours'
+                        ? t('inProgress')
+                        : t('submitted');
+
                     return (
-                      <div key={solution.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border px-3 py-2 text-sm">
+                      <div key={`${participant.user?.id ?? 'unknown'}-${index}`} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border px-3 py-2 text-sm">
                         <div className="min-w-0">
                           <p className="font-medium truncate">{name}</p>
-                          <p className="text-xs text-muted-foreground truncate">{solution.user?.email}</p>
+                          <p className="text-xs text-muted-foreground truncate">{participant.user?.email}</p>
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge variant="outline">{statusLabel}</Badge>
-                          <span className="text-xs text-muted-foreground">{t('score')}: {solution.note ?? '-'}</span>
+                          {solution && (
+                            <span className="text-xs text-muted-foreground">{t('score')}: {solution.note ?? '-'}</span>
+                          )}
                         </div>
                       </div>
                     );

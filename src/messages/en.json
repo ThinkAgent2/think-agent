@@ -141,9 +141,9 @@
       "listTitle": "Participants",
       "user": "User",
       "status": "Status",
-      "score": "Score"
-    }
-  },
+      "score": "Score",
+      "inProgress": "In progress"
+    },
     "submit": {
       "title": "Submit your solution",
       "descriptionLabel": "Description of your solution",
