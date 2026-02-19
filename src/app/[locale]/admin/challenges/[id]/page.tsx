@@ -59,9 +59,18 @@ export default function AdminChallengeStatsPage() {
         .order('created_at', { ascending: false });
 
       if (!isCancelled) {
+        const normalizedParticipants = (participantsData ?? []).map((participant) => {
+          const rawUser = (participant as { user?: unknown }).user;
+          const user = Array.isArray(rawUser) ? rawUser[0] ?? null : (rawUser ?? null);
+          return {
+            statut: (participant as { statut: string }).statut,
+            user: user as Pick<User, 'id' | 'email' | 'nom'> | null,
+          };
+        });
+
         setChallenge((challengeData as Challenge) ?? null);
         setSolutions((solutionsData as SolutionRow[]) ?? []);
-        setParticipants((participantsData as Array<{ user: Pick<User, 'id' | 'email' | 'nom'> | null; statut: string }>) ?? []);
+        setParticipants(normalizedParticipants);
         setParticipantsCount(participantsTotal ?? 0);
         setIsLoading(false);
       }
