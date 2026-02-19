@@ -19,6 +19,7 @@ export default function ChallengesPage() {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [participations, setParticipations] = useState<Participation[]>([]);
   const [filters, setFilters] = useState<Filters>({});
+  const [completionFilter, setCompletionFilter] = useState<'all' | 'completed' | 'incomplete'>('all');
   const [isLoading, setIsLoading] = useState(true);
   const t = useTranslations('challenges');
   const tCommon = useTranslations('common');
@@ -63,11 +64,23 @@ export default function ChallengesPage() {
     return participations.find(p => p.challenge_id === challengeId);
   };
 
+  const isCompleted = (challengeId: string) =>
+    participations.some((p) => p.challenge_id === challengeId && p.statut === 'Terminé');
+
+  const isIncomplete = (challengeId: string) =>
+    !participations.some((p) => p.challenge_id === challengeId && p.statut === 'Terminé');
+
+  const filteredChallenges = challenges.filter((challenge) => {
+    if (completionFilter === 'completed') return isCompleted(challenge.id);
+    if (completionFilter === 'incomplete') return isIncomplete(challenge.id);
+    return true;
+  });
+
   // Grouper par niveau
   const challengesByLevel = {
-    Explorer: challenges.filter((c) => c.niveau_associe === 'Explorer'),
-    Crafter: challenges.filter((c) => c.niveau_associe === 'Crafter'),
-    Architecte: challenges.filter((c) => c.niveau_associe === 'Architecte'),
+    Explorer: filteredChallenges.filter((c) => c.niveau_associe === 'Explorer'),
+    Crafter: filteredChallenges.filter((c) => c.niveau_associe === 'Crafter'),
+    Architecte: filteredChallenges.filter((c) => c.niveau_associe === 'Architecte'),
   };
 
   const challengeCount = challenges.length;
@@ -103,6 +116,37 @@ export default function ChallengesPage() {
             {/* Sidebar filters */}
             <aside className="lg:sticky lg:top-24 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto z-10 space-y-6 pr-2">
               <ChallengeFilters filters={filters} onFiltersChange={setFilters} />
+
+              <div className="space-y-2 bg-background p-4 rounded-lg border border-border">
+                <label className="text-sm font-medium text-muted-foreground">Statut</label>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={`px-3 ${completionFilter === 'all' ? 'bg-accent-jaune text-black border-accent-jaune' : 'border-border hover:border-accent-cyan'}`}
+                    onClick={() => setCompletionFilter('all')}
+                  >
+                    Tous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={`px-3 ${completionFilter === 'completed' ? 'bg-accent-jaune text-black border-accent-jaune' : 'border-border hover:border-accent-cyan'}`}
+                    onClick={() => setCompletionFilter('completed')}
+                  >
+                    Complétés
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={`px-3 ${completionFilter === 'incomplete' ? 'bg-accent-jaune text-black border-accent-jaune' : 'border-border hover:border-accent-cyan'}`}
+                    onClick={() => setCompletionFilter('incomplete')}
+                  >
+                    Non complétés
+                  </Button>
+                </div>
+              </div>
+
               {user && (
                 <Link href="/challenges/propose" className="block">
                   <Button className="w-full bg-exalt-blue hover:bg-exalt-blue/80 text-white font-semibold">

@@ -31,7 +31,10 @@ export function ChallengeCard({ challenge, participation }: ChallengeCardProps) 
       {/* Status indicator */}
       {isCompleted && (
         <div className="absolute top-3 right-3 z-10">
-          <CheckCircle className="h-6 w-6 text-accent-vert" />
+          <span className="inline-flex items-center gap-1 rounded-full bg-accent-vert/20 text-accent-vert border border-accent-vert px-2 py-1 text-[10px] font-semibold">
+            <CheckCircle className="h-3 w-3" />
+            Validé
+          </span>
         </div>
       )}
 
