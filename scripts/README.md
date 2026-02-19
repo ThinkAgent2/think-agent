@@ -49,6 +49,18 @@ Un exemple de prompt et d'appel OpenAI est commenté dans le code.
 
 ---
 
+## retro-award-badges.ts
+
+Script de rétro-attribution des badges pour tous les utilisateurs.
+
+### Exécution
+
+```bash
+npx ts-node scripts/retro-award-badges.ts
+```
+
+---
+
 ## Schéma de données
 
 ### Table `challenges`

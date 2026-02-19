@@ -53,6 +53,7 @@ export interface User {
   niveau_actuel: UserLevel;
   role: UserRole;
   points_totaux: number;
+  pr_merged?: boolean | null;
   created_at: string;
 }
 
