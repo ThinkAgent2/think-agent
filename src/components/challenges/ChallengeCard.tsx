@@ -5,7 +5,7 @@ import { Link } from '@/i18n/navigation';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Star, Users, Zap, CheckCircle } from 'lucide-react';
+import { Star, Users, Zap, CheckCircle, Clock, XCircle } from 'lucide-react';
 import type { Challenge, Participation, Solution } from '@/types/database';
 
 interface ChallengeCardProps {
@@ -31,28 +31,36 @@ export function ChallengeCard({ challenge, participation, solution }: ChallengeC
   const t = useTranslations('challenges.card');
   const tCommon = useTranslations('common');
 
+  const statusBorder = isValidated
+    ? 'border-accent-vert/60'
+    : isFailed
+    ? 'border-destructive/60'
+    : isPending
+    ? 'border-accent-jaune/60'
+    : 'border-border';
+
   return (
-    <Card className={`group relative overflow-hidden transition-all duration-300 bg-card border-border ${config.glow} transition-glow`}>
+    <Card className={`group relative overflow-hidden transition-all duration-300 bg-card ${statusBorder} ${config.glow} transition-glow`}>
       {/* Status indicator */}
       {isPending && (
-        <div className="absolute top-3 right-3 z-10">
-          <span className="inline-flex items-center gap-1 rounded-full bg-accent-jaune/10 text-accent-jaune border border-accent-jaune/50 px-2 py-0.5 text-[10px] font-medium">
-            {t('status.pending')}
-          </span>
+        <div className="absolute top-3 left-3 z-10">
+          <div className="h-7 w-7 rounded-full bg-accent-jaune/15 border border-accent-jaune/50 flex items-center justify-center">
+            <Clock className="h-4 w-4 text-accent-jaune" />
+          </div>
         </div>
       )}
       {isValidated && (
-        <div className="absolute top-3 right-3 z-10">
-          <span className="inline-flex items-center gap-1 rounded-full bg-accent-vert/10 text-accent-vert border border-accent-vert/50 px-2 py-0.5 text-[10px] font-medium">
-            {t('status.completed')}
-          </span>
+        <div className="absolute top-3 left-3 z-10">
+          <div className="h-7 w-7 rounded-full bg-accent-vert/15 border border-accent-vert/50 flex items-center justify-center">
+            <CheckCircle className="h-4 w-4 text-accent-vert" />
+          </div>
         </div>
       )}
       {isFailed && (
-        <div className="absolute top-3 right-3 z-10">
-          <span className="inline-flex items-center gap-1 rounded-full bg-destructive/10 text-destructive border border-destructive/50 px-2 py-0.5 text-[10px] font-medium">
-            {t('status.failed')}
-          </span>
+        <div className="absolute top-3 left-3 z-10">
+          <div className="h-7 w-7 rounded-full bg-destructive/15 border border-destructive/50 flex items-center justify-center">
+            <XCircle className="h-4 w-4 text-destructive" />
+          </div>
         </div>
       )}
 
