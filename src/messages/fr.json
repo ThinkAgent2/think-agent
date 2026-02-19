@@ -125,8 +125,25 @@
       "challengeCompleted": "Challenge validé !",
       "challengePending": "En cours de validation",
       "challengeFailed": "Challenge échoué",
-      "pendingHint": "Ta solution est en cours d’évaluation. Les XP seront attribués après validation."
+      "pendingHint": "Ta solution est en cours d’évaluation. Les XP seront attribués après validation.",
+      "retryChallenge": "Recommencer le challenge",
+      "viewStats": "Voir les statistiques"
     },
+    "stats": {
+      "title": "Statistiques du challenge",
+      "subtitle": "Vue d’ensemble des soumissions et résultats",
+      "totalAttempts": "Participants",
+      "submitted": "Soumissions",
+      "evaluated": "Évalués",
+      "validated": "Validés",
+      "failed": "Échoués",
+      "successRate": "Taux de réussite",
+      "listTitle": "Participants",
+      "user": "Utilisateur",
+      "status": "Statut",
+      "score": "Note"
+    }
+  },
     "submit": {
       "title": "Soumettre ta solution",
       "descriptionLabel": "Description de ta solution",

@@ -398,16 +398,35 @@ export async function submitSolution(
   contenuTexte: string,
   fichiers?: string[]
 ): Promise<Solution | null> {
-  const { data, error } = await supabase
+  const { data: existing } = await supabase
     .from('solutions')
-    .insert({
-      user_id: userId,
-      challenge_id: challengeId,
-      contenu_texte: contenuTexte,
-      fichiers_attaches: fichiers || [],
-    })
-    .select()
-    .single();
+    .select('*')
+    .eq('user_id', userId)
+    .eq('challenge_id', challengeId)
+    .maybeSingle();
+
+  const payload = {
+    user_id: userId,
+    challenge_id: challengeId,
+    contenu_texte: contenuTexte,
+    fichiers_attaches: fichiers || [],
+    statut: 'Soumise' as Solution['statut'],
+    note: null,
+    feedback_reviewer: null,
+  };
+
+  const { data, error } = existing
+    ? await supabase
+        .from('solutions')
+        .update(payload)
+        .eq('id', existing.id)
+        .select()
+        .single()
+    : await supabase
+        .from('solutions')
+        .insert(payload)
+        .select()
+        .single();
 
   if (error) {
     console.error('Error submitting solution:', error);

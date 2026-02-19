@@ -125,8 +125,25 @@
       "challengeCompleted": "Challenge validated!",
       "challengePending": "Pending validation",
       "challengeFailed": "Challenge failed",
-      "pendingHint": "Your solution is being reviewed. XP will be granted after validation."
+      "pendingHint": "Your solution is being reviewed. XP will be granted after validation.",
+      "retryChallenge": "Retry challenge",
+      "viewStats": "View stats"
     },
+    "stats": {
+      "title": "Challenge statistics",
+      "subtitle": "Submission and results overview",
+      "totalAttempts": "Participants",
+      "submitted": "Submissions",
+      "evaluated": "Evaluated",
+      "validated": "Validated",
+      "failed": "Failed",
+      "successRate": "Success rate",
+      "listTitle": "Participants",
+      "user": "User",
+      "status": "Status",
+      "score": "Score"
+    }
+  },
     "submit": {
       "title": "Submit your solution",
       "descriptionLabel": "Description of your solution",

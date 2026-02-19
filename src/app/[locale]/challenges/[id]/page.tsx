@@ -23,7 +23,8 @@ import {
   getSolution,
   createParticipation, 
   submitSolution,
-  abandonParticipation
+  abandonParticipation,
+  updateParticipation
 } from '@/lib/supabase/queries';
 import type { Challenge, Participation, Solution, VortexStage, Thematique } from '@/types/database';
 
@@ -68,6 +69,7 @@ export default function ChallengeDetailPage() {
 
   // Vérifier si l'utilisateur est admin
   const isAdmin = user?.role === 'Administrateur';
+  const canRetry = solution?.statut === 'Évaluée' && (solution.note ?? 0) < 3;
 
   // Helper to get localized vortex label
   const getVortexLabel = (stage: VortexStage): string => {
@@ -118,6 +120,17 @@ export default function ChallengeDetailPage() {
     const newParticipation = await createParticipation(user.id, challenge.id);
     if (newParticipation) {
       setParticipation(newParticipation);
+    }
+    setIsSubmitting(false);
+  };
+
+  const handleRetry = async () => {
+    if (!user || !challenge || !canRetry) return;
+
+    setIsSubmitting(true);
+    const restarted = await updateParticipation(user.id, challenge.id, { statut: 'En_cours' });
+    if (restarted) {
+      setParticipation(restarted);
     }
     setIsSubmitting(false);
   };
@@ -517,9 +530,20 @@ export default function ChallengeDetailPage() {
                       <p className="text-sm text-muted-foreground">+{challenge.xp} {tCommon('xp')}</p>
                     </div>
                   ) : isFailed ? (
-                    <div className="text-center space-y-2">
+                    <div className="text-center space-y-3">
                       <XCircle className="h-12 w-12 mx-auto text-destructive" />
                       <p className="font-semibold text-destructive">{t('challengeFailed')}</p>
+                      {canRetry && (
+                        <Button
+                          onClick={handleRetry}
+                          disabled={isSubmitting}
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                        >
+                          {t('retryChallenge')}
+                        </Button>
+                      )}
                     </div>
                   ) : isPendingEvaluation ? (
                     <div className="text-center space-y-2">
@@ -552,17 +576,26 @@ export default function ChallengeDetailPage() {
                       </Button>
                     </div>
                   ) : (
-                    <Button
-                      onClick={handleParticipate}
-                      disabled={isSubmitting || !isPublished}
-                      className="w-full bg-accent-jaune hover:bg-accent-jaune/80 text-black font-semibold"
-                    >
-                      {isSubmitting ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        isPublished ? t('participate') : t('pendingPublication')
+                    <div className="space-y-3">
+                      <Button
+                        onClick={handleParticipate}
+                        disabled={isSubmitting || !isPublished}
+                        className="w-full bg-accent-jaune hover:bg-accent-jaune/80 text-black font-semibold"
+                      >
+                        {isSubmitting ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          isPublished ? t('participate') : t('pendingPublication')
+                        )}
+                      </Button>
+                      {isAdmin && (
+                        <Link href={`/admin/challenges/${challenge.id}`}>
+                          <Button variant="outline" size="sm" className="w-full">
+                            {t('viewStats')}
+                          </Button>
+                        </Link>
                       )}
-                    </Button>
+                    </div>
                   )}
                 </CardContent>
               </Card>
