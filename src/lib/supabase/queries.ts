@@ -414,20 +414,36 @@ export async function submitSolution(
     return null;
   }
 
-  // Mettre à jour la participation en "Terminé"
-  await updateParticipation(userId, challengeId, { statut: 'Terminé' });
+  return data;
+}
 
-  // Récupérer le challenge pour les XP
-  const challenge = await getChallengeById(challengeId);
-  if (challenge) {
-    // Ajouter les XP du challenge à l'utilisateur
-    await addUserXP(userId, challenge.xp);
+export async function evaluateSolution(
+  userId: string,
+  challengeId: string,
+  note: number,
+  feedback?: string
+): Promise<boolean> {
+  const { error } = await supabase
+    .from('solutions')
+    .update({ statut: 'Évaluée', note, feedback_reviewer: feedback ?? null })
+    .eq('user_id', userId)
+    .eq('challenge_id', challengeId);
+
+  if (error) {
+    console.error('Error evaluating solution:', error);
+    return false;
   }
 
-  // Vérifier et mettre à jour le niveau + badges
-  await checkAndUpdateLevelAndBadges(userId);
+  if (note >= 3) {
+    await updateParticipation(userId, challengeId, { statut: 'Terminé' });
+    const challenge = await getChallengeById(challengeId);
+    if (challenge) {
+      await addUserXP(userId, challenge.xp);
+    }
+    await checkAndUpdateLevelAndBadges(userId);
+  }
 
-  return data;
+  return true;
 }
 
 export async function markSolutionViewed(userId: string, challengeId: string): Promise<void> {

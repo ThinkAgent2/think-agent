@@ -179,6 +179,10 @@ export default function ChallengeDetailPage() {
   const isParticipating = participation?.statut === 'En_cours';
   const hasSubmitted = !!solution;
   const isCompleted = participation?.statut === 'Terminé';
+  const isPendingEvaluation = solution?.statut === 'Soumise';
+  const isEvaluated = solution?.statut === 'Évaluée';
+  const isValidated = isEvaluated && (solution?.note ?? 0) >= 3;
+  const isFailed = isEvaluated && (solution?.note ?? 0) < 3;
   const isPublished = challenge.statut === 'Actif' || challenge.statut === 'Publie';
 
   return (
@@ -506,11 +510,22 @@ export default function ChallengeDetailPage() {
                         </Button>
                       </Link>
                     </div>
-                  ) : isCompleted ? (
+                  ) : isValidated ? (
                     <div className="text-center space-y-2">
                       <CheckCircle className="h-12 w-12 mx-auto text-accent-vert" />
                       <p className="font-semibold text-accent-vert">{t('challengeCompleted')}</p>
                       <p className="text-sm text-muted-foreground">+{challenge.xp} {tCommon('xp')}</p>
+                    </div>
+                  ) : isFailed ? (
+                    <div className="text-center space-y-2">
+                      <XCircle className="h-12 w-12 mx-auto text-destructive" />
+                      <p className="font-semibold text-destructive">{t('challengeFailed')}</p>
+                    </div>
+                  ) : isPendingEvaluation ? (
+                    <div className="text-center space-y-2">
+                      <Clock className="h-12 w-12 mx-auto text-accent-jaune" />
+                      <p className="font-semibold text-accent-jaune">{t('challengePending')}</p>
+                      <p className="text-sm text-muted-foreground">{t('pendingHint')}</p>
                     </div>
                   ) : isParticipating ? (
                     <div className="text-center space-y-4">

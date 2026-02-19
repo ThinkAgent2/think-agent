@@ -117,7 +117,10 @@
       "participate": "Participate",
       "pendingPublication": "Pending publication",
       "loginToParticipate": "Sign in to participate",
-      "challengeCompleted": "Challenge completed!"
+      "challengeCompleted": "Challenge validated!",
+      "challengePending": "Pending validation",
+      "challengeFailed": "Challenge failed",
+      "pendingHint": "Your solution is being reviewed. XP will be granted after validation."
     },
     "submit": {
       "title": "Submit your solution",

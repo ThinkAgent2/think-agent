@@ -36,24 +36,21 @@ export function ChallengeCard({ challenge, participation, solution }: ChallengeC
       {/* Status indicator */}
       {isPending && (
         <div className="absolute top-3 right-3 z-10">
-          <span className="inline-flex items-center gap-1 rounded-full bg-accent-jaune/20 text-accent-jaune border border-accent-jaune px-2 py-1 text-[10px] font-semibold">
-            <CheckCircle className="h-3 w-3" />
+          <span className="inline-flex items-center gap-1 rounded-full bg-accent-jaune/10 text-accent-jaune border border-accent-jaune/50 px-2 py-0.5 text-[10px] font-medium">
             {t('status.pending')}
           </span>
         </div>
       )}
       {isValidated && (
         <div className="absolute top-3 right-3 z-10">
-          <span className="inline-flex items-center gap-1 rounded-full bg-accent-vert/20 text-accent-vert border border-accent-vert px-2 py-1 text-[10px] font-semibold">
-            <CheckCircle className="h-3 w-3" />
+          <span className="inline-flex items-center gap-1 rounded-full bg-accent-vert/10 text-accent-vert border border-accent-vert/50 px-2 py-0.5 text-[10px] font-medium">
             {t('status.completed')}
           </span>
         </div>
       )}
       {isFailed && (
         <div className="absolute top-3 right-3 z-10">
-          <span className="inline-flex items-center gap-1 rounded-full bg-destructive/20 text-destructive border border-destructive px-2 py-1 text-[10px] font-semibold">
-            <CheckCircle className="h-3 w-3" />
+          <span className="inline-flex items-center gap-1 rounded-full bg-destructive/10 text-destructive border border-destructive/50 px-2 py-0.5 text-[10px] font-medium">
             {t('status.failed')}
           </span>
         </div>

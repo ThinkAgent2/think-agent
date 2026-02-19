@@ -117,7 +117,10 @@
       "participate": "Participer",
       "pendingPublication": "En attente de publication",
       "loginToParticipate": "Connecte-toi pour participer",
-      "challengeCompleted": "Challenge complété !"
+      "challengeCompleted": "Challenge validé !",
+      "challengePending": "En cours de validation",
+      "challengeFailed": "Challenge échoué",
+      "pendingHint": "Ta solution est en cours d’évaluation. Les XP seront attribués après validation."
     },
     "submit": {
       "title": "Soumettre ta solution",
