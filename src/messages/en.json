@@ -80,6 +80,11 @@
     "newChallenge": "New challenge",
     "proposeChallenge": "Propose a challenge",
     "searchPlaceholder": "Search for a challenge...",
+    "levels": {
+      "explorer": "Explorer",
+      "crafter": "Crafter",
+      "architecte": "Architect"
+    },
     "filters": {
       "level": "Level",
       "brand": "Brand",
@@ -271,8 +276,9 @@
     "searching": "Searching...",
     "noRanking": "No ranking yet",
     "you": "(you)",
-    "currentProfile": "(profile)"
-  },
+    "currentProfile": "(profile)",
+    "globalRank": "Global ranking: {rank} / {total}"
+  }
   "admin": {
     "validation": {
       "title": "Challenge validation",

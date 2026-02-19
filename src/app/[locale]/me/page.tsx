@@ -291,7 +291,7 @@ export default function ProfilePage() {
                         {rankInfo && (
                           <div className="flex items-center gap-1 text-muted-foreground">
                             <Trophy className="h-4 w-4 text-accent-jaune" />
-                            <span>Classement global: {rankInfo.rank} / {rankInfo.total}</span>
+                            <span>{tLeaderboard('globalRank', { rank: rankInfo.rank, total: rankInfo.total })}</span>
                           </div>
                         )}
                       </div>

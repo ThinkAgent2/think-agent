@@ -80,6 +80,11 @@
     "newChallenge": "Nouveau challenge",
     "proposeChallenge": "Proposer un challenge",
     "searchPlaceholder": "Rechercher un challenge...",
+    "levels": {
+      "explorer": "Explorer",
+      "crafter": "Crafter",
+      "architecte": "Architecte"
+    },
     "filters": {
       "level": "Niveau",
       "brand": "Marque",
@@ -271,7 +276,8 @@
     "searching": "Recherche...",
     "noRanking": "Pas encore de classement",
     "you": "(toi)",
-    "currentProfile": "(profil)"
+    "currentProfile": "(profil)",
+    "globalRank": "Classement global : {rank} / {total}"
   },
   "admin": {
     "validation": {

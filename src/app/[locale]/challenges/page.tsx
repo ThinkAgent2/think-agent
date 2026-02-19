@@ -192,7 +192,7 @@ export default function ChallengesPage() {
                     <section>
                       <h2 className="mb-6 text-2xl font-bold text-accent-vert flex items-center gap-2">
                         <span className="h-3 w-3 rounded-full bg-accent-vert" />
-                        Explorer
+                        {t('levels.explorer')}
                       </h2>
                       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
                         {challengesByLevel.Explorer.map((challenge) => (
@@ -212,7 +212,7 @@ export default function ChallengesPage() {
                     <section>
                       <h2 className="mb-6 text-2xl font-bold text-exalt-blue flex items-center gap-2">
                         <span className="h-3 w-3 rounded-full bg-exalt-blue" />
-                        Crafter
+                        {t('levels.crafter')}
                       </h2>
                       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
                         {challengesByLevel.Crafter.map((challenge) => (
@@ -232,7 +232,7 @@ export default function ChallengesPage() {
                     <section>
                       <h2 className="mb-6 text-2xl font-bold text-accent-rose flex items-center gap-2">
                         <span className="h-3 w-3 rounded-full bg-accent-rose" />
-                        Architecte
+                        {t('levels.architecte')}
                       </h2>
                       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
                         {challengesByLevel.Architecte.map((challenge) => (
