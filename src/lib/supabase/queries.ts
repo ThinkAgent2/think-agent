@@ -4,6 +4,7 @@ import type {
   Badge, DojoEvent, ChallengeFilters, LeaderboardEntry,
   UserLevel, ChallengeStatus, IdeaProposal, IdeaVote, IdeaWithVotes
 } from '@/types/database';
+type BadgeType = Badge;
 import { formatNameFromEmail } from '@/lib/userName';
 import { localizeChallenge, localizeBadge, localizeDojoEvent } from './localization';
 
