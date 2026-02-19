@@ -607,7 +607,9 @@ export default function ChallengeDetailPage() {
                   href={`/admin/challenges/${challenge.id}`}
                   onClick={() => {
                     if (typeof window !== 'undefined') {
-                      sessionStorage.setItem('statsFrom', window.location.pathname + window.location.search);
+                      const current = window.location.pathname + window.location.search;
+                      sessionStorage.setItem('statsOrigin', current);
+                      sessionStorage.setItem('statsFrom', current);
                     }
                   }}
                 >

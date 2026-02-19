@@ -179,7 +179,6 @@ export default function UserProfilePage() {
               onClick={() => {
                 const from = sessionStorage.getItem('statsFrom');
                 if (from && from !== window.location.pathname) {
-                  sessionStorage.removeItem('statsFrom');
                   window.location.href = from;
                   return;
                 }

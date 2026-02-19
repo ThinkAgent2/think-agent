@@ -40,12 +40,14 @@ export default function AdminChallengeStatsPage() {
 
     if (typeof window !== 'undefined') {
       const ref = document.referrer;
-      const existing = sessionStorage.getItem('statsFrom');
+      const existing = sessionStorage.getItem('statsOrigin');
       if (!existing && ref && ref.includes('/challenges/')) {
         try {
           const url = new URL(ref);
+          sessionStorage.setItem('statsOrigin', url.pathname + url.search);
           sessionStorage.setItem('statsFrom', url.pathname + url.search);
         } catch {
+          sessionStorage.setItem('statsOrigin', ref);
           sessionStorage.setItem('statsFrom', ref);
         }
       }
@@ -128,7 +130,7 @@ export default function AdminChallengeStatsPage() {
         <div className="container mx-auto px-4 max-w-5xl space-y-6">
           <button
             onClick={() => {
-              const from = sessionStorage.getItem('statsFrom');
+              const from = sessionStorage.getItem('statsOrigin') || sessionStorage.getItem('statsFrom');
               if (from && from !== window.location.pathname) {
                 sessionStorage.removeItem('statsFrom');
                 window.location.href = from;
