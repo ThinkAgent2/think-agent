@@ -26,9 +26,10 @@ export async function POST() {
 
     const { data: users, error } = await supabaseAdmin
       .from('users')
-      .select('id, role, niveau_actuel, auth_id, pr_merged');
+      .select('id, role, niveau_actuel, auth_id');
 
     if (error || !users) {
+      console.error('retro-badges users error', error);
       return NextResponse.json({ error: 'Erreur récupération users' }, { status: 500 });
     }
 
@@ -144,7 +145,7 @@ export async function POST() {
         }
 
         if (conditions.pr_merged === true) {
-          return Boolean(u.pr_merged);
+          return false;
         }
 
         return false;
