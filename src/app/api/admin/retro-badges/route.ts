@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
-import { getAllBadges } from '@/lib/supabase/queries';
 import type { UserLevel } from '@/types/database';
 
 export async function POST() {
@@ -33,13 +32,20 @@ export async function POST() {
       return NextResponse.json({ error: 'Erreur récupération users' }, { status: 500 });
     }
 
+    const { data: allBadges, error: badgesError } = await supabaseAdmin
+      .from('badges')
+      .select('*');
+
+    if (badgesError || !allBadges) {
+      console.error('retro-badges badges error', badgesError);
+      return NextResponse.json({ error: 'Erreur récupération badges' }, { status: 500 });
+    }
+
     const LEVEL_ORDER: Record<UserLevel, number> = {
       Explorer: 1,
       Crafter: 2,
       Architecte: 3,
     };
-
-    const allBadges = await getAllBadges('fr');
 
     let processed = 0;
     for (const u of users) {
@@ -144,10 +150,6 @@ export async function POST() {
           return conditions.role === 'Admin' ? u.role === 'Administrateur' : u.role === conditions.role;
         }
 
-        if (conditions.pr_merged === true) {
-          return false;
-        }
-
         return false;
       };
 
@@ -155,9 +157,7 @@ export async function POST() {
         if (shouldAward(badge)) {
           await supabaseAdmin
             .from('user_badges')
-            .insert({ user_id: u.id, badge_id: badge.id })
-            .select()
-            .single();
+            .upsert({ user_id: u.id, badge_id: badge.id }, { onConflict: 'user_id,badge_id' });
         }
       }
 
