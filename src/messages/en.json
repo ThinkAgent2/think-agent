@@ -99,7 +99,12 @@
     "card": {
       "seeDetails": "See details",
       "continue": "Continue",
-      "review": "Review"
+      "review": "Review",
+      "status": {
+        "completed": "Validated",
+        "pending": "In progress",
+        "failed": "Failed"
+      }
     },
     "detail": {
       "backToCatalog": "Back to catalog",

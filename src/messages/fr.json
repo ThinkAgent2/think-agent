@@ -99,7 +99,12 @@
     "card": {
       "seeDetails": "Voir le détail",
       "continue": "Continuer",
-      "review": "Revoir"
+      "review": "Revoir",
+      "status": {
+        "completed": "Validé",
+        "pending": "En cours",
+        "failed": "Échoué"
+      }
     },
     "detail": {
       "backToCatalog": "Retour au catalogue",
