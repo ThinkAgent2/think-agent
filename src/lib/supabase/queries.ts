@@ -379,6 +379,19 @@ export async function getSolution(userId: string, challengeId: string): Promise<
   return data;
 }
 
+export async function getUserSolutions(userId: string): Promise<Solution[]> {
+  const { data, error } = await supabase
+    .from('solutions')
+    .select('*')
+    .eq('user_id', userId);
+
+  if (error) {
+    console.error('Error fetching user solutions:', error);
+    return [];
+  }
+  return data || [];
+}
+
 export async function submitSolution(
   userId: string,
   challengeId: string,

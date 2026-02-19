@@ -84,7 +84,16 @@
       "level": "Niveau",
       "brand": "Marque",
       "difficulty": "Difficulté",
+      "status": "Statut",
+      "statusAll": "Tous",
+      "statusCompleted": "Complétés",
+      "statusPending": "En validation",
+      "statusIncomplete": "Non complétés",
       "clearFilters": "Effacer les filtres"
+    },
+    "status": {
+      "completed": "Validé",
+      "pending": "En validation"
     },
     "empty": "Aucun challenge ne correspond à tes critères.",
     "card": {

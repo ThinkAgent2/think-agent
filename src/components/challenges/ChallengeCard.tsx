@@ -11,6 +11,7 @@ import type { Challenge, Participation } from '@/types/database';
 interface ChallengeCardProps {
   challenge: Challenge;
   participation?: Participation;
+  isPending?: boolean;
 }
 
 const levelConfig = {
@@ -19,7 +20,7 @@ const levelConfig = {
   Architecte: { color: 'bg-accent-rose text-white', glow: 'hover:glow-rose' },
 };
 
-export function ChallengeCard({ challenge, participation }: ChallengeCardProps) {
+export function ChallengeCard({ challenge, participation, isPending }: ChallengeCardProps) {
   const config = levelConfig[challenge.niveau_associe];
   const isCompleted = participation?.statut === 'Terminé';
   const isInProgress = participation?.statut === 'En_cours';
@@ -33,7 +34,15 @@ export function ChallengeCard({ challenge, participation }: ChallengeCardProps) 
         <div className="absolute top-3 right-3 z-10">
           <span className="inline-flex items-center gap-1 rounded-full bg-accent-vert/20 text-accent-vert border border-accent-vert px-2 py-1 text-[10px] font-semibold">
             <CheckCircle className="h-3 w-3" />
-            Validé
+            {t('status.completed')}
+          </span>
+        </div>
+      )}
+      {!isCompleted && isPending && (
+        <div className="absolute top-3 right-3 z-10">
+          <span className="inline-flex items-center gap-1 rounded-full bg-accent-jaune/20 text-accent-jaune border border-accent-jaune px-2 py-1 text-[10px] font-semibold">
+            <CheckCircle className="h-3 w-3" />
+            {t('status.pending')}
           </span>
         </div>
       )}

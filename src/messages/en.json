@@ -84,7 +84,16 @@
       "level": "Level",
       "brand": "Brand",
       "difficulty": "Difficulty",
+      "status": "Status",
+      "statusAll": "All",
+      "statusCompleted": "Completed",
+      "statusPending": "Pending validation",
+      "statusIncomplete": "Not completed",
       "clearFilters": "Clear filters"
+    },
+    "status": {
+      "completed": "Validated",
+      "pending": "Pending validation"
     },
     "empty": "No challenge matches your criteria.",
     "card": {

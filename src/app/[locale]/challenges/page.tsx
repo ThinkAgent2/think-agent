@@ -9,17 +9,18 @@ import { ChallengeFilters } from '@/components/challenges/ChallengeFilters';
 import { Loader2, Plus } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
-import { getChallenges, getUserParticipations } from '@/lib/supabase/queries';
+import { getChallenges, getUserParticipations, getUserSolutions } from '@/lib/supabase/queries';
 import { useAuth } from '@/lib/auth';
-import type { Challenge, Participation, ChallengeFilters as Filters } from '@/types/database';
+import type { Challenge, Participation, Solution, ChallengeFilters as Filters } from '@/types/database';
 
 export default function ChallengesPage() {
   const { user } = useAuth();
   const locale = useLocale();
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [participations, setParticipations] = useState<Participation[]>([]);
+  const [solutions, setSolutions] = useState<Solution[]>([]);
   const [filters, setFilters] = useState<Filters>({});
-  const [completionFilter, setCompletionFilter] = useState<'all' | 'completed' | 'incomplete'>('all');
+  const [completionFilter, setCompletionFilter] = useState<'all' | 'completed' | 'incomplete' | 'pending'>('all');
   const [isLoading, setIsLoading] = useState(true);
   const t = useTranslations('challenges');
   const tCommon = useTranslations('common');
@@ -52,8 +53,12 @@ export default function ChallengesPage() {
   useEffect(() => {
     async function loadParticipations() {
       if (user) {
-        const data = await getUserParticipations(user.id);
-        setParticipations(data);
+        const [participationsData, solutionsData] = await Promise.all([
+          getUserParticipations(user.id),
+          getUserSolutions(user.id),
+        ]);
+        setParticipations(participationsData);
+        setSolutions(solutionsData);
       }
     }
     loadParticipations();
@@ -70,9 +75,18 @@ export default function ChallengesPage() {
   const isIncomplete = (challengeId: string) =>
     !participations.some((p) => p.challenge_id === challengeId && p.statut === 'Terminé');
 
+  const isPending = (challengeId: string) => {
+    const solution = solutions.find((s) => s.challenge_id === challengeId);
+    return Boolean(solution && solution.statut === 'Soumise');
+  };
+
+  const isCompletedParticipation = (challengeId: string) =>
+    participations.some((p) => p.challenge_id === challengeId && p.statut === 'Terminé');
+
   const filteredChallenges = challenges.filter((challenge) => {
     if (completionFilter === 'completed') return isCompleted(challenge.id);
     if (completionFilter === 'incomplete') return isIncomplete(challenge.id);
+    if (completionFilter === 'pending') return isPending(challenge.id);
     return true;
   });
 
@@ -83,7 +97,7 @@ export default function ChallengesPage() {
     Architecte: filteredChallenges.filter((c) => c.niveau_associe === 'Architecte'),
   };
 
-  const challengeCount = challenges.length;
+  const challengeCount = filteredChallenges.length;
   const countText = challengeCount > 1 
     ? t('countPlural', { count: challengeCount })
     : t('count', { count: challengeCount });
@@ -118,7 +132,7 @@ export default function ChallengesPage() {
               <ChallengeFilters filters={filters} onFiltersChange={setFilters} />
 
               <div className="space-y-2 bg-background p-4 rounded-lg border border-border">
-                <label className="text-sm font-medium text-muted-foreground">Statut</label>
+                <label className="text-sm font-medium text-muted-foreground">{t('filters.status')}</label>
                 <div className="flex flex-wrap gap-2">
                   <Button
                     variant="outline"
@@ -126,7 +140,7 @@ export default function ChallengesPage() {
                     className={`px-3 ${completionFilter === 'all' ? 'bg-accent-jaune text-black border-accent-jaune' : 'border-border hover:border-accent-cyan'}`}
                     onClick={() => setCompletionFilter('all')}
                   >
-                    Tous
+                    {t('filters.statusAll')}
                   </Button>
                   <Button
                     variant="outline"
@@ -134,7 +148,15 @@ export default function ChallengesPage() {
                     className={`px-3 ${completionFilter === 'completed' ? 'bg-accent-jaune text-black border-accent-jaune' : 'border-border hover:border-accent-cyan'}`}
                     onClick={() => setCompletionFilter('completed')}
                   >
-                    Complétés
+                    {t('filters.statusCompleted')}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={`px-3 ${completionFilter === 'pending' ? 'bg-accent-jaune text-black border-accent-jaune' : 'border-border hover:border-accent-cyan'}`}
+                    onClick={() => setCompletionFilter('pending')}
+                  >
+                    {t('filters.statusPending')}
                   </Button>
                   <Button
                     variant="outline"
@@ -142,7 +164,7 @@ export default function ChallengesPage() {
                     className={`px-3 ${completionFilter === 'incomplete' ? 'bg-accent-jaune text-black border-accent-jaune' : 'border-border hover:border-accent-cyan'}`}
                     onClick={() => setCompletionFilter('incomplete')}
                   >
-                    Non complétés
+                    {t('filters.statusIncomplete')}
                   </Button>
                 </div>
               </div>
@@ -177,6 +199,7 @@ export default function ChallengesPage() {
                             key={challenge.id}
                             challenge={challenge}
                             participation={getParticipation(challenge.id)}
+                            isPending={isPending(challenge.id) && !isCompletedParticipation(challenge.id)}
                           />
                         ))}
                       </div>
@@ -196,6 +219,7 @@ export default function ChallengesPage() {
                             key={challenge.id}
                             challenge={challenge}
                             participation={getParticipation(challenge.id)}
+                            isPending={isPending(challenge.id) && !isCompletedParticipation(challenge.id)}
                           />
                         ))}
                       </div>
@@ -215,6 +239,7 @@ export default function ChallengesPage() {
                             key={challenge.id}
                             challenge={challenge}
                             participation={getParticipation(challenge.id)}
+                            isPending={isPending(challenge.id) && !isCompletedParticipation(challenge.id)}
                           />
                         ))}
                       </div>
