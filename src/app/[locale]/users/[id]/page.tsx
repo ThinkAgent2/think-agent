@@ -169,13 +169,20 @@ export default function UserProfilePage() {
       <main className="flex-1 py-8">
         <div className="container mx-auto px-4">
           <div className="mb-6">
-            <Link
-              href="/me"
+            <button
+              onClick={() => {
+                const lastRoute = sessionStorage.getItem('lastRoute');
+                if (lastRoute) {
+                  router.push(lastRoute);
+                } else {
+                  router.back();
+                }
+              }}
               className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent-cyan transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
-              {t('backToMyProfile')}
-            </Link>
+              {tCommon('back')}
+            </button>
           </div>
 
           <div className="grid gap-8 lg:grid-cols-[1fr_320px]">

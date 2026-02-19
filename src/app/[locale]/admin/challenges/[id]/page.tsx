@@ -38,6 +38,13 @@ export default function AdminChallengeStatsPage() {
   useEffect(() => {
     let isCancelled = false;
 
+    if (typeof window !== 'undefined') {
+      const from = document.referrer;
+      if (from && from.includes('/users/')) {
+        sessionStorage.setItem('statsFrom', from);
+      }
+    }
+
     async function loadData() {
       if (!id) return;
       setIsLoading(true);
@@ -115,6 +122,12 @@ export default function AdminChallengeStatsPage() {
         <div className="container mx-auto px-4 max-w-5xl space-y-6">
           <button
             onClick={() => {
+              sessionStorage.setItem('lastRoute', window.location.pathname + window.location.search);
+              const from = sessionStorage.getItem('statsFrom');
+              if (from) {
+                window.location.href = from;
+                return;
+              }
               const lastRoute = sessionStorage.getItem('lastRoute');
               if (lastRoute) {
                 window.location.href = lastRoute;
