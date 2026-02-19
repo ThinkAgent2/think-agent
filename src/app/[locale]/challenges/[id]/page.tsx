@@ -603,7 +603,14 @@ export default function ChallengeDetailPage() {
               </Card>
 
               {isAdmin && challenge && (
-                <Link href={`/admin/challenges/${challenge.id}`}>
+                <Link
+                  href={`/admin/challenges/${challenge.id}`}
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      sessionStorage.setItem('statsFrom', window.location.pathname + window.location.search);
+                    }
+                  }}
+                >
                   <Button variant="outline" size="sm" className="w-full">
                     {t('viewStats')}
                   </Button>
