@@ -20,6 +20,7 @@ import {
 import { useAuth } from '@/lib/auth';
 import { getUserParticipations, getAllBadges, getUserBadges, getLeaderboard, getLeaderboardRecent, searchUsers, getUserChallenges, getUserIdeas, deleteIdeaProposal, updateUser, deleteChallenge, getUserRankAndTotal, getUserSolutions } from '@/lib/supabase/queries';
 import { formatNameFromEmail } from '@/lib/userName';
+import { localizeChallenge } from '@/lib/supabase/localization';
 import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry, IdeaProposal, Solution } from '@/types/database';
 import { IdeaProposalForm } from '@/components/ideas/IdeaProposalForm';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
@@ -94,8 +95,13 @@ export default function ProfilePage() {
           getUserSolutions(user.id),
         ]);
 
+        const localizedParticipations = participationsData.map((participation) => ({
+          ...participation,
+          challenge: participation.challenge ? localizeChallenge(participation.challenge, locale) : participation.challenge,
+        }));
+
         if (!isCancelled) {
-          setParticipations(participationsData);
+          setParticipations(localizedParticipations);
           setAllBadges(allBadgesData);
           setUserBadges(userBadgesData);
           setLeaderboard(leaderboardData);
