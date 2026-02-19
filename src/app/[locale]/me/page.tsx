@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { 
-  Trophy, Zap, Target, Clock, CheckCircle, 
+  Trophy, Zap, Target, Clock, CheckCircle, XCircle,
   Medal, Crown, Rocket, Brain, Loader2
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
