@@ -13,7 +13,6 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { 
   Trophy, Zap, Target, Clock, CheckCircle, XCircle,
   Medal, Crown, Rocket, Brain, Loader2
@@ -52,7 +51,6 @@ export default function ProfilePage() {
   const [isUpdatingBadge, setIsUpdatingBadge] = useState(false);
   const [rankInfo, setRankInfo] = useState<{ rank: number; total: number } | null>(null);
   const [solutions, setSolutions] = useState<Solution[]>([]);
-  const [selectedBadge, setSelectedBadge] = useState<BadgeType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const t = useTranslations('profile');
@@ -585,32 +583,22 @@ export default function ProfilePage() {
                           {badgesWithStatus
                             .filter((badge) => badge.obtained)
                             .map((badge) => (
-                              <Dialog key={badge.id}>
-                                <DialogTrigger asChild>
-                                  <button
-                                    onClick={() => setSelectedBadge(badge)}
-                                    disabled={isUpdatingBadge}
-                                    className={`flex flex-col items-center p-3 rounded-lg border transition-all ${
-                                      featuredBadgeId === badge.id
-                                        ? 'border-accent-cyan bg-accent-cyan/10'
-                                        : 'border-border'
-                                    }`}
-                                  >
-                                    <span className="text-2xl mb-1">{badge.emoji}</span>
-                                    <span className="text-xs text-center text-muted-foreground">
-                                      {badge.nom}
-                                    </span>
-                                  </button>
-                                </DialogTrigger>
-                                <DialogContent>
-                                  <DialogHeader>
-                                    <DialogTitle>{badge.nom}</DialogTitle>
-                                    <DialogDescription>
-                                      {badge.description || tBadges('howToEarnDefault')}
-                                    </DialogDescription>
-                                  </DialogHeader>
-                                </DialogContent>
-                              </Dialog>
+                              <button
+                                key={badge.id}
+                                onClick={() => handleBadgeSelect(badge.id)}
+                                disabled={isUpdatingBadge}
+                                title={badge.description || tBadges('howToEarnDefault')}
+                                className={`flex flex-col items-center p-3 rounded-lg border transition-all ${
+                                  featuredBadgeId === badge.id
+                                    ? 'border-accent-cyan bg-accent-cyan/10'
+                                    : 'border-border'
+                                }`}
+                              >
+                                <span className="text-2xl mb-1">{badge.emoji}</span>
+                                <span className="text-xs text-center text-muted-foreground">
+                                  {badge.nom}
+                                </span>
+                              </button>
                             ))}
                         </div>
                         <Button
@@ -628,31 +616,20 @@ export default function ProfilePage() {
                         <p className="text-sm font-medium mb-2">{t('allBadges')}</p>
                         <div className="grid grid-cols-3 gap-3">
                           {badgesWithStatus.map((badge) => (
-                            <Dialog key={badge.id}>
-                              <DialogTrigger asChild>
-                                <button
-                                  onClick={() => setSelectedBadge(badge)}
-                                  className={`flex flex-col items-center p-3 rounded-lg border transition-all ${
-                                    badge.obtained
-                                      ? 'border-accent-jaune/50 bg-accent-jaune/10'
-                                      : 'border-border opacity-40'
-                                  }`}
-                                >
-                                  <span className="text-2xl mb-1">{badge.emoji}</span>
-                                  <span className="text-xs text-center text-muted-foreground">
-                                    {badge.nom}
-                                  </span>
-                                </button>
-                              </DialogTrigger>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>{badge.nom}</DialogTitle>
-                                  <DialogDescription>
-                                    {badge.description || tBadges('howToEarnDefault')}
-                                  </DialogDescription>
-                                </DialogHeader>
-                              </DialogContent>
-                            </Dialog>
+                            <div
+                              key={badge.id}
+                              className={`flex flex-col items-center p-3 rounded-lg border transition-all ${
+                                badge.obtained
+                                  ? 'border-accent-jaune/50 bg-accent-jaune/10'
+                                  : 'border-border opacity-40'
+                              }`}
+                              title={badge.description || tBadges('howToEarnDefault')}
+                            >
+                              <span className="text-2xl mb-1">{badge.emoji}</span>
+                              <span className="text-xs text-center text-muted-foreground">
+                                {badge.nom}
+                              </span>
+                            </div>
                           ))}
                         </div>
                       </div>
