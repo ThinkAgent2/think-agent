@@ -968,33 +968,121 @@ export async function checkAndUpdateLevelAndBadges(userId: string): Promise<void
     await updateUser(userId, { niveau_actuel: newLevel });
   }
 
-  // Attribuer les badges de volume
-  await awardVolumeBadges(userId, completedByLevel);
+  // Attribuer les badges conditionnels
+  await awardConditionalBadges(userId, completedByLevel);
 }
 
-/**
- * Attribue les badges de volume en fonction du nombre de challenges terminés
- */
-async function awardVolumeBadges(
-  userId: string, 
+const LEVEL_ORDER: Record<UserLevel, number> = {
+  Explorer: 1,
+  Crafter: 2,
+  Architecte: 3,
+};
+
+async function awardConditionalBadges(
+  userId: string,
   completedByLevel: Record<string, number>
 ): Promise<void> {
-  // Récupérer tous les badges existants
   const allBadges = await getAllBadges();
-  
-  for (const [level, thresholds] of Object.entries(VOLUME_BADGES)) {
-    const completed = completedByLevel[level] || 0;
-    
-    for (const threshold of thresholds) {
-      if (completed >= threshold) {
-        // Chercher le badge correspondant (ex: "Explorer 2", "Crafter 5")
-        const badgeName = `${level} ${threshold}`;
-        const badge = allBadges.find(b => b.nom === badgeName);
-        
-        if (badge) {
-          await awardBadge(userId, badge.id);
-        }
-      }
+
+  const { data: user } = await supabase
+    .from('users')
+    .select('id, role, niveau_actuel, auth_id')
+    .eq('id', userId)
+    .single();
+
+  const { data: validatedSolutions } = await supabase
+    .from('solutions')
+    .select(`
+      challenge_id,
+      created_at,
+      challenge:challenges(niveau_associe, participants)
+    `)
+    .eq('user_id', userId)
+    .eq('statut', 'Évaluée')
+    .gte('note', 3);
+
+  const validatedChallengeIds = new Set<string>();
+  const validatedByLevel: Record<string, number> = {
+    Explorer: 0,
+    Crafter: 0,
+    Architecte: 0,
+  };
+
+  let hasDuoChallenge = false;
+  let monthlyValidated = 0;
+  const since = new Date();
+  since.setDate(since.getDate() - 30);
+
+  (validatedSolutions || []).forEach((row) => {
+    const challenge = (row as { challenge?: { niveau_associe: UserLevel; participants: string } | null }).challenge;
+    if (!challenge) return;
+    if (!validatedChallengeIds.has(row.challenge_id)) {
+      validatedChallengeIds.add(row.challenge_id);
+      validatedByLevel[challenge.niveau_associe]++;
+    }
+    if (challenge.participants === 'Duo') {
+      hasDuoChallenge = true;
+    }
+    if (new Date(row.created_at) >= since) {
+      monthlyValidated++;
+    }
+  });
+
+  const { data: challengesData } = await supabase
+    .from('challenges')
+    .select('id, niveau_associe')
+    .in('statut', ['Actif', 'Publie']);
+
+  const totalByLevel: Record<string, number> = {
+    Explorer: 0,
+    Crafter: 0,
+    Architecte: 0,
+  };
+
+  (challengesData || []).forEach((challenge) => {
+    totalByLevel[challenge.niveau_associe]++;
+  });
+
+  const shouldAward = (badge: BadgeType): boolean => {
+    const conditions = badge.conditions as Record<string, unknown> | null;
+    if (!conditions) return false;
+
+    if (typeof conditions.challenges_completed === 'number') {
+      return validatedChallengeIds.size >= conditions.challenges_completed;
+    }
+
+    if (typeof conditions.level_reached === 'string' && user) {
+      const required = conditions.level_reached as UserLevel;
+      return LEVEL_ORDER[user.niveau_actuel] >= LEVEL_ORDER[required];
+    }
+
+    if (conditions.duo_challenge === true) {
+      return hasDuoChallenge;
+    }
+
+    if (typeof conditions.monthly_challenges === 'number') {
+      return monthlyValidated >= conditions.monthly_challenges;
+    }
+
+    if (typeof conditions.level_complete === 'string') {
+      const level = conditions.level_complete as UserLevel;
+      return totalByLevel[level] > 0 && validatedByLevel[level] >= totalByLevel[level];
+    }
+
+    if (typeof conditions.role === 'string' && user) {
+      return conditions.role === 'Admin' ? user.role === 'Administrateur' : user.role === conditions.role;
+    }
+
+    if (conditions.pr_merged === true) {
+      return Boolean((user as { pr_merged?: boolean } | null)?.pr_merged);
+    }
+
+    return false;
+  };
+
+  for (const badge of allBadges) {
+    if (shouldAward(badge)) {
+      await awardBadge(userId, badge.id);
     }
   }
 }
