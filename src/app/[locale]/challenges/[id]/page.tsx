@@ -144,7 +144,7 @@ export default function ChallengeDetailPage() {
     const newSolution = await submitSolution(user.id, challenge.id, solutionText, fileUrls);
     if (newSolution) {
       setSolution(newSolution);
-      setParticipation(prev => prev ? { ...prev, statut: 'Terminé' } : null);
+      setParticipation(prev => prev ? { ...prev, statut: 'En_cours' } : null);
     }
     setIsSubmitting(false);
   };
