@@ -72,6 +72,9 @@ export default function ChallengesPage() {
   const getSolution = (challengeId: string) =>
     solutions.find((s) => s.challenge_id === challengeId);
 
+  const hasInProgressParticipation = (challengeId: string) =>
+    participations.some((p) => p.challenge_id === challengeId && p.statut === 'En_cours');
+
   const isPending = (challengeId: string) => {
     const solution = getSolution(challengeId);
     return Boolean(solution && solution.statut === 'Soumise');
@@ -83,7 +86,9 @@ export default function ChallengesPage() {
   };
 
   const filteredChallenges = challenges.filter((challenge) => {
-    if (completionFilter === 'pending') return isPending(challenge.id);
+    if (completionFilter === 'pending') {
+      return isPending(challenge.id) || hasInProgressParticipation(challenge.id);
+    }
     if (completionFilter === 'evaluated') return isEvaluated(challenge.id);
     return true;
   });
