@@ -42,16 +42,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       try {
         const { data } = await supabase.auth.getSession();
         const authId = data.session?.user?.id ?? null;
-        // TEMP: log claims to inspect Azure SSO data
-        if (data.session?.user) {
-          console.log('[SSO] session user', {
-            id: data.session.user.id,
-            email: data.session.user.email,
-            user_metadata: data.session.user.user_metadata,
-            app_metadata: data.session.user.app_metadata,
-            identities: data.session.user.identities,
-          });
-        }
         if (!isMounted) return;
         await loadUser(authId);
       } finally {
