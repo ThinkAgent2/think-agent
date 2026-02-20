@@ -172,7 +172,7 @@
         "difficulty": "Difficulty",
         "xp": "XP",
         "participants": "Participants",
-        "sources": "Sources & References *",
+        "sources": "Sources & References (optional)",
         "sourcesPlaceholder": "One URL per line...",
         "proposedSolution": "Proposed solution *",
         "proposedSolutionPlaceholder": "Describe your ideal solution...",
@@ -180,9 +180,9 @@
         "submit": "Propose",
         "sending": "Sending...",
         "success": "Challenge proposed! An admin will validate it.",
-        "adminFillsNotice": "Only the title, description, sources and solution are required. The rest will be completed by an admin (or AI).",
+        "adminFillsNotice": "Only the title, description and solution are required. The rest will be completed by an admin (or AI).",
         "errorRequired": "Title and description are required",
-        "errorRequiredFull": "Sources & References and Proposed solution are required",
+        "errorRequiredFull": "The proposed solution is required",
         "errorDuplicate": "A challenge with this title already exists.",
         "errorGeneric": "Error while proposing."
       }
@@ -282,7 +282,9 @@
       "rejectionPlaceholder": "Explain why the challenge is rejected",
       "rejectionRequired": "Add a comment for the rejection.",
       "proposedSolution": "Proposed solution",
-      "attachments": "Attachments"
+      "attachments": "Attachments",
+      "completeAndPublish": "Complete & publish",
+      "publishMissingFields": "Unable to publish: please complete all required fields before publishing."
     },
     "ideas": {
       "title": "Ideas validation",

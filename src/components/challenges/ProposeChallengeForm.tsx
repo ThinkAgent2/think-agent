@@ -51,7 +51,7 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
       return;
     }
 
-    if (!sources.length || !formData.solution_proposee.trim()) {
+    if (!formData.solution_proposee.trim()) {
       setFormError(t('errorRequiredFull'));
       return;
     }
@@ -82,7 +82,7 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
       criteres_evaluation: '',
       vision_impact: null,
       le_saviez_vous: null,
-      sources,
+      sources: sources.length ? sources : null,
       plan_solution: null,
       auteur_id: authorId,
       solution_proposee: formData.solution_proposee,
@@ -152,7 +152,6 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
               value={formData.sources}
               onChange={handleChange}
               placeholder={t('sourcesPlaceholder')}
-              required
               className="w-full h-20 p-3 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none resize-none"
             />
           </div>

@@ -41,7 +41,33 @@ export function AdminChallengesContent() {
     );
   };
 
+  const isPublishReady = (challenge: Challenge) => {
+    return Boolean(
+      challenge.titre?.trim() &&
+      challenge.description?.trim() &&
+      challenge.niveau_associe &&
+      challenge.type &&
+      typeof challenge.difficulte === 'number' &&
+      challenge.type_evaluation &&
+      typeof challenge.xp === 'number' &&
+      challenge.participants &&
+      challenge.marques &&
+      challenge.thematiques &&
+      challenge.criteres_evaluation?.trim() &&
+      challenge.vision_impact?.trim() &&
+      challenge.le_saviez_vous?.trim() &&
+      challenge.sources &&
+      challenge.sources.length > 0 &&
+      challenge.plan_solution?.trim()
+    );
+  };
+
   const handlePublish = async (challenge: Challenge) => {
+    if (!isPublishReady(challenge)) {
+      alert(t('publishMissingFields'));
+      return;
+    }
+
     await updateChallenge(challenge.id, { statut: 'Publie' });
     setChallenges((prev) => prev.filter((item) => item.id !== challenge.id));
   };
@@ -103,9 +129,16 @@ export function AdminChallengesContent() {
                     </Button>
                   )}
                   {challenge.statut === 'Valide' && (
-                    <Button size="sm" onClick={() => handlePublish(challenge)}>
-                      {t('publish')}
-                    </Button>
+                    <>
+                      <Link href={`/challenges/${challenge.id}?edit=1`}>
+                        <Button size="sm" variant="outline">
+                          {t('completeAndPublish')}
+                        </Button>
+                      </Link>
+                      <Button size="sm" onClick={() => handlePublish(challenge)}>
+                        {t('publish')}
+                      </Button>
+                    </>
                   )}
                 </div>
               </div>

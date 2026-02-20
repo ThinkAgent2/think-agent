@@ -172,7 +172,7 @@
         "difficulty": "Difficulté",
         "xp": "XP",
         "participants": "Participants",
-        "sources": "Sources & Références *",
+        "sources": "Sources & Références (optionnel)",
         "sourcesPlaceholder": "Une URL par ligne...",
         "proposedSolution": "Solution proposée *",
         "proposedSolutionPlaceholder": "Décris ta solution idéale...",
@@ -180,9 +180,9 @@
         "submit": "Proposer",
         "sending": "Envoi...",
         "success": "Challenge proposé ! Un admin va le valider.",
-        "adminFillsNotice": "Seuls le titre, la description, les sources et la solution sont requis. Le reste sera complété par un admin (ou par l'IA).",
+        "adminFillsNotice": "Seuls le titre, la description et la solution sont requis. Le reste sera complété par un admin (ou par l'IA).",
         "errorRequired": "Titre et description sont obligatoires",
-        "errorRequiredFull": "Sources & Références et Solution proposée sont obligatoires",
+        "errorRequiredFull": "La solution proposée est obligatoire",
         "errorDuplicate": "Un challenge avec ce titre existe déjà.",
         "errorGeneric": "Erreur lors de la proposition."
       }
@@ -282,7 +282,9 @@
       "rejectionPlaceholder": "Explique pourquoi le challenge est refusé",
       "rejectionRequired": "Ajoute un commentaire pour le refus.",
       "proposedSolution": "Solution proposée",
-      "attachments": "Pièces jointes"
+      "attachments": "Pièces jointes",
+      "completeAndPublish": "Compléter & publier",
+      "publishMissingFields": "Impossible de publier : merci de compléter tous les champs obligatoires avant publication."
     },
     "ideas": {
       "title": "Validation des idées",

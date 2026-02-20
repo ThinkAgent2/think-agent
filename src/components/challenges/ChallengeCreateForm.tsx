@@ -42,8 +42,8 @@ export function ChallengeCreateForm({ onSuccess, onCancel }: ChallengeCreateForm
       .map((s) => s.trim())
       .filter(Boolean);
 
-    if (!sources.length || !formData.solution.trim()) {
-      alert('Sources & Références et solution sont obligatoires');
+    if (!formData.solution.trim()) {
+      alert('La solution est obligatoire');
       return;
     }
 
@@ -66,7 +66,7 @@ export function ChallengeCreateForm({ onSuccess, onCancel }: ChallengeCreateForm
       criteres_evaluation: '',
       vision_impact: null,
       le_saviez_vous: null,
-      sources,
+      sources: sources.length ? sources : null,
       plan_solution: formData.solution,
     };
 
@@ -114,7 +114,7 @@ export function ChallengeCreateForm({ onSuccess, onCancel }: ChallengeCreateForm
 
       <Card>
         <CardHeader>
-          <CardTitle>Sources & Références</CardTitle>
+          <CardTitle>Sources & Références (optionnel)</CardTitle>
         </CardHeader>
         <CardContent>
           <textarea
@@ -122,7 +122,6 @@ export function ChallengeCreateForm({ onSuccess, onCancel }: ChallengeCreateForm
             value={formData.sources}
             onChange={handleChange}
             placeholder="Une URL par ligne..."
-            required
             className="w-full h-24 p-3 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none resize-none"
           />
         </CardContent>

@@ -69,6 +69,13 @@ export default function ChallengeDetailPage() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isEditing, setIsEditing] = useState(false);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('edit') === '1') {
+      setIsEditing(true);
+    }
+  }, []);
+
   // Vérifier si l'utilisateur est admin
   const isAdmin = user?.role === 'Administrateur';
   const canRetry = solution?.statut === 'Évaluée' && (solution.note ?? 0) < 3;
