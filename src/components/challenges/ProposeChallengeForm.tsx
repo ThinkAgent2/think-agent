@@ -5,32 +5,16 @@ import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MultiSelectMarques } from '@/components/ui/multi-select-marques';
-import { MultiSelectThematiques } from '@/components/ui/multi-select-thematiques';
 import { Loader2, Send, Paperclip } from 'lucide-react';
 import { createChallengeProposal, findChallengeByTitle } from '@/lib/supabase/queries';
 import { FileUpload } from '@/components/challenges/FileUpload';
-import type { Challenge, UserLevel, ChallengeType, Marque, VortexStage, Thematique } from '@/types/database';
+import type { Challenge } from '@/types/database';
 import type { UploadedFile } from '@/lib/supabase/storage';
 
 interface ProposeChallengeFormProps {
   authorId: string;
   onSuccess?: (challenge: Challenge) => void;
 }
-
-const NIVEAUX: UserLevel[] = ['Explorer', 'Crafter', 'Architecte'];
-const TYPES: ChallengeType[] = ['Quiz', 'Exercice', 'Projet', 'Use_Case'];
-const PARTICIPANTS = ['Solo', 'Duo', 'Équipe'] as const;
-
-const VORTEX_STAGES: { value: VortexStage; label: string }[] = [
-  { value: 'contextualize', label: '1. Cadrer (Contextualize)' },
-  { value: 'empathize', label: '2. Découvrir (Empathize)' },
-  { value: 'synthesize', label: '3. Définir (Synthesize)' },
-  { value: 'hypothesize', label: '4. Idéer (Hypothesize)' },
-  { value: 'externalize', label: '5. Construire (Externalize)' },
-  { value: 'sensitize', label: '6. Tester (Sensitize)' },
-  { value: 'systematize', label: '7. Apprendre (Systematize)' },
-];
 
 export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -39,18 +23,6 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
   const [formData, setFormData] = useState({
     titre: '',
     description: '',
-    niveau_associe: 'Explorer' as UserLevel,
-    type: 'Exercice' as ChallengeType,
-    difficulte: 2,
-    xp: 100,
-    marques: [] as Marque[],
-    etape_vortex: '' as string,
-    thematiques: [] as Thematique[],
-    participants: 'Solo' as 'Solo' | 'Duo' | 'Équipe',
-    outils_recommandes: '',
-    criteres_evaluation: '',
-    vision_impact: '',
-    le_saviez_vous: '',
     sources: '',
     solution_proposee: '',
   });
@@ -58,18 +30,10 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
   const t = useTranslations('challenges.propose.form');
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleMarquesChange = (marques: Marque[]) => {
-    setFormData((prev) => ({ ...prev, marques }));
-  };
-
-  const handleThematiquesChange = (thematiques: Thematique[]) => {
-    setFormData((prev) => ({ ...prev, thematiques }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -77,12 +41,17 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
 
     setFormError(null);
 
+    const sources = formData.sources
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean);
+
     if (!formData.titre.trim() || !formData.description.trim()) {
       setFormError(t('errorRequired'));
       return;
     }
 
-    if (!formData.criteres_evaluation.trim() || !formData.vision_impact.trim() || !formData.solution_proposee.trim()) {
+    if (!sources.length || !formData.solution_proposee.trim()) {
       setFormError(t('errorRequiredFull'));
       return;
     }
@@ -99,30 +68,24 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
     const newChallenge: Omit<Challenge, 'id' | 'created_at'> = {
       titre: formData.titre,
       description: formData.description,
-      niveau_associe: formData.niveau_associe,
-      type: formData.type,
-      difficulte: Number(formData.difficulte),
+      niveau_associe: 'Explorer',
+      type: 'Exercice',
+      difficulte: 2,
       type_evaluation: 'Manuelle',
-      xp: Number(formData.xp),
+      xp: 100,
       statut: 'Propose',
-      marques: formData.marques,
-      etape_vortex: (formData.etape_vortex || null) as VortexStage | null,
-      thematiques: formData.thematiques,
-      participants: formData.participants,
-      outils_recommandes: formData.outils_recommandes
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean),
-      criteres_evaluation: formData.criteres_evaluation,
-      vision_impact: formData.vision_impact || null,
-      le_saviez_vous: formData.le_saviez_vous || null,
-      sources: formData.sources
-        .split('\n')
-        .map((s) => s.trim())
-        .filter(Boolean),
+      marques: [],
+      etape_vortex: null,
+      thematiques: [],
+      participants: 'Solo',
+      outils_recommandes: [],
+      criteres_evaluation: '',
+      vision_impact: null,
+      le_saviez_vous: null,
+      sources,
       plan_solution: null,
       auteur_id: authorId,
-      solution_proposee: formData.solution_proposee || null,
+      solution_proposee: formData.solution_proposee,
       solution_proposee_fichiers: uploadedFiles.map((file) => file.url),
     };
 
@@ -133,17 +96,12 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
       onSuccess?.(data);
       setFormError(null);
       alert(t('success'));
-      setFormData((prev) => ({
-        ...prev,
+      setFormData({
         titre: '',
         description: '',
-        outils_recommandes: '',
-        criteres_evaluation: '',
-        vision_impact: '',
-        le_saviez_vous: '',
         sources: '',
         solution_proposee: '',
-      }));
+      });
     } else {
       setFormError(error || t('errorGeneric'));
     }
@@ -161,6 +119,9 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
               {formError}
             </div>
           )}
+          <p className="text-sm text-muted-foreground">
+            {t('adminFillsNotice')}
+          </p>
           <div className="space-y-2">
             <label className="text-sm font-medium">{t('titleLabel')}</label>
             <Input
@@ -184,132 +145,6 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-3">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">{t('level')}</label>
-              <select
-                name="niveau_associe"
-                value={formData.niveau_associe}
-                onChange={handleChange}
-                className="w-full p-2 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none"
-              >
-                {NIVEAUX.map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">{t('type')}</label>
-                <select
-                  name="type"
-                  value={formData.type}
-                  onChange={handleChange}
-                  className="w-full p-2 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none"
-                >
-                  {TYPES.map((tp) => (
-                    <option key={tp} value={tp}>
-                      {tp.replace('_', ' ')}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">{t('difficulty')}</label>
-                <select
-                  name="difficulte"
-                  value={formData.difficulte}
-                  onChange={handleChange}
-                  className="w-full p-2 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none"
-                >
-                  {[1, 2, 3, 4, 5].map((d) => (
-                    <option key={d} value={d}>
-                      {d} ⭐
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">{t('xp')}</label>
-                <Input
-                  name="xp"
-                  type="number"
-                  value={formData.xp}
-                  onChange={handleChange}
-                  min={0}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">{t('participants')}</label>
-                <select
-                  name="participants"
-                  value={formData.participants}
-                  onChange={handleChange}
-                  className="w-full p-2 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none"
-                >
-                  {PARTICIPANTS.map((p) => (
-                    <option key={p} value={p}>
-                      {p}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t('evaluationCriteria')}</label>
-            <textarea
-              name="criteres_evaluation"
-              value={formData.criteres_evaluation}
-              onChange={handleChange}
-              placeholder={t('evaluationPlaceholder')}
-              required
-              className="w-full h-20 p-3 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none resize-none"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t('recommendedTools')}</label>
-            <Input
-              name="outils_recommandes"
-              value={formData.outils_recommandes}
-              onChange={handleChange}
-              placeholder={t('recommendedToolsPlaceholder')}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t('visionImpact')}</label>
-            <textarea
-              name="vision_impact"
-              value={formData.vision_impact}
-              onChange={handleChange}
-              placeholder={t('visionPlaceholder')}
-              required
-              className="w-full h-20 p-3 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none resize-none"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t('didYouKnow')}</label>
-            <textarea
-              name="le_saviez_vous"
-              value={formData.le_saviez_vous}
-              onChange={handleChange}
-              placeholder={t('didYouKnowPlaceholder')}
-              className="w-full h-20 p-3 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none resize-none"
-            />
-          </div>
-
           <div className="space-y-2">
             <label className="text-sm font-medium">{t('sources')}</label>
             <textarea
@@ -317,6 +152,7 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
               value={formData.sources}
               onChange={handleChange}
               placeholder={t('sourcesPlaceholder')}
+              required
               className="w-full h-20 p-3 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none resize-none"
             />
           </div>
@@ -345,39 +181,6 @@ export function ProposeChallengeForm({ authorId, onSuccess }: ProposeChallengeFo
               maxFiles={3}
               maxSizeMB={10}
             />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t('brands')}</label>
-            <MultiSelectMarques
-              value={formData.marques}
-              onChange={handleMarquesChange}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t('themes')}</label>
-            <MultiSelectThematiques
-              value={formData.thematiques}
-              onChange={handleThematiquesChange}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t('vortexPhase')}</label>
-            <select
-              name="etape_vortex"
-              value={formData.etape_vortex}
-              onChange={handleChange}
-              className="w-full p-2 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none"
-            >
-              <option value="">{t('vortexNotDefined')}</option>
-              {VORTEX_STAGES.map((stage) => (
-                <option key={stage.value} value={stage.value}>
-                  {stage.label}
-                </option>
-              ))}
-            </select>
           </div>
 
           <Button
