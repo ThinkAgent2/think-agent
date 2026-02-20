@@ -38,17 +38,29 @@
       "explorer": {
         "name": "Explorer",
         "quote": "\"Je découvre ce que l'IA peut faire pour moi.\"",
-        "skills": ["Curiosité & expérimentation", "Prompting basique", "Réflexes sécurité"]
+        "skills": [
+          "Curiosité & expérimentation",
+          "Prompting basique",
+          "Réflexes sécurité"
+        ]
       },
       "crafter": {
         "name": "Crafter",
         "quote": "\"Je crée des outils qui augmentent ma productivité.\"",
-        "skills": ["Création d'assistants", "RAG & Prompt avancé", "Livrables automatisés"]
+        "skills": [
+          "Création d'assistants",
+          "RAG & Prompt avancé",
+          "Livrables automatisés"
+        ]
       },
       "architect": {
         "name": "Architecte",
         "quote": "\"Je ne fais plus. Je fais faire — et je repense ma valeur.\"",
-        "skills": ["Multi-agents", "Orchestration", "Vision stratégique"]
+        "skills": [
+          "Multi-agents",
+          "Orchestration",
+          "Vision stratégique"
+        ]
       }
     },
     "cta": {
@@ -375,8 +387,6 @@
       "titlePlaceholder": "Ex: Ajout d'un mode sombre",
       "descriptionLabel": "Description *",
       "descriptionPlaceholder": "Explique le problème, le contexte et l'impact...",
-      "githubLabel": "Pseudo GitHub (optionnel)",
-      "githubPlaceholder": "ex: prenomnom",
       "themesLabel": "Thématique *",
       "themesHint": "Choisis une seule thématique.",
       "screenshots": "Screenshots (optionnel)",
@@ -404,6 +414,13 @@
       "correction_bug": "Correction de bug",
       "nouvelle_fonctionnalite": "Nouvelle fonctionnalité",
       "amelioration_ui": "Amélioration UI/UX"
-    }
+    },
+    "githubGateTitle": "Accès GitHub requis",
+    "githubGateDescription": "Renseigne ton pseudo GitHub pour accéder aux idées et au code.",
+    "githubLabel": "Pseudo GitHub *",
+    "githubPlaceholder": "ex: prenomnom",
+    "githubSave": "Enregistrer mon GitHub",
+    "githubRequired": "Le pseudo GitHub est obligatoire.",
+    "githubError": "Impossible d'enregistrer le pseudo GitHub."
   }
 }

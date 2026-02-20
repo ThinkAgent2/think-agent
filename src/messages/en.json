@@ -38,17 +38,29 @@
       "explorer": {
         "name": "Explorer",
         "quote": "\"I discover what AI can do for me.\"",
-        "skills": ["Curiosity & experimentation", "Basic prompting", "Security reflexes"]
+        "skills": [
+          "Curiosity & experimentation",
+          "Basic prompting",
+          "Security reflexes"
+        ]
       },
       "crafter": {
         "name": "Crafter",
         "quote": "\"I create tools that boost my productivity.\"",
-        "skills": ["Creating assistants", "RAG & Advanced prompting", "Automated deliverables"]
+        "skills": [
+          "Creating assistants",
+          "RAG & Advanced prompting",
+          "Automated deliverables"
+        ]
       },
       "architect": {
         "name": "Architect",
         "quote": "\"I no longer do. I delegate — and rethink my value.\"",
-        "skills": ["Multi-agents", "Orchestration", "Strategic vision"]
+        "skills": [
+          "Multi-agents",
+          "Orchestration",
+          "Strategic vision"
+        ]
       }
     },
     "cta": {
@@ -375,8 +387,6 @@
       "titlePlaceholder": "Ex: Add dark mode",
       "descriptionLabel": "Description *",
       "descriptionPlaceholder": "Explain the problem, context and impact...",
-      "githubLabel": "GitHub username (optional)",
-      "githubPlaceholder": "ex: firstnamelastname",
       "themesLabel": "Theme *",
       "themesHint": "Select a single theme.",
       "screenshots": "Screenshots (optional)",
@@ -404,6 +414,13 @@
       "correction_bug": "Bug fix",
       "nouvelle_fonctionnalite": "New feature",
       "amelioration_ui": "UI/UX improvement"
-    }
+    },
+    "githubGateTitle": "GitHub access required",
+    "githubGateDescription": "Enter your GitHub username to access ideas and code.",
+    "githubLabel": "GitHub username *",
+    "githubPlaceholder": "ex: firstnamelastname",
+    "githubSave": "Save my GitHub",
+    "githubRequired": "GitHub username is required.",
+    "githubError": "Unable to save GitHub username."
   }
 }

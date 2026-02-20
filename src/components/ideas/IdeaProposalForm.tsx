@@ -32,7 +32,6 @@ export function IdeaProposalForm({ authorId, existingIdea, onSuccess }: IdeaProp
     titre: existingIdea?.titre || '',
     description: existingIdea?.description || '',
     themes: existingIdea?.themes || ([] as IdeaTheme[]),
-    githubUsername: existingIdea?.github_username || '',
   });
 
   const toggleTheme = (theme: IdeaTheme) => {
@@ -63,7 +62,6 @@ export function IdeaProposalForm({ authorId, existingIdea, onSuccess }: IdeaProp
       existingIdea &&
       formData.titre.trim() === existingIdea.titre &&
       formData.description.trim() === existingIdea.description &&
-      formData.githubUsername.trim() === (existingIdea.github_username || '') &&
       JSON.stringify(formData.themes) === JSON.stringify(existingIdea.themes || []) &&
       uploadedFiles.length === 0
     ) {
@@ -84,7 +82,7 @@ export function IdeaProposalForm({ authorId, existingIdea, onSuccess }: IdeaProp
       themes: formData.themes,
       screenshots,
       statut: 'Proposee',
-      github_username: formData.githubUsername.trim() || null,
+      github_username: existingIdea?.github_username || null,
       validation_commentaire: null,
     };
 
@@ -94,7 +92,7 @@ export function IdeaProposalForm({ authorId, existingIdea, onSuccess }: IdeaProp
           description: newIdea.description,
           themes: newIdea.themes,
           screenshots: newIdea.screenshots,
-          github_username: newIdea.github_username,
+          github_username: existingIdea?.github_username || null,
           statut: 'Proposee',
           validation_commentaire: null,
         })
@@ -107,7 +105,7 @@ export function IdeaProposalForm({ authorId, existingIdea, onSuccess }: IdeaProp
       setFormError(null);
       alert(existingIdea ? t('updated') : t('success'));
       if (!existingIdea) {
-        setFormData({ titre: '', description: '', themes: [], githubUsername: '' });
+        setFormData({ titre: '', description: '', themes: [] });
         setUploadedFiles([]);
       }
     } else {
@@ -148,16 +146,6 @@ export function IdeaProposalForm({ authorId, existingIdea, onSuccess }: IdeaProp
               placeholder={t('descriptionPlaceholder')}
               required
               className="w-full h-28 p-3 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none resize-none"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t('githubLabel')}</label>
-            <Input
-              name="githubUsername"
-              value={formData.githubUsername}
-              onChange={(e) => setFormData((prev) => ({ ...prev, githubUsername: e.target.value }))}
-              placeholder={t('githubPlaceholder')}
             />
           </div>
 
