@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/auth';
 import { deleteChallengeAdmin } from '@/app/actions/admin';
 import { updateChallenge } from '@/lib/supabase/queries';
@@ -8,7 +9,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import type { Challenge } from '@/types/database';
+import { MultiSelectMarques } from '@/components/ui/multi-select-marques';
+import { MultiSelectThematiques } from '@/components/ui/multi-select-thematiques';
+import type { Challenge, Marque, Thematique, VortexStage } from '@/types/database';
 
 interface ChallengeEditFormProps {
   challenge: Challenge;
@@ -16,11 +19,23 @@ interface ChallengeEditFormProps {
   onSave: (updated: Challenge) => void;
 }
 
+const VORTEX_STAGES: { value: VortexStage; label: string }[] = [
+  { value: 'contextualize', label: '1. Cadrer (Contextualize)' },
+  { value: 'empathize', label: '2. Découvrir (Empathize)' },
+  { value: 'synthesize', label: '3. Définir (Synthesize)' },
+  { value: 'hypothesize', label: '4. Idéer (Hypothesize)' },
+  { value: 'externalize', label: '5. Construire (Externalize)' },
+  { value: 'sensitize', label: '6. Tester (Sensitize)' },
+  { value: 'systematize', label: '7. Apprendre (Systematize)' },
+];
+
 export function ChallengeEditForm({ challenge, onCancel, onSave }: ChallengeEditFormProps) {
   const { user } = useAuth();
+  const tAdmin = useTranslations('admin.validation');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRepublishing, setIsRepublishing] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
   const [formData, setFormData] = useState({
     titre: challenge.titre,
     description: challenge.description,
@@ -46,26 +61,35 @@ export function ChallengeEditForm({ challenge, onCancel, onSave }: ChallengeEdit
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleMarquesChange = (marques: Marque[]) => {
+    setFormData((prev) => ({ ...prev, marques }));
+  };
+
+  const handleThematiquesChange = (thematiques: Thematique[]) => {
+    setFormData((prev) => ({ ...prev, thematiques }));
+  };
+
+  const buildUpdates = () => ({
+    ...formData,
+    difficulte: Number(formData.difficulte),
+    xp: Number(formData.xp),
+    outils_recommandes: formData.outils_recommandes
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean),
+    sources: formData.sources
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean),
+    plan_solution: formData.plan_solution || null,
+    etape_vortex: (formData.etape_vortex || null) as VortexStage | null,
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const updates = {
-      ...formData,
-      difficulte: Number(formData.difficulte),
-      xp: Number(formData.xp),
-      outils_recommandes: formData.outils_recommandes
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean),
-      sources: formData.sources
-        .split('\n')
-        .map((s) => s.trim())
-        .filter(Boolean),
-      plan_solution: formData.plan_solution || null,
-    };
-
-    const updated = await updateChallenge(challenge.id, updates);
+    const updated = await updateChallenge(challenge.id, buildUpdates());
     setIsSubmitting(false);
 
     if (updated) {
@@ -108,6 +132,47 @@ export function ChallengeEditForm({ challenge, onCancel, onSave }: ChallengeEdit
     }
   };
 
+  const isPublishReady = () => {
+    return Boolean(
+      formData.titre?.trim() &&
+      formData.description?.trim() &&
+      formData.niveau_associe &&
+      formData.type &&
+      formData.difficulte &&
+      formData.type_evaluation &&
+      formData.xp &&
+      formData.participants &&
+      formData.marques &&
+      formData.marques.length > 0 &&
+      formData.thematiques &&
+      formData.thematiques.length > 0 &&
+      formData.criteres_evaluation?.trim() &&
+      formData.vision_impact?.trim() &&
+      formData.le_saviez_vous?.trim() &&
+      formData.sources.trim() &&
+      formData.plan_solution?.trim()
+    );
+  };
+
+  const handlePublish = async () => {
+    if (!isPublishReady()) {
+      alert(tAdmin('publishMissingFields'));
+      return;
+    }
+
+    setIsPublishing(true);
+    const updated = await updateChallenge(challenge.id, {
+      ...buildUpdates(),
+      statut: 'Publie',
+    });
+    setIsPublishing(false);
+
+    if (updated) {
+      onSave(updated);
+      alert('Challenge publié.');
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <Card>
@@ -115,7 +180,6 @@ export function ChallengeEditForm({ challenge, onCancel, onSave }: ChallengeEdit
           <CardTitle>Informations générales</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Titre */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Titre</label>
             <Input
@@ -126,7 +190,6 @@ export function ChallengeEditForm({ challenge, onCancel, onSave }: ChallengeEdit
             />
           </div>
 
-          {/* Description */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Description</label>
             <textarea
@@ -138,7 +201,6 @@ export function ChallengeEditForm({ challenge, onCancel, onSave }: ChallengeEdit
             />
           </div>
 
-          {/* Niveau + Type + Difficulté */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Niveau</label>
@@ -169,7 +231,6 @@ export function ChallengeEditForm({ challenge, onCancel, onSave }: ChallengeEdit
             </div>
           </div>
 
-          {/* Type évaluation + XP */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Type d'évaluation</label>
@@ -191,17 +252,16 @@ export function ChallengeEditForm({ challenge, onCancel, onSave }: ChallengeEdit
             </div>
           </div>
 
-          {/* Outils recommandés */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Outils recommandés</label>
+            <label className="text-sm font-medium">Outils recommandés (optionnel)</label>
             <Input
               name="outils_recommandes"
               value={formData.outils_recommandes}
               onChange={handleChange}
+              placeholder="Séparés par des virgules : ChatGPT, n8n, Cursor..."
             />
           </div>
 
-          {/* Critères d'évaluation */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Critères d'évaluation</label>
             <Textarea
@@ -212,7 +272,44 @@ export function ChallengeEditForm({ challenge, onCancel, onSave }: ChallengeEdit
             />
           </div>
 
-          {/* Plan solution */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Marques concernées</label>
+            <MultiSelectMarques
+              value={formData.marques}
+              onChange={handleMarquesChange}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Thématiques IA</label>
+            <MultiSelectThematiques
+              value={formData.thematiques}
+              onChange={handleThematiquesChange}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Phase Vortex *</label>
+            <select
+              name="etape_vortex"
+              value={formData.etape_vortex ?? ''}
+              onChange={(event) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  etape_vortex: event.target.value as VortexStage | null,
+                }))
+              }
+              className="w-full p-2 rounded-lg bg-background border border-border focus:border-accent-cyan focus:outline-none"
+            >
+              <option value="">Non définie</option>
+              {VORTEX_STAGES.map((stage) => (
+                <option key={stage.value} value={stage.value}>
+                  {stage.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className="space-y-2">
             <label className="text-sm font-medium">Plan solution</label>
             <Textarea
@@ -222,7 +319,6 @@ export function ChallengeEditForm({ challenge, onCancel, onSave }: ChallengeEdit
             />
           </div>
 
-          {/* Sources */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Sources</label>
             <Textarea
@@ -232,7 +328,6 @@ export function ChallengeEditForm({ challenge, onCancel, onSave }: ChallengeEdit
             />
           </div>
 
-          {/* Vision impact */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Vision impact</label>
             <Textarea
@@ -242,7 +337,6 @@ export function ChallengeEditForm({ challenge, onCancel, onSave }: ChallengeEdit
             />
           </div>
 
-          {/* Le saviez-vous */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Le saviez-vous</label>
             <Textarea
@@ -270,6 +364,19 @@ export function ChallengeEditForm({ challenge, onCancel, onSave }: ChallengeEdit
           </Button>
         )}
       </div>
+
+      {challenge.statut === 'Valide' && (
+        <div className="pt-4 border-t border-border">
+          <Button
+            type="button"
+            onClick={handlePublish}
+            disabled={isPublishing}
+            className="bg-accent-jaune hover:bg-accent-jaune/80 text-black font-semibold"
+          >
+            {isPublishing ? 'Publication...' : tAdmin('completeAndPublish')}
+          </Button>
+        </div>
+      )}
     </form>
   );
 }
