@@ -50,6 +50,7 @@ export interface User {
   auth_id?: string | null;
   avatar_url?: string | null;
   featured_badge_id?: string | null;
+  github_username?: string | null;
   niveau_actuel: UserLevel;
   role: UserRole;
   points_totaux: number;
