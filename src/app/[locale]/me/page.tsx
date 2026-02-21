@@ -20,7 +20,7 @@ import { getUserParticipations, getAllBadges, getUserBadges, getUserChallenges, 
 import { formatNameFromEmail } from '@/lib/userName';
 import { localizeChallenge } from '@/lib/supabase/localization';
 import { getEarnedTitles, getLevelProgress, getThemeTitle } from '@/services/progressionService';
-import type { Badge as BadgeType, Challenge, Participation, IdeaProposal, Solution } from '@/types/database';
+import type { Badge as BadgeType, Challenge, Participation, IdeaProposal, Solution, LeaderboardEntry } from '@/types/database';
 import { IdeaProposalForm } from '@/components/ideas/IdeaProposalForm';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
 import { ThemeProgressCircles } from '@/components/gamification/ThemeProgressCircles';
