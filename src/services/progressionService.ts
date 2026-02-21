@@ -242,4 +242,16 @@ export async function updateLeagueWeekly() {
     }
   }
 }
+export function getLevelProgress(xp: number) {
+  let level = 1;
+  let remaining = xp;
+  let needed = getRequiredXp(level);
+  while (remaining >= needed) {
+    remaining -= needed;
+    level += 1;
+    needed = getRequiredXp(level);
+  }
+  const progress = needed > 0 ? remaining / needed : 0;
+  return { level, currentXp: remaining, neededXp: needed, progress: Math.max(0, Math.min(progress, 1)) };
+}
 

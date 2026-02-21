@@ -10,7 +10,7 @@ import { Zap, Calendar, User, LogOut, Trophy, Award } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { getUserBadges } from '@/lib/supabase/queries';
-import { getRequiredXp } from '@/services/progressionService';
+import { getLevelProgress } from '@/services/progressionService';
 
 const levelColors: Record<string, string> = {
   Explorer: 'bg-accent-vert text-black',
@@ -35,9 +35,7 @@ export function Header() {
 
   const selectedTitle = user?.selected_title || null;
   const selectedTitleLabel = user?.selected_title || null;
-  const levelGlobal = user?.level_global || 1;
-  const xpGlobal = user?.xp_global || 0;
-  const xpToNext = Math.max(0, getRequiredXp(levelGlobal) - xpGlobal);
+  const levelProgress = getLevelProgress(user?.xp_global || 0);
 
   React.useEffect(() => {
     async function loadBadges() {
@@ -121,9 +119,10 @@ export function Header() {
                 <Badge className={levelColors[user.niveau_actuel] || levelColors.Explorer}>
                   {user.niveau_actuel}
                 </Badge>
-                <span className="text-xs text-muted-foreground">
-                  Niv {levelGlobal} • {xpToNext} XP restants
-                </span>
+                <span className="text-xs text-muted-foreground">Niveau {levelProgress.level}</span>
+                <div className="w-20">
+                  <Progress value={Math.round(levelProgress.progress * 100)} className="h-1" />
+                </div>
               </div>
               <Link href="/me">
                 <div className="flex items-center gap-2">

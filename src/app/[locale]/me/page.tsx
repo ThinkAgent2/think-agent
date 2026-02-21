@@ -16,15 +16,16 @@ import {
   Medal, Crown, Rocket, Brain, Loader2
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
-import { getUserParticipations, getAllBadges, getUserBadges, getUserChallenges, getUserIdeas, deleteIdeaProposal, updateUser, deleteChallenge, getUserSolutions } from '@/lib/supabase/queries';
+import { getUserParticipations, getAllBadges, getUserBadges, getUserChallenges, getUserIdeas, deleteIdeaProposal, updateUser, deleteChallenge, getUserSolutions, getLeaderboard } from '@/lib/supabase/queries';
 import { formatNameFromEmail } from '@/lib/userName';
 import { localizeChallenge } from '@/lib/supabase/localization';
-import { getEarnedTitles, getRequiredXp, getThemeTitle } from '@/services/progressionService';
+import { getEarnedTitles, getLevelProgress, getThemeTitle } from '@/services/progressionService';
 import type { Badge as BadgeType, Challenge, Participation, IdeaProposal, Solution } from '@/types/database';
 import { IdeaProposalForm } from '@/components/ideas/IdeaProposalForm';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
 import { ThemeProgressCircles } from '@/components/gamification/ThemeProgressCircles';
 import { TitleSelector } from '@/components/gamification/TitleSelector';
+import { LeaderboardList } from '@/components/gamification/LeaderboardList';
 import { LeagueBanner } from '@/components/gamification/LeagueBanner';
 
 const levelConfig: Record<string, { color: string; icon: typeof Brain; nextLevel: string | null; xpNeeded: number | null }> = {
@@ -53,6 +54,7 @@ export default function ProfilePage() {
   const [participations, setParticipations] = useState<(Participation & { challenge?: Challenge })[]>([]);
   const [allBadges, setAllBadges] = useState<BadgeType[]>([]);
   const [userBadges, setUserBadges] = useState<BadgeType[]>([]);
+  const [globalLeaderboard, setGlobalLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [proposedChallenges, setProposedChallenges] = useState<Challenge[]>([]);
   const [myIdeas, setMyIdeas] = useState<IdeaProposal[]>([]);
   const [editingIdea, setEditingIdea] = useState<IdeaProposal | null>(null);
@@ -86,13 +88,14 @@ export default function ProfilePage() {
 
       setIsLoading(true);
       try {
-        const [participationsData, allBadgesData, userBadgesData, proposedChallengesData, myIdeasData, solutionsData] = await Promise.all([
+        const [participationsData, allBadgesData, userBadgesData, proposedChallengesData, myIdeasData, solutionsData, leaderboardData] = await Promise.all([
           getUserParticipations(user.id),
           getAllBadges(locale),
           getUserBadges(user.id, locale),
           getUserChallenges(user.id),
           getUserIdeas(user.id),
           getUserSolutions(user.id),
+          getLeaderboard(10),
         ]);
 
         const localizedParticipations = participationsData.map((participation) => ({
@@ -111,6 +114,7 @@ export default function ProfilePage() {
           setSelectedSecondaryBadge(user.selected_badge_secondary || null);
           setSelectedTitle(user.selected_title || null);
           setSolutions(solutionsData);
+          setGlobalLeaderboard(leaderboardData);
         }
       } finally {
         if (!isCancelled) {
@@ -147,6 +151,7 @@ export default function ProfilePage() {
   const titleColor = titleKey === 'Explorer' ? 'bg-accent-vert text-black' : titleKey === 'Crafter' ? 'bg-exalt-blue text-white' : titleKey === 'Architecte' ? 'bg-accent-rose text-white' : levelConfig[user.niveau_actuel]?.color || levelConfig.Explorer.color;
   
   const inProgress = participations.filter(p => p.statut === 'En_cours');
+  const levelProgress = getLevelProgress(user?.xp_global ?? 0);
 
   const solutionsByChallenge = new Map(solutions.map((solution) => [solution.challenge_id, solution]));
   const completed = participations.filter((p) => p.statut === 'Terminé');
@@ -291,8 +296,12 @@ export default function ProfilePage() {
                       <div className="flex flex-wrap gap-4 text-sm">
                         <div className="flex items-center gap-1">
                 <Zap className="h-4 w-4 text-accent-jaune" />
-                <span className="font-semibold">Niv {user?.level_global ?? 1} • {Math.max(0, getRequiredXp(user?.level_global ?? 1) - (user?.xp_global ?? 0))} XP restants</span>
+                <span className="font-semibold">Niveau {levelProgress.level}</span>
               </div>
+            </div>
+            <div className="mt-3 w-full">
+              <Progress value={Math.round(levelProgress.progress * 100)} className="h-2" />
+              <div className="mt-1 text-xs text-muted-foreground">{Math.round(levelProgress.progress * 100)}% vers niveau {levelProgress.level + 1}</div>
             </div>
                     </div>
                   </div>
@@ -717,8 +726,19 @@ export default function ProfilePage() {
                 </CardContent>
               </Card>
 
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg">{t('leaderboardTitle') || 'Classement global'}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {globalLeaderboard.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">{t('noRanking') || 'Pas encore de classement'}</p>
+                  ) : (
+                    <LeaderboardList entries={globalLeaderboard} />
+                  )}
+                </CardContent>
+              </Card>
 
-              
             </div>
           </div>
         </div>

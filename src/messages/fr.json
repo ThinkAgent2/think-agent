@@ -226,6 +226,8 @@
     }
   },
   "profile": {
+    "leaderboardTitle": "Classement global",
+    "noRanking": "Pas encore de classement",
     "challengesCompleted": "challenges terminés",
     "inProgress": "en cours",
     "myChallenges": "Mes Challenges",
