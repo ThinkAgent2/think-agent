@@ -367,9 +367,9 @@ export default function ProfilePage() {
                   <CardTitle>{t('titles')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                            <div className="text-sm">Explorer: {getThemeTitle(user?.explorer_completed_count ?? 0)}</div>
-                            <div className="text-sm">Crafter: {getThemeTitle(user?.crafter_completed_count ?? 0)}</div>
-                            <div className="text-sm">Architecte: {getThemeTitle(user?.architect_completed_count ?? 0)}</div>
+                            <div className="text-sm font-semibold text-accent-vert">Explorer  {getThemeTitle(user?.explorer_completed_count ?? 0)}</div>
+                            <div className="text-sm font-semibold text-exalt-blue">Crafter  {getThemeTitle(user?.crafter_completed_count ?? 0)}</div>
+                            <div className="text-sm font-semibold text-accent-rose">Architecte  {getThemeTitle(user?.architect_completed_count ?? 0)}</div>
                 </CardContent>
               </Card>
             </div>

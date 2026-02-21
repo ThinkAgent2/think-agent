@@ -30,12 +30,13 @@ export function TitleSelector({ titles, selectedTitle, onChange, isSaving = fals
           titles.map((title) => (
             <Button
               key={title}
+              className="pointer-events-auto"
               size="sm"
               variant={selectedTitle === title ? 'default' : 'outline'}
               onClick={() => onChange(title)}
               disabled={isSaving}
             >
-              <span className={titleColors[title.split(' ')[0]] || ''}>{title}</span>
+<span className={`font-semibold ${titleColors[title.split(' ')[0]] || ''}`}>{title}</span>
             </Button>
           ))
         )}

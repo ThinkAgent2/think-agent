@@ -3,7 +3,14 @@
 import { createContext, useContext, useMemo, useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
+
 export type ProgressionEventType = 'xp' | 'level' | 'title' | 'badge' | 'streak' | 'league';
+
+const FlameIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
+    <path d="M12 2c1.8 2.2 2.6 4.6 2.3 7.1 2.2-1 4.2-3 5-5.6C22.7 8.6 19.5 20 12 22 4.5 20 1.3 8.6 4.7 3.5c.8 2.6 2.8 4.6 5 5.6C9.4 6.6 10.2 4.2 12 2z"/>
+  </svg>
+);
 
 interface ProgressionEvent {
   id: string;
@@ -63,10 +70,24 @@ export function ProgressionOverlayProvider({ children }: { children: React.React
               <div className="text-sm uppercase tracking-wide text-accent-jaune">{event.type}</div>
               <div className="text-lg font-semibold">{event.title}</div>
               {event.type === 'title' && event.title.includes('Maître') && (
-                <div className="absolute -top-4 -right-3 text-3xl text-orange-400 animate-pulse drop-shadow">🔥</div>
+                <motion.div
+                  className="absolute -top-8 -right-6 text-orange-400 drop-shadow-lg"
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1.15, opacity: 1 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <FlameIcon className="h-12 w-12" />
+                </motion.div>
               )}
               {event.type === 'streak' && (
-                <div className="absolute -top-4 -left-3 text-3xl text-orange-400 animate-bounce drop-shadow">🔥</div>
+                <motion.div
+                  className="absolute -top-8 -left-6 text-orange-400 drop-shadow-lg"
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1.15, opacity: 1 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <FlameIcon className="h-12 w-12" />
+                </motion.div>
               )}
               {event.description && (
                 <div className="text-sm text-muted-foreground">{event.description}</div>
