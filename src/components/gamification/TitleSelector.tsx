@@ -13,6 +13,12 @@ interface TitleSelectorProps {
 export function TitleSelector({ titles, selectedTitle, onChange, isSaving = false }: TitleSelectorProps) {
   const t = useTranslations('profile');
 
+  const titleColors: Record<string, string> = {
+    Explorer: 'text-accent-vert',
+    Crafter: 'text-exalt-blue',
+    Architecte: 'text-accent-rose',
+  };
+
   return (
     <div>
       <p className="text-sm font-medium">{t('selectTitle')}</p>
@@ -29,7 +35,7 @@ export function TitleSelector({ titles, selectedTitle, onChange, isSaving = fals
               onClick={() => onChange(title)}
               disabled={isSaving}
             >
-              {title}
+              <span className={titleColors[title.split(' ')[0]] || ''}>{title}</span>
             </Button>
           ))
         )}

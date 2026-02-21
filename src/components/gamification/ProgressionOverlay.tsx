@@ -63,10 +63,10 @@ export function ProgressionOverlayProvider({ children }: { children: React.React
               <div className="text-sm uppercase tracking-wide text-accent-jaune">{event.type}</div>
               <div className="text-lg font-semibold">{event.title}</div>
               {event.type === 'title' && event.title.includes('Maître') && (
-                <div className="absolute -top-2 -right-2 text-orange-400 animate-pulse">🔥</div>
+                <div className="absolute -top-4 -right-3 text-3xl text-orange-400 animate-pulse drop-shadow">🔥</div>
               )}
               {event.type === 'streak' && (
-                <div className="absolute -top-2 -left-2 text-orange-400 animate-bounce">🔥</div>
+                <div className="absolute -top-4 -left-3 text-3xl text-orange-400 animate-bounce drop-shadow">🔥</div>
               )}
               {event.description && (
                 <div className="text-sm text-muted-foreground">{event.description}</div>
