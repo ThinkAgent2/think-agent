@@ -23,7 +23,9 @@
     "ideasValidation": "Ideas validation",
     "proposeIdea": "Propose an idea",
     "login": "Sign in",
-    "logout": "Sign out"
+    "logout": "Sign out",
+    "leaderboard": "Rankings",
+    "badges": "Badges"
   },
   "home": {
     "badge": "eXalt Platform",
@@ -256,15 +258,42 @@
       "errorSize": "Image too large (max 2 MB).",
       "errorUpload": "Image upload error.",
       "errorSave": "Error while saving."
-    }
+    },
+    "circle": {
+      "Explorer": "Explorer Circle",
+      "Crafter": "Crafter Circle",
+      "Architecte": "Architect Circle",
+      "progress": "Progress",
+      "next": "Next milestone: {count}",
+      "max": "Max milestone reached"
+    },
+    "globalXp": "Global XP",
+    "levelGlobal": "Global level",
+    "weeklyXp": "Weekly XP",
+    "currentStreak": "Current streak",
+    "maxStreak": "Best streak",
+    "league": "League",
+    "titles": "Titles",
+    "badgesUnlocked": "Unlocked badges",
+    "noBadges": "No badges unlocked yet.",
+    "legendaryHidden": "Hidden description",
+    "badgePrimary": "Primary badge",
+    "badgeSecondary": "Secondary badge",
+    "selectBadge": "Select",
+    "clearBadge": "Clear",
+    "selectTitle": "Displayed title",
+    "selectTitleHint": "Choose the title shown on your profile",
+    "clearTitle": "Clear title"
   },
   "badges": {
     "title": "Badges",
-    "howToEarnDefault": "Complete challenges and meet its conditions to unlock this badge."
+    "howToEarnDefault": "Complete challenges and meet its conditions to unlock this badge.",
+    "legendaryHidden": "Hidden description",
+    "loading": "Loading..."
   },
   "leaderboard": {
-    "title": "Leaderboard",
-    "global": "Global Top 10",
+    "title": "Rankings",
+    "global": "Global ranking",
     "recent": "Last 30 days",
     "entity": "Top 10 by entity",
     "circle": "Top 10 by circle",
@@ -279,7 +308,17 @@
     "noRanking": "No ranking yet",
     "you": "(you)",
     "currentProfile": "(profile)",
-    "globalRank": "Global ranking: {rank} / {total}"
+    "globalRank": "Global ranking: {rank} / {total}",
+    "subtitle": "Community rankings and leagues.",
+    "loading": "Loading...",
+    "weekly": "Weekly ranking",
+    "league": "League ranking",
+    "themes": "Circle ranking",
+    "globalTop50": "Top 50 global",
+    "podiumTitle": "Podium",
+    "pointsLabel": "XP",
+    "badge": "Badge",
+    "listTitle": "Global ranking"
   },
   "admin": {
     "validation": {

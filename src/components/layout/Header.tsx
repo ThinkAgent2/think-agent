@@ -6,7 +6,7 @@ import { Link, usePathname } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Zap, Calendar, User, LogOut } from 'lucide-react';
+import { Zap, Calendar, User, LogOut, Trophy, Award } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { getUserBadges } from '@/lib/supabase/queries';
@@ -22,9 +22,17 @@ export function Header() {
   const { user, logout } = useAuth();
   const t = useTranslations('nav');
   const [userBadgesMap, setUserBadgesMap] = React.useState(new Map<string, string>());
-  const featuredBadgeEmoji = user?.featured_badge_id
-    ? userBadgesMap.get(user.featured_badge_id) || null
+  const selectedPrimaryBadgeEmoji = user?.selected_badge_primary
+    ? userBadgesMap.get(user.selected_badge_primary) || null
+    : user?.featured_badge_id
+      ? userBadgesMap.get(user.featured_badge_id) || null
+      : null;
+
+  const selectedSecondaryBadgeEmoji = user?.selected_badge_secondary
+    ? userBadgesMap.get(user.selected_badge_secondary) || null
     : null;
+
+  const selectedTitle = user?.selected_title || null;
 
   React.useEffect(() => {
     async function loadBadges() {
@@ -39,6 +47,8 @@ export function Header() {
     { href: '/challenges', label: t('challenges'), icon: Zap },
     { href: '/ideas', label: t('ideas'), icon: Zap },
     { href: '/events', label: t('events'), icon: Calendar },
+    { href: '/classement', label: t('leaderboard'), icon: Trophy },
+    { href: '/badges', label: t('badges'), icon: Award },
     { href: '/me', label: t('myPage'), icon: User },
   ];
 
@@ -112,17 +122,25 @@ export function Header() {
                 </span>
               </div>
               <Link href="/me">
-                <Avatar className="h-8 w-8 cursor-pointer transition-glow hover:glow-cyan">
-                  {user.avatar_url && <AvatarImage src={user.avatar_url} alt={user.nom || user.email} />}
-                  <AvatarFallback className="bg-exalt-blue text-white text-xs">
-                    {user.nom?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
-                  </AvatarFallback>
-                  {featuredBadgeEmoji && (
-                    <AvatarBadge className="text-xs translate-x-0.5 translate-y-0.5">
-                      {featuredBadgeEmoji}
-                    </AvatarBadge>
+                <div className="flex items-center gap-2">
+                  {selectedSecondaryBadgeEmoji && (
+                    <span className="text-sm" title="Badge secondaire">{selectedSecondaryBadgeEmoji}</span>
                   )}
-                </Avatar>
+                  <Avatar className="h-8 w-8 cursor-pointer transition-glow hover:glow-cyan">
+                    {user.avatar_url && <AvatarImage src={user.avatar_url} alt={user.nom || user.email} />}
+                    <AvatarFallback className="bg-exalt-blue text-white text-xs">
+                      {user.nom?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
+                    </AvatarFallback>
+                    {selectedPrimaryBadgeEmoji && (
+                      <AvatarBadge className="text-xs translate-x-0.5 translate-y-0.5">
+                        {selectedPrimaryBadgeEmoji}
+                      </AvatarBadge>
+                    )}
+                  </Avatar>
+                  {selectedTitle && (
+                    <span className="text-xs text-muted-foreground">{selectedTitle}</span>
+                  )}
+                </div>
               </Link>
               <Button
                 variant="ghost"

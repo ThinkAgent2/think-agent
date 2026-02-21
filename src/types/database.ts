@@ -54,6 +54,19 @@ export interface User {
   niveau_actuel: UserLevel;
   role: UserRole;
   points_totaux: number;
+  xp_global?: number | null;
+  level_global?: number | null;
+  xp_weekly?: number | null;
+  explorer_completed_count?: number | null;
+  crafter_completed_count?: number | null;
+  architect_completed_count?: number | null;
+  selected_badge_primary?: string | null;
+  selected_badge_secondary?: string | null;
+  selected_title?: string | null;
+  current_streak?: number | null;
+  max_streak?: number | null;
+  last_active_date?: string | null;
+  league?: string | null;
   pr_merged?: boolean | null;
   created_at: string;
 }
@@ -107,12 +120,17 @@ export interface Participation {
   created_at: string;
 }
 
+export type BadgeRarity = 'common' | 'rare' | 'epic' | 'legendary';
+
 export interface Badge {
   id: string;
   nom: string;
   description: string;
   emoji: string;
   conditions: Record<string, unknown>;
+  rarity?: BadgeRarity | null;
+  icon?: string | null;
+  condition_json?: Record<string, unknown> | null;
 }
 
 export interface IdeaProposal {

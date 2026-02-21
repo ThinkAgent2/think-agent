@@ -23,7 +23,9 @@
     "ideasValidation": "Validation idées",
     "proposeIdea": "Proposer une idée",
     "login": "Se connecter",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "leaderboard": "Classements",
+    "badges": "Badges"
   },
   "home": {
     "badge": "Plateforme eXalt",
@@ -256,15 +258,42 @@
       "errorSize": "Image trop volumineuse (max 2 Mo).",
       "errorUpload": "Erreur upload de l'image.",
       "errorSave": "Erreur lors de l'enregistrement."
-    }
+    },
+    "circle": {
+      "Explorer": "Cercle Explorer",
+      "Crafter": "Cercle Crafter",
+      "Architecte": "Cercle Architecte",
+      "progress": "Progression",
+      "next": "Prochain palier : {count}",
+      "max": "Palier max atteint"
+    },
+    "globalXp": "XP global",
+    "levelGlobal": "Niveau global",
+    "weeklyXp": "XP hebdo",
+    "currentStreak": "Série en cours",
+    "maxStreak": "Meilleure série",
+    "league": "Ligue",
+    "titles": "Titres",
+    "badgesUnlocked": "Badges débloqués",
+    "noBadges": "Aucun badge débloqué pour le moment.",
+    "legendaryHidden": "Description masquée",
+    "badgePrimary": "Badge principal",
+    "badgeSecondary": "Badge secondaire",
+    "selectBadge": "Choisir",
+    "clearBadge": "Retirer",
+    "selectTitle": "Titre affiché",
+    "selectTitleHint": "Choisis le titre affiché sur ton profil",
+    "clearTitle": "Retirer le titre"
   },
   "badges": {
     "title": "Badges",
-    "howToEarnDefault": "Termine des challenges et débloque ce badge en remplissant ses conditions."
+    "howToEarnDefault": "Termine des challenges et débloque ce badge en remplissant ses conditions.",
+    "legendaryHidden": "Description masquée",
+    "loading": "Chargement..."
   },
   "leaderboard": {
-    "title": "Leaderboard",
-    "global": "Top 10 global",
+    "title": "Classements",
+    "global": "Classement global",
     "recent": "30 derniers jours",
     "entity": "Top 10 par entité",
     "circle": "Top 10 par cercle",
@@ -279,7 +308,17 @@
     "noRanking": "Pas encore de classement",
     "you": "(toi)",
     "currentProfile": "(profil)",
-    "globalRank": "Classement global : {rank} / {total}"
+    "globalRank": "Classement global : {rank} / {total}",
+    "subtitle": "Classements et ligues de la communauté.",
+    "loading": "Chargement...",
+    "weekly": "Classement hebdomadaire",
+    "league": "Classement par ligue",
+    "themes": "Classement par cercle",
+    "globalTop50": "Top 50 global",
+    "podiumTitle": "Podium",
+    "pointsLabel": "XP",
+    "badge": "Badge",
+    "listTitle": "Classement global"
   },
   "admin": {
     "validation": {

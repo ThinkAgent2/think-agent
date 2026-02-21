@@ -21,9 +21,15 @@ import { useAuth } from '@/lib/auth';
 import { getUserParticipations, getAllBadges, getUserBadges, getLeaderboard, getLeaderboardRecent, searchUsers, getUserChallenges, getUserIdeas, deleteIdeaProposal, updateUser, deleteChallenge, getUserRankAndTotal, getUserSolutions } from '@/lib/supabase/queries';
 import { formatNameFromEmail } from '@/lib/userName';
 import { localizeChallenge } from '@/lib/supabase/localization';
+import { getEarnedTitles, getThemeTitle } from '@/services/progressionService';
 import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry, IdeaProposal, Solution } from '@/types/database';
 import { IdeaProposalForm } from '@/components/ideas/IdeaProposalForm';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
+import { ThemeProgressCircles } from '@/components/gamification/ThemeProgressCircles';
+import { BadgeGrid } from '@/components/gamification/BadgeGrid';
+import { BadgeSelector } from '@/components/gamification/BadgeSelector';
+import { TitleSelector } from '@/components/gamification/TitleSelector';
+import { LeagueBanner } from '@/components/gamification/LeagueBanner';
 
 const levelConfig: Record<string, { color: string; icon: typeof Brain; nextLevel: string | null; xpNeeded: number | null }> = {
   Explorer: { color: 'bg-accent-vert text-black', icon: Brain, nextLevel: 'Crafter', xpNeeded: 150 },
@@ -61,6 +67,9 @@ export default function ProfilePage() {
   const [myIdeas, setMyIdeas] = useState<IdeaProposal[]>([]);
   const [editingIdea, setEditingIdea] = useState<IdeaProposal | null>(null);
   const [featuredBadgeId, setFeaturedBadgeId] = useState<string | null>(null);
+  const [selectedPrimaryBadge, setSelectedPrimaryBadge] = useState<string | null>(null);
+  const [selectedSecondaryBadge, setSelectedSecondaryBadge] = useState<string | null>(null);
+  const [selectedTitle, setSelectedTitle] = useState<string | null>(null);
   const [isUpdatingBadge, setIsUpdatingBadge] = useState(false);
   const [rankInfo, setRankInfo] = useState<{ rank: number; total: number } | null>(null);
   const [solutions, setSolutions] = useState<Solution[]>([]);
@@ -115,6 +124,9 @@ export default function ProfilePage() {
           setProposedChallenges(proposedChallengesData);
           setMyIdeas(myIdeasData);
           setFeaturedBadgeId(user.featured_badge_id || null);
+          setSelectedPrimaryBadge(user.selected_badge_primary || null);
+          setSelectedSecondaryBadge(user.selected_badge_secondary || null);
+          setSelectedTitle(user.selected_title || null);
           setRankInfo(rankData);
           setSolutions(solutionsData);
         }
@@ -174,6 +186,7 @@ export default function ProfilePage() {
   const displayName = sanitizedName || formatNameFromEmail(user.email) || 'Anonyme';
   
   const inProgress = participations.filter(p => p.statut === 'En_cours');
+
   const solutionsByChallenge = new Map(solutions.map((solution) => [solution.challenge_id, solution]));
   const completed = participations.filter((p) => p.statut === 'Terminé');
 
@@ -203,6 +216,12 @@ export default function ProfilePage() {
   }));
 
   const pendingIdeasCount = myIdeas.filter((idea) => idea.statut === 'Proposee').length;
+
+  const earnedTitles = [
+    ...getEarnedTitles(user?.explorer_completed_count ?? 0, 'Explorer'),
+    ...getEarnedTitles(user?.crafter_completed_count ?? 0, 'Crafter'),
+    ...getEarnedTitles(user?.architect_completed_count ?? 0, 'Architecte'),
+  ];
 
   const handleDeleteIdea = async (idea: IdeaProposal) => {
     const confirmed = window.confirm(tIdeas('deleteConfirm'));
@@ -238,6 +257,29 @@ export default function ProfilePage() {
     const updated = await updateUser(user.id, { featured_badge_id: badgeId });
     if (updated) {
       setFeaturedBadgeId(badgeId);
+      await refreshUser();
+    }
+    setIsUpdatingBadge(false);
+  };
+
+  const handleSelectedBadgeChange = async (primary: string | null, secondary: string | null) => {
+    if (!user) return;
+    setIsUpdatingBadge(true);
+    const updated = await updateUser(user.id, { selected_badge_primary: primary, selected_badge_secondary: secondary });
+    if (updated) {
+      setSelectedPrimaryBadge(primary);
+      setSelectedSecondaryBadge(secondary);
+      await refreshUser();
+    }
+    setIsUpdatingBadge(false);
+  };
+
+  const handleTitleSelect = async (title: string | null) => {
+    if (!user) return;
+    setIsUpdatingBadge(true);
+    const updated = await updateUser(user.id, { selected_title: title });
+    if (updated) {
+      setSelectedTitle(title);
       await refreshUser();
     }
     setIsUpdatingBadge(false);
@@ -350,7 +392,68 @@ export default function ProfilePage() {
                       />
                     </div>
                   ) : (
-                    <Tabs value={activeTab} onValueChange={setActiveTab}>
+                    
+          <div className="mt-6 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t('globalXp')}</CardTitle>
+                  <CardDescription>{t('levelGlobal')}: {user?.level_global ?? 1}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-semibold">{user?.xp_global ?? 0} XP</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t('weeklyXp')}</CardTitle>
+                  <CardDescription>{t('league')}: {user?.league ?? 'Bronze'}</CardDescription>
+                </CardHeader>
+                <CardContent className="flex items-center justify-between">
+                  <p className="text-2xl font-semibold">{user?.xp_weekly ?? 0} XP</p>
+                  <LeagueBanner league={user?.league} />
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t('currentStreak')}</CardTitle>
+                  <CardDescription>{t('maxStreak')}: {user?.max_streak ?? 0}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-semibold">{user?.current_streak ?? 0}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t('titles')}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="text-sm">Explorer: {getThemeTitle(user?.explorer_completed_count ?? 0)}</div>
+                  <div className="text-sm">Crafter: {getThemeTitle(user?.crafter_completed_count ?? 0)}</div>
+                  <div className="text-sm">Architecte: {getThemeTitle(user?.architect_completed_count ?? 0)}</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <ThemeProgressCircles
+              explorerCount={user?.explorer_completed_count ?? 0}
+              crafterCount={user?.crafter_completed_count ?? 0}
+              architectCount={user?.architect_completed_count ?? 0}
+            />
+
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('badgesUnlocked')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <BadgeGrid badges={userBadges} />
+              </CardContent>
+            </Card>
+          </div>
+<Tabs value={activeTab} onValueChange={setActiveTab}>
                       <TabsList className="mb-4">
                         <TabsTrigger value="en-cours" className="gap-2">
                           <Clock className="h-4 w-4" />
@@ -641,6 +744,25 @@ export default function ProfilePage() {
                         >
                           {t('featuredBadgeClear')}
                         </Button>
+                      </div>
+
+                      <div>
+                        <BadgeSelector
+                          userId={user.id}
+                          badges={badgesWithStatus.filter((badge) => badge.obtained)}
+                          primaryId={selectedPrimaryBadge}
+                          secondaryId={selectedSecondaryBadge}
+                          onChange={handleSelectedBadgeChange}
+                        />
+                      </div>
+
+                      <div>
+                        <TitleSelector
+                          titles={earnedTitles}
+                          selectedTitle={selectedTitle}
+                          onChange={handleTitleSelect}
+                          isSaving={isUpdatingBadge}
+                        />
                       </div>
 
                       <div>
