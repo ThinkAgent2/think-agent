@@ -699,6 +699,15 @@ export default function ProfilePage() {
                         >
                           {t('clearBadge')}
                         </Button>
+
+                      <div className="mt-6">
+                        <TitleSelector
+                          titles={earnedTitles}
+                          selectedTitle={selectedTitle}
+                          onChange={handleTitleSelect}
+                          isSaving={isUpdatingBadge}
+                        />
+                      </div>
                       </div>
                     </div>
                   )}
