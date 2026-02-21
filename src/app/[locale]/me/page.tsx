@@ -620,7 +620,7 @@ export default function ProfilePage() {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg flex items-center gap-2">
                     <Medal className="h-5 w-5 text-accent-jaune" />
-                    {tBadges('title')}
+                    <Link href="/badges" className="hover:underline">{tBadges('title')}</Link>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>

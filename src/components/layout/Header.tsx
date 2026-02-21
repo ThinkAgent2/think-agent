@@ -48,7 +48,6 @@ export function Header() {
     { href: '/ideas', label: t('ideas'), icon: Zap },
     { href: '/events', label: t('events'), icon: Calendar },
     { href: '/classement', label: t('leaderboard'), icon: Trophy },
-    { href: '/badges', label: t('badges'), icon: Award },
     { href: '/me', label: t('myPage'), icon: User },
   ];
 
@@ -136,7 +135,7 @@ export function Header() {
                       )}
                     </Avatar>
                     {selectedSecondaryBadgeEmoji && (
-                      <span className="absolute -bottom-1 -left-1 h-4 w-4 rounded-full bg-background border border-border flex items-center justify-center text-[10px]" title="Badge secondaire">
+                      <span className="absolute -bottom-1 -left-1 h-4 w-4 rounded-full bg-background flex items-center justify-center text-[10px]" title="Badge secondaire">
                         {selectedSecondaryBadgeEmoji}
                       </span>
                     )}
