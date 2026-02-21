@@ -5,6 +5,7 @@ import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { ProgressionOverlayProvider } from '@/components/gamification/ProgressionOverlay';
 import { routing } from "@/i18n/routing";
 import { Locale } from "@/i18n/config";
 import "../globals.css";
@@ -58,7 +59,9 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <ErrorBoundary>
             <AuthProvider>
-              {children}
+              <ProgressionOverlayProvider>
+                {children}
+              </ProgressionOverlayProvider>
             </AuthProvider>
           </ErrorBoundary>
         </NextIntlClientProvider>

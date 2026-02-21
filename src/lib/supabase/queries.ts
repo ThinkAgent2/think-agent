@@ -6,6 +6,7 @@ import type {
 } from '@/types/database';
 type BadgeType = Badge;
 import { formatNameFromEmail } from '@/lib/userName';
+import { handleChallengeValidated } from '@/services/progressionService';
 import { localizeChallenge, localizeBadge, localizeDojoEvent } from './localization';
 
 const supabase = createClient();
@@ -459,6 +460,7 @@ export async function evaluateSolution(
     const challenge = await getChallengeById(challengeId);
     if (challenge) {
       await addUserXP(userId, challenge.xp);
+      await handleChallengeValidated(userId, challenge);
     }
     await checkAndUpdateLevelAndBadges(userId);
   }
