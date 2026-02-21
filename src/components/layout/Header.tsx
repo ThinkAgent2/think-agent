@@ -10,6 +10,7 @@ import { Zap, Calendar, User, LogOut, Trophy, Award } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { getUserBadges } from '@/lib/supabase/queries';
+import { getRequiredXp } from '@/services/progressionService';
 
 const levelColors: Record<string, string> = {
   Explorer: 'bg-accent-vert text-black',
@@ -33,6 +34,10 @@ export function Header() {
     : null;
 
   const selectedTitle = user?.selected_title || null;
+  const selectedTitleLabel = user?.selected_title || null;
+  const levelGlobal = user?.level_global || 1;
+  const xpGlobal = user?.xp_global || 0;
+  const xpToNext = Math.max(0, getRequiredXp(levelGlobal) - xpGlobal);
 
   React.useEffect(() => {
     async function loadBadges() {
@@ -116,8 +121,8 @@ export function Header() {
                 <Badge className={levelColors[user.niveau_actuel] || levelColors.Explorer}>
                   {user.niveau_actuel}
                 </Badge>
-                <span className="text-sm text-muted-foreground">
-                  {user.points_totaux} XP
+                <span className="text-xs text-muted-foreground">
+                  Niv {levelGlobal} • {xpToNext} XP restants
                 </span>
               </div>
               <Link href="/me">
@@ -140,8 +145,8 @@ export function Header() {
                       </span>
                     )}
                   </div>
-                  {selectedTitle && (
-                    <span className="text-xs text-muted-foreground">{selectedTitle}</span>
+                  {selectedTitleLabel && (
+                    <span className="text-xs text-muted-foreground">{selectedTitleLabel}</span>
                   )}
                 </div>
               </Link>

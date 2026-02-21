@@ -19,7 +19,7 @@ import { useAuth } from '@/lib/auth';
 import { getUserParticipations, getAllBadges, getUserBadges, getUserChallenges, getUserIdeas, deleteIdeaProposal, updateUser, deleteChallenge, getUserSolutions } from '@/lib/supabase/queries';
 import { formatNameFromEmail } from '@/lib/userName';
 import { localizeChallenge } from '@/lib/supabase/localization';
-import { getEarnedTitles, getThemeTitle } from '@/services/progressionService';
+import { getEarnedTitles, getRequiredXp, getThemeTitle } from '@/services/progressionService';
 import type { Badge as BadgeType, Challenge, Participation, IdeaProposal, Solution } from '@/types/database';
 import { IdeaProposalForm } from '@/components/ideas/IdeaProposalForm';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
@@ -291,7 +291,7 @@ export default function ProfilePage() {
                       <div className="flex flex-wrap gap-4 text-sm">
                         <div className="flex items-center gap-1">
                 <Zap className="h-4 w-4 text-accent-jaune" />
-                <span className="font-semibold">{user.points_totaux} {tCommon('xp')}</span>
+                <span className="font-semibold">Niv {user?.level_global ?? 1} • {Math.max(0, getRequiredXp(user?.level_global ?? 1) - (user?.xp_global ?? 0))} XP restants</span>
               </div>
             </div>
                     </div>
