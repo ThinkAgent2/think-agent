@@ -17,7 +17,7 @@ import {
   Medal, Crown, Rocket, Brain, Loader2
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
-import { getUserParticipations, getAllBadges, getUserBadges, getUserChallenges, getUserIdeas, deleteIdeaProposal, updateUser, deleteChallenge, getUserSolutions, getLeaderboard } from '@/lib/supabase/queries';
+import { getUserParticipations, getAllBadges, getUserBadges, getUserChallenges, getUserIdeas, deleteIdeaProposal, updateUser, deleteChallenge, getUserSolutions, getLeaderboard, getUserRankAndTotal } from '@/lib/supabase/queries';
 import { formatNameFromEmail } from '@/lib/userName';
 import { localizeChallenge } from '@/lib/supabase/localization';
 import { getEarnedTitles, getLevelProgress, getThemeTitle } from '@/services/progressionService';
@@ -56,6 +56,7 @@ export default function ProfilePage() {
   const [allBadges, setAllBadges] = useState<BadgeType[]>([]);
   const [userBadges, setUserBadges] = useState<BadgeType[]>([]);
   const [globalLeaderboard, setGlobalLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [rankInfo, setRankInfo] = useState<{ rank: number; total: number } | null>(null);
   const [proposedChallenges, setProposedChallenges] = useState<Challenge[]>([]);
   const [myIdeas, setMyIdeas] = useState<IdeaProposal[]>([]);
   const [editingIdea, setEditingIdea] = useState<IdeaProposal | null>(null);
@@ -89,7 +90,7 @@ export default function ProfilePage() {
 
       setIsLoading(true);
       try {
-        const [participationsData, allBadgesData, userBadgesData, proposedChallengesData, myIdeasData, solutionsData, leaderboardData] = await Promise.all([
+        const [participationsData, allBadgesData, userBadgesData, proposedChallengesData, myIdeasData, solutionsData, leaderboardData, rankData] = await Promise.all([
           getUserParticipations(user.id),
           getAllBadges(locale),
           getUserBadges(user.id, locale),
@@ -97,6 +98,7 @@ export default function ProfilePage() {
           getUserIdeas(user.id),
           getUserSolutions(user.id),
           getLeaderboard(10),
+          getUserRankAndTotal(user.id, user.points_totaux),
         ]);
 
         const localizedParticipations = participationsData.map((participation) => ({
@@ -116,6 +118,7 @@ export default function ProfilePage() {
           setSelectedTitle(user.selected_title || null);
           setSolutions(solutionsData);
           setGlobalLeaderboard(leaderboardData);
+          setRankInfo(rankData);
         }
       } finally {
         if (!isCancelled) {
@@ -304,6 +307,11 @@ export default function ProfilePage() {
               <Progress value={Math.round(levelProgress.progress * 100)} className="h-2" />
               <div className="mt-1 text-xs text-muted-foreground">{Math.round(levelProgress.progress * 100)}% vers niveau {levelProgress.level + 1}</div>
             </div>
+            {rankInfo && (
+              <div className="text-xs text-muted-foreground mt-2">
+                Classement total : {rankInfo.rank} / {rankInfo.total}
+              </div>
+            )}
                     </div>
                   </div>
 

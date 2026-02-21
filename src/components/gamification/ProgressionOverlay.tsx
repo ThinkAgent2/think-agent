@@ -72,7 +72,7 @@ export function ProgressionOverlayProvider({ children }: { children: React.React
               initial={{ opacity: 0, y: -20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              className={`pointer-events-none rounded-2xl bg-card/90 border px-6 py-4 shadow-2xl backdrop-blur relative overflow-visible min-h-[96px] ${event.type === 'title' && event.title.includes('Maître') ? 'border-orange-300/60 shadow-[0_0_45px_rgba(255,150,0,0.55)]' : 'border-border'}`}
+              className={`pointer-events-none rounded-2xl bg-card/90 border px-6 py-4 shadow-xl backdrop-blur relative overflow-visible min-h-[96px] ${event.type === 'title' && event.title.includes('Maître') ? 'border-orange-300/60' : 'border-border'}`}
             >
               <div className="text-sm uppercase tracking-wide text-accent-jaune">{event.type}</div>
               <div className="text-lg font-semibold">{event.title}</div>
@@ -83,7 +83,8 @@ export function ProgressionOverlayProvider({ children }: { children: React.React
                   animate={{ scale: 1.15, opacity: 1 }}
                   transition={{ duration: 0.4 }}
                 >
-                  <motion.div animate={{ scale: [1, 1.1, 1], rotate: [-2, 2, -2] }} transition={{ repeat: Infinity, duration: 1.2 }}><FlameIcon className="h-16 w-16 drop-shadow-[0_0_24px_rgba(255,140,0,0.9)]" /></motion.div>
+                  <motion.div animate={{ scale: [1, 1.1, 1], rotate: [-2, 2, -2] }} transition={{ repeat: Infinity, duration: 1.2 }}><span className="absolute inset-0 -z-10 rounded-full bg-orange-400/30 blur-xl" />
+                  <FlameIcon className="h-16 w-16 drop-shadow-[0_0_18px_rgba(255,140,0,0.8)]" /></motion.div>
                 </motion.div>
               )}
               {event.type === 'streak' && (
@@ -93,7 +94,8 @@ export function ProgressionOverlayProvider({ children }: { children: React.React
                   animate={{ scale: 1.15, opacity: 1 }}
                   transition={{ duration: 0.4 }}
                 >
-                  <motion.div animate={{ scale: [1, 1.1, 1], rotate: [-2, 2, -2] }} transition={{ repeat: Infinity, duration: 1.2 }}><FlameIcon className="h-16 w-16 drop-shadow-[0_0_24px_rgba(255,140,0,0.9)]" /></motion.div>
+                  <motion.div animate={{ scale: [1, 1.1, 1], rotate: [-2, 2, -2] }} transition={{ repeat: Infinity, duration: 1.2 }}><span className="absolute inset-0 -z-10 rounded-full bg-orange-400/30 blur-xl" />
+                  <FlameIcon className="h-16 w-16 drop-shadow-[0_0_18px_rgba(255,140,0,0.8)]" /></motion.div>
                 </motion.div>
               )}
               {event.description && (

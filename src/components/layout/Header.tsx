@@ -6,7 +6,6 @@ import { Link, usePathname } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Zap, Calendar, User, LogOut, Trophy, Award } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -120,10 +119,7 @@ export function Header() {
                 <Badge className={levelColors[user.niveau_actuel] || levelColors.Explorer}>
                   {user.niveau_actuel}
                 </Badge>
-                <span className="text-xs text-muted-foreground">Niveau {levelProgress.level}</span>
-                <div className="w-20">
-                  <Progress value={Math.round(levelProgress.progress * 100)} className="h-1" />
-                </div>
+                <span className="text-xs font-semibold text-accent-cyan">Niveau {levelProgress.level}</span>
               </div>
               <Link href="/me">
                 <div className="flex items-center gap-2">
