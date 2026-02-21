@@ -279,6 +279,8 @@
     "legendaryHidden": "Description masquée",
     "badgePrimary": "Badge principal",
     "badgeSecondary": "Badge secondaire",
+    "badgeSelect": "Badges affichés",
+    "badgeSelectHint": "Clique un badge pour le définir comme principal (1) puis un second pour le secondaire (2).",
     "selectBadge": "Choisir",
     "clearBadge": "Retirer",
     "selectTitle": "Titre affiché",

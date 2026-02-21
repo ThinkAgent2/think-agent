@@ -10,9 +10,9 @@ interface ThemeProgressCirclesProps {
 }
 
 const circleConfig = [
-  { key: 'Explorer', color: 'text-accent-vert', bg: 'bg-accent-vert/10' },
-  { key: 'Crafter', color: 'text-exalt-blue', bg: 'bg-exalt-blue/10' },
-  { key: 'Architecte', color: 'text-accent-rose', bg: 'bg-accent-rose/10' },
+  { key: 'Explorer', color: 'text-accent-vert', bg: 'bg-accent-vert/10', fill: '#72F39A' },
+  { key: 'Crafter', color: 'text-exalt-blue', bg: 'bg-exalt-blue/10', fill: '#2BD3FF' },
+  { key: 'Architecte', color: 'text-accent-rose', bg: 'bg-accent-rose/10', fill: '#FF77C8' },
 ] as const;
 
 export function ThemeProgressCircles({ explorerCount, crafterCount, architectCount }: ThemeProgressCirclesProps) {
@@ -30,6 +30,7 @@ export function ThemeProgressCircles({ explorerCount, crafterCount, architectCou
         const { progress, nextTarget } = getThemeProgress(count);
         const title = getThemeTitle(count);
         const percent = Math.round(progress * 100);
+        const fill = circle.fill;
         return (
           <div key={circle.key} className={`rounded-xl border border-border p-4 ${circle.bg}`}>
             <div className="flex items-center justify-between">
@@ -37,18 +38,18 @@ export function ThemeProgressCircles({ explorerCount, crafterCount, architectCou
                 <p className="text-sm text-muted-foreground">{t(`circle.${circle.key}`)}</p>
                 <p className={`text-2xl font-semibold ${circle.color}`}>{title}</p>
               </div>
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground">{t('circle.progress')}</p>
-                <p className="text-lg font-semibold">{percent}%</p>
+              <div
+                className="h-16 w-16 rounded-full flex items-center justify-center text-sm font-semibold"
+                style={{
+                  background: `conic-gradient(${fill} ${percent}%, hsl(var(--muted)) 0%)`,
+                }}
+              >
+                <span className="h-12 w-12 rounded-full bg-background flex items-center justify-center">
+                  {percent}%
+                </span>
               </div>
             </div>
-            <div className="mt-3 h-2 w-full rounded-full bg-muted">
-              <div
-                className={`h-2 rounded-full ${circle.color.replace('text-', 'bg-')}`}
-                style={{ width: `${percent}%` }}
-              />
-            </div>
-            <p className="mt-2 text-xs text-muted-foreground">
+            <p className="mt-3 text-xs text-muted-foreground">
               {nextTarget ? t('circle.next', { count: nextTarget }) : t('circle.max')}
             </p>
           </div>
@@ -57,3 +58,4 @@ export function ThemeProgressCircles({ explorerCount, crafterCount, architectCou
     </div>
   );
 }
+

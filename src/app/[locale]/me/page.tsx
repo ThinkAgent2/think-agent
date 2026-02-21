@@ -12,17 +12,16 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from '@/components/ui/avatar';
-import { Input } from '@/components/ui/input';
 import { 
-  Trophy, Zap, Target, Clock, CheckCircle, XCircle,
+  Zap, Clock, CheckCircle, XCircle,
   Medal, Crown, Rocket, Brain, Loader2
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
-import { getUserParticipations, getAllBadges, getUserBadges, getLeaderboard, getLeaderboardRecent, searchUsers, getUserChallenges, getUserIdeas, deleteIdeaProposal, updateUser, deleteChallenge, getUserRankAndTotal, getUserSolutions } from '@/lib/supabase/queries';
+import { getUserParticipations, getAllBadges, getUserBadges, getUserChallenges, getUserIdeas, deleteIdeaProposal, updateUser, deleteChallenge, getUserSolutions } from '@/lib/supabase/queries';
 import { formatNameFromEmail } from '@/lib/userName';
 import { localizeChallenge } from '@/lib/supabase/localization';
 import { getEarnedTitles, getThemeTitle } from '@/services/progressionService';
-import type { Badge as BadgeType, Challenge, Participation, LeaderboardEntry, IdeaProposal, Solution } from '@/types/database';
+import type { Badge as BadgeType, Challenge, Participation, IdeaProposal, Solution } from '@/types/database';
 import { IdeaProposalForm } from '@/components/ideas/IdeaProposalForm';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
 import { ThemeProgressCircles } from '@/components/gamification/ThemeProgressCircles';
@@ -57,12 +56,6 @@ export default function ProfilePage() {
   const [participations, setParticipations] = useState<(Participation & { challenge?: Challenge })[]>([]);
   const [allBadges, setAllBadges] = useState<BadgeType[]>([]);
   const [userBadges, setUserBadges] = useState<BadgeType[]>([]);
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [leaderboardRecent, setLeaderboardRecent] = useState<LeaderboardEntry[]>([]);
-  const [leaderboardScope, setLeaderboardScope] = useState<'global' | 'recent' | 'entite' | 'cercle'>('global');
-  const [userSearchTerm, setUserSearchTerm] = useState('');
-  const [userSearchResults, setUserSearchResults] = useState<Array<{ id: string; nom: string; email: string }>>([]);
-  const [isSearchingUsers, setIsSearchingUsers] = useState(false);
   const [proposedChallenges, setProposedChallenges] = useState<Challenge[]>([]);
   const [myIdeas, setMyIdeas] = useState<IdeaProposal[]>([]);
   const [editingIdea, setEditingIdea] = useState<IdeaProposal | null>(null);
@@ -71,13 +64,11 @@ export default function ProfilePage() {
   const [selectedSecondaryBadge, setSelectedSecondaryBadge] = useState<string | null>(null);
   const [selectedTitle, setSelectedTitle] = useState<string | null>(null);
   const [isUpdatingBadge, setIsUpdatingBadge] = useState(false);
-  const [rankInfo, setRankInfo] = useState<{ rank: number; total: number } | null>(null);
   const [solutions, setSolutions] = useState<Solution[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const t = useTranslations('profile');
   const tBadges = useTranslations('badges');
-  const tLeaderboard = useTranslations('leaderboard');
   const tCommon = useTranslations('common');
   const tChallenges = useTranslations('challenges.card');
   const tIdeas = useTranslations('ideas');
@@ -98,15 +89,12 @@ export default function ProfilePage() {
 
       setIsLoading(true);
       try {
-        const [participationsData, allBadgesData, userBadgesData, leaderboardData, leaderboardRecentData, proposedChallengesData, myIdeasData, rankData, solutionsData] = await Promise.all([
+        const [participationsData, allBadgesData, userBadgesData, proposedChallengesData, myIdeasData, solutionsData] = await Promise.all([
           getUserParticipations(user.id),
           getAllBadges(locale),
           getUserBadges(user.id, locale),
-          getLeaderboard(10),
-          getLeaderboardRecent(10),
           getUserChallenges(user.id),
           getUserIdeas(user.id),
-          getUserRankAndTotal(user.id, user.points_totaux),
           getUserSolutions(user.id),
         ]);
 
@@ -119,15 +107,12 @@ export default function ProfilePage() {
           setParticipations(localizedParticipations);
           setAllBadges(allBadgesData);
           setUserBadges(userBadgesData);
-          setLeaderboard(leaderboardData);
-          setLeaderboardRecent(leaderboardRecentData);
           setProposedChallenges(proposedChallengesData);
           setMyIdeas(myIdeasData);
           setFeaturedBadgeId(user.featured_badge_id || null);
           setSelectedPrimaryBadge(user.selected_badge_primary || null);
           setSelectedSecondaryBadge(user.selected_badge_secondary || null);
           setSelectedTitle(user.selected_title || null);
-          setRankInfo(rankData);
           setSolutions(solutionsData);
         }
       } finally {
@@ -143,30 +128,6 @@ export default function ProfilePage() {
     };
   }, [user, locale]);
 
-  useEffect(() => {
-    let isCancelled = false;
-
-    async function runSearch() {
-      const trimmed = userSearchTerm.trim();
-      if (!trimmed) {
-        setUserSearchResults([]);
-        return;
-      }
-
-      setIsSearchingUsers(true);
-      const results = await searchUsers(trimmed, 5);
-      if (!isCancelled) {
-        setUserSearchResults(results);
-        setIsSearchingUsers(false);
-      }
-    }
-
-    const timer = setTimeout(runSearch, 250);
-    return () => {
-      isCancelled = true;
-      clearTimeout(timer);
-    };
-  }, [userSearchTerm]);
 
   if (authLoading || !user) {
     return (
@@ -334,20 +295,6 @@ export default function ProfilePage() {
                 <Zap className="h-4 w-4 text-accent-jaune" />
                 <span className="font-semibold">{user.points_totaux} {tCommon('xp')}</span>
               </div>
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                <CheckCircle className="h-4 w-4" />
-                <span>{completed.length} {t('challengesCompleted')}</span>
-              </div>
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                <Target className="h-4 w-4" />
-                <span>{inProgress.length} {t('inProgress')}</span>
-              </div>
-              {rankInfo && (
-                          <div className="flex items-center gap-1 text-muted-foreground">
-                  <Trophy className="h-4 w-4 text-accent-jaune" />
-                  <span>{tLeaderboard('globalRank', { rank: rankInfo.rank, total: rankInfo.total })}</span>
-                </div>
-              )}
             </div>
                     </div>
                   </div>
@@ -793,118 +740,7 @@ export default function ProfilePage() {
                 </CardContent>
               </Card>
 
-              {/* Leaderboard */}
-              <Card>
-                <CardHeader className="pb-3">
-                            <div className="flex items-start justify-between gap-3">
-                              <div>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-accent-jaune" />
-              {tLeaderboard('title')}
-            </CardTitle>
-            <CardDescription>
-              {leaderboardScope === 'global'
-                ? tLeaderboard('global')
-                : leaderboardScope === 'recent'
-                ? tLeaderboard('recent')
-                : leaderboardScope === 'entite'
-                ? tLeaderboard('entity')
-                : tLeaderboard('circle')}
-            </CardDescription>
-                    </div>
-                    <select
-            value={leaderboardScope}
-            onChange={(event) => setLeaderboardScope(event.target.value as 'global' | 'recent' | 'entite' | 'cercle')}
-            className="rounded-md border border-border bg-background px-2 py-1 text-xs text-muted-foreground focus:border-accent-cyan focus:outline-none"
-                    >
-            <option value="global">{tLeaderboard('scope.global')}</option>
-            <option value="recent">{tLeaderboard('scope.recent')}</option>
-            <option value="entite">{tLeaderboard('scope.entity')}</option>
-            <option value="cercle">{tLeaderboard('scope.circle')}</option>
-                    </select>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                            <div className="mb-4">
-                    <Input
-            value={userSearchTerm}
-            onChange={(event) => setUserSearchTerm(event.target.value)}
-            placeholder={tLeaderboard('searchUser')}
-            className="bg-background border-border focus:border-accent-cyan"
-                    />
-                    {userSearchTerm.trim().length > 0 && (
-                      <div className="mt-2 rounded-lg border border-border bg-card p-2 space-y-1">
-              {isSearchingUsers ? (
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground px-2 py-1">
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                  {tLeaderboard('searching')}
-                </div>
-              ) : userSearchResults.length === 0 ? (
-                          <div className="text-xs text-muted-foreground px-2 py-1">
-                  {tCommon('noResults')}
-                </div>
-              ) : (
-                userSearchResults.map((result) => (
-                  <Link
-                    key={result.id}
-                    href={`/users/${result.id}`}
-                    className="flex items-center justify-between gap-2 rounded-md px-2 py-1 text-sm hover:bg-accent-cyan/10"
-                  >
-                    <span className="font-medium truncate">{result.nom}</span>
-                    <span className="text-xs text-muted-foreground truncate">{result.email}</span>
-                  </Link>
-                ))
-              )}
-            </div>
-                    )}
-                  </div>
-
-                  {isLoading ? (
-                              <div className="flex justify-center py-4">
-            <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
-                    </div>
-                  ) : (leaderboardScope === 'recent' ? leaderboardRecent : leaderboard).length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-4">
-            {tLeaderboard('noRanking')}
-                    </p>
-                  ) : (
-                              <div className="space-y-2">
-            {(leaderboardScope === 'recent' ? leaderboardRecent : leaderboard).map((entry, index) => {
-              const isCurrentUser = entry.user_id === user.id;
-              const href = isCurrentUser ? '/me' : `/users/${entry.user_id}`;
-              return (
-                <Link
-                  key={entry.user_id}
-                  href={href}
-                  className={`flex items-center gap-3 p-2 rounded-lg transition-colors hover:border hover:border-accent-cyan ${
-                    isCurrentUser ? 'bg-exalt-blue/20 border border-exalt-blue/50' : ''
-                  }`}
-                >
-                  <span className={`w-6 text-center font-bold ${
-                    index === 0 ? 'text-accent-jaune' :
-                    index === 1 ? 'text-gray-400' :
-                    index === 2 ? 'text-amber-600' :
-                    'text-muted-foreground'
-                  }`}>
-                    {index < 3 ? ['🥇', '🥈', '🥉'][index] : entry.rank}
-                  </span>
-                            <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate text-sm">
-                      {entry.nom}
-                      {isCurrentUser && <span className="text-exalt-blue ml-1">{tLeaderboard('you')}</span>}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{entry.marque || '-'}</p>
-                  </div>
-                  <span className="text-sm font-semibold text-accent-jaune">
-                    {leaderboardScope === 'recent' ? entry.points_30j ?? 0 : entry.points_totaux}
-                  </span>
-                </Link>
-              );
-            })}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+              
             </div>
           </div>
         </div>
