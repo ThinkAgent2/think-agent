@@ -6,6 +6,7 @@ import { Link, usePathname } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { Zap, Calendar, User, LogOut, Trophy, Award } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { LanguageSwitcher } from './LanguageSwitcher';
