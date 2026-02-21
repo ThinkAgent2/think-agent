@@ -203,11 +203,16 @@ export default function ProfilePage() {
 
   const handleSelectedBadgeChange = async (primary: string | null, secondary: string | null) => {
     if (!user) return;
+    const prevPrimary = selectedPrimaryBadge;
+    const prevSecondary = selectedSecondaryBadge;
+    setSelectedPrimaryBadge(primary);
+    setSelectedSecondaryBadge(secondary);
     setIsUpdatingBadge(true);
     const updated = await updateUser(user.id, { selected_badge_primary: primary, selected_badge_secondary: secondary });
-    if (updated) {
-      setSelectedPrimaryBadge(primary);
-      setSelectedSecondaryBadge(secondary);
+    if (!updated) {
+      setSelectedPrimaryBadge(prevPrimary);
+      setSelectedSecondaryBadge(prevSecondary);
+    } else {
       await refreshUser();
     }
     setIsUpdatingBadge(false);

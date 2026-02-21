@@ -64,40 +64,64 @@ export default function ClassementPage() {
               {scope === 'global' && (
                 <section>
                   <h2 className="text-xl font-semibold mb-4">{t('global')}</h2>
-                  <Podium entries={globalTop3} />
-                  <div className="mt-4">
-                    <LeaderboardList entries={globalRest} />
-                  </div>
+                  {global.length === 0 ? (
+                    <p className="text-muted-foreground">{t('noRanking')}</p>
+                  ) : (
+                    <>
+                      <Podium entries={globalTop3} />
+                      <div className="mt-4">
+                        <LeaderboardList entries={globalRest} />
+                      </div>
+                    </>
+                  )}
                 </section>
               )}
 
               {scope === 'league' && (
                 <section>
                   <h2 className="text-xl font-semibold mb-4">{t('league')}</h2>
-                  <Podium entries={leagueTop3} />
-                  <div className="mt-4">
-                    <LeaderboardList entries={leagueRest} />
-                  </div>
+                  {league.length === 0 ? (
+                    <p className="text-muted-foreground">{t('noRanking')}</p>
+                  ) : (
+                    <>
+                      <Podium entries={leagueTop3} />
+                      <div className="mt-4">
+                        <LeaderboardList entries={leagueRest} />
+                      </div>
+                    </>
+                  )}
                 </section>
               )}
 
               {scope === 'circle' && (
                 <section>
                   <h2 className="text-xl font-semibold mb-4">{t('themes')}</h2>
-                  <Podium entries={globalTop3} />
-                  <div className="mt-4">
-                    <LeaderboardList entries={globalRest} />
-                  </div>
+                  {global.length === 0 ? (
+                    <p className="text-muted-foreground">{t('noRanking')}</p>
+                  ) : (
+                    <>
+                      <Podium entries={globalTop3} />
+                      <div className="mt-4">
+                        <LeaderboardList entries={globalRest} />
+                      </div>
+                    </>
+                  )}
                 </section>
               )}
 
               {scope === 'entity' && (
                 <section>
                   <h2 className="text-xl font-semibold mb-4">{t('entity')}</h2>
-                  <Podium entries={globalTop3} />
-                  <div className="mt-4">
-                    <LeaderboardList entries={globalRest} />
-                  </div>
+                  {global.length === 0 ? (
+                    <p className="text-muted-foreground">{t('noRanking')}</p>
+                  ) : (
+                    <>
+                      <Podium entries={globalTop3} />
+                      <div className="mt-4">
+                        <LeaderboardList entries={globalRest} />
+                      </div>
+                    </>
+                  )}
                 </section>
               )}
             </div>

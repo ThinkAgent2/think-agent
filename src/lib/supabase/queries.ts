@@ -611,6 +611,10 @@ export async function getLeaderboard(limit: number = 10): Promise<LeaderboardEnt
     return [];
   }
 
+  if (!data) {
+    console.warn('Leaderboard: no data returned');
+  }
+
   // Pour simplifier, on ne fait pas de join pour le nom de marque dans le MVP
   return (data || []).map((user, index) => {
     const inferredName = formatNameFromEmail(user.email);
