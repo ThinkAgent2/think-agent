@@ -32,6 +32,7 @@ export function Podium({ entries }: PodiumProps) {
               size={56}
               src={(entry as { avatar_url?: string | null }).avatar_url || null}
               alt={entry.nom}
+              streakDays={(entry as { current_streak?: number | null }).current_streak || null}
             />
             <div className="mt-3 text-lg font-semibold">{entry.nom}</div>
             <div className="text-xs text-muted-foreground">{entry.niveau_actuel}</div>

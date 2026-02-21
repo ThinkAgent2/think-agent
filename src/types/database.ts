@@ -229,4 +229,5 @@ export interface LeaderboardEntry {
   selected_badge_secondary?: string | null;
   selected_title?: string | null;
   avatar_url?: string | null;
+  current_streak?: number | null;
 }

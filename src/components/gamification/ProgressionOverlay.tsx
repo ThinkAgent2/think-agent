@@ -58,10 +58,16 @@ export function ProgressionOverlayProvider({ children }: { children: React.React
               initial={{ opacity: 0, y: -20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              className="pointer-events-none rounded-xl bg-card border border-border px-6 py-4 shadow-xl"
+              className="pointer-events-none rounded-xl bg-card border border-border px-6 py-4 shadow-xl relative overflow-hidden"
             >
               <div className="text-sm uppercase tracking-wide text-accent-jaune">{event.type}</div>
               <div className="text-lg font-semibold">{event.title}</div>
+              {event.type === 'title' && event.title.includes('Maître') && (
+                <div className="absolute -top-2 -right-2 text-orange-400 animate-pulse">🔥</div>
+              )}
+              {event.type === 'streak' && (
+                <div className="absolute -top-2 -left-2 text-orange-400 animate-bounce">🔥</div>
+              )}
               {event.description && (
                 <div className="text-sm text-muted-foreground">{event.description}</div>
               )}

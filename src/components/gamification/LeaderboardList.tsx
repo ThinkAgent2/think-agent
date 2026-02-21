@@ -19,6 +19,7 @@ export function LeaderboardList({ entries }: LeaderboardListProps) {
               size={36}
               src={(entry as { avatar_url?: string | null }).avatar_url || null}
               alt={entry.nom}
+              streakDays={(entry as { current_streak?: number | null }).current_streak || null}
             />
             <div>
               <div className="font-medium">{entry.nom}</div>

@@ -16,15 +16,16 @@ interface AvatarWithLeagueBorderProps {
   alt?: string;
   size?: number;
   league?: string | null;
+  streakDays?: number | null;
   className?: string;
 }
 
-export function AvatarWithLeagueBorder({ src, alt, size = 44, league, className }: AvatarWithLeagueBorderProps) {
+export function AvatarWithLeagueBorder({ src, alt, size = 44, league, streakDays, className }: AvatarWithLeagueBorderProps) {
   const wrapperClass = league ? leagueStyles[league] || 'border-border' : 'border-border';
 
   return (
     <div
-      className={cn('rounded-full border-2 bg-background', wrapperClass, className)}
+      className={cn('rounded-full border-2 bg-background relative', wrapperClass, className)}
       style={{ width: size, height: size }}
     >
       <img
@@ -32,6 +33,9 @@ export function AvatarWithLeagueBorder({ src, alt, size = 44, league, className 
         alt={alt || 'Avatar'}
         className="h-full w-full rounded-full object-cover"
       />
+      {typeof streakDays === 'number' && streakDays >= 5 && (
+        <span className="absolute -top-2 right-0 text-sm" title={`Streak ${streakDays} jours`}>🔥</span>
+      )}
     </div>
   );
 }
