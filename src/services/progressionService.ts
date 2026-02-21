@@ -155,7 +155,7 @@ export async function checkAndUnlockBadges(userId: string): Promise<Badge[]> {
     .eq('id', userId)
     .single();
 
-  if (!user) return null;
+  if (!user) return [];
 
   const shouldAward = (badge: Badge) => {
     const conditions = (badge.condition_json || badge.conditions) as Record<string, unknown> | null;
