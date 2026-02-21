@@ -243,15 +243,20 @@ export default function ProfilePage() {
                 <CardContent className="pt-6">
                             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
                               <div className="flex flex-col items-start gap-3">
-            <Avatar className="h-20 w-20">
+            <Avatar className="h-20 w-20 relative">
               {user.avatar_url && <AvatarImage src={user.avatar_url} alt={displayName} />}
               <AvatarFallback className="bg-exalt-blue text-white text-2xl">
                 {user.nom?.split(' ').map(n => n[0]).join('') || user.email[0].toUpperCase()}
               </AvatarFallback>
-              {featuredBadgeId && (
+              {selectedPrimaryBadge && (
                 <AvatarBadge className="text-3xl size-12">
-                  {badgesWithStatus.find((badge) => badge.id === featuredBadgeId)?.emoji || '🏅'}
+                  {badgesWithStatus.find((badge) => badge.id === selectedPrimaryBadge)?.emoji || '🏅'}
                 </AvatarBadge>
+              )}
+              {selectedSecondaryBadge && (
+                <span className="absolute -bottom-1 -left-1 h-6 w-6 rounded-full bg-background border border-border flex items-center justify-center text-base">
+                  {badgesWithStatus.find((badge) => badge.id === selectedSecondaryBadge)?.emoji || '⭐'}
+                </span>
               )}
             </Avatar>
             <AvatarUpload
@@ -661,8 +666,10 @@ export default function ProfilePage() {
                                 className={`flex flex-col items-center p-3 rounded-lg border transition-all ${
                                   disabled
                                     ? 'border-border opacity-40'
-                                    : isPrimary || isSecondary
+                                    : isPrimary
                                     ? 'border-accent-cyan ring-1 ring-accent-cyan/40'
+                                    : isSecondary
+                                    ? 'border-accent-rose ring-1 ring-accent-rose/40'
                                     : 'border-border'
                                 }`}
                               >
