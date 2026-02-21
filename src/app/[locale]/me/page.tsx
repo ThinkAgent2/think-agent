@@ -142,6 +142,9 @@ export default function ProfilePage() {
   const LevelIcon = config.icon;
   const sanitizedName = user.nom && user.nom !== 'Anonyme' ? user.nom : null;
   const displayName = sanitizedName || formatNameFromEmail(user.email) || 'Anonyme';
+  const selectedTitleLabel = selectedTitle || user.niveau_actuel;
+  const titleKey = selectedTitleLabel.split(' ')[0];
+  const titleColor = titleKey === 'Explorer' ? 'bg-accent-vert text-black' : titleKey === 'Crafter' ? 'bg-exalt-blue text-white' : titleKey === 'Architecte' ? 'bg-accent-rose text-white' : levelConfig[user.niveau_actuel]?.color || levelConfig.Explorer.color;
   
   const inProgress = participations.filter(p => p.statut === 'En_cours');
 
@@ -277,9 +280,9 @@ export default function ProfilePage() {
                               <div className="flex-1">
                       <div className="flex flex-wrap items-center gap-3 mb-2">
               <h1 className="text-2xl font-bold">{displayName}</h1>
-              <Badge className={config.color}>
+              <Badge className={titleColor}>
                 <LevelIcon className="h-3 w-3 mr-1" />
-                {user.niveau_actuel}
+                {selectedTitleLabel}
               </Badge>
             </div>
             

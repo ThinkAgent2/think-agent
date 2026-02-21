@@ -65,7 +65,7 @@ export function ProgressionOverlayProvider({ children }: { children: React.React
               initial={{ opacity: 0, y: -20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              className="pointer-events-none rounded-xl bg-card border border-border px-6 py-4 shadow-xl relative overflow-visible min-h-[88px]"
+              className={`pointer-events-none rounded-xl bg-card border px-6 py-4 shadow-xl relative overflow-visible min-h-[88px] ${event.type === 'title' && event.title.includes('Maître') ? 'border-orange-400/60 shadow-[0_0_25px_rgba(255,140,0,0.45)]' : 'border-border'}`}
             >
               <div className="text-sm uppercase tracking-wide text-accent-jaune">{event.type}</div>
               <div className="text-lg font-semibold">{event.title}</div>
@@ -76,7 +76,7 @@ export function ProgressionOverlayProvider({ children }: { children: React.React
                   animate={{ scale: 1.15, opacity: 1 }}
                   transition={{ duration: 0.4 }}
                 >
-                  <FlameIcon className="h-12 w-12" />
+                  <motion.div animate={{ scale: [1, 1.1, 1], rotate: [-2, 2, -2] }} transition={{ repeat: Infinity, duration: 1.2 }}><FlameIcon className="h-12 w-12 drop-shadow-[0_0_12px_rgba(255,120,0,0.8)]" /></motion.div>
                 </motion.div>
               )}
               {event.type === 'streak' && (
@@ -86,7 +86,7 @@ export function ProgressionOverlayProvider({ children }: { children: React.React
                   animate={{ scale: 1.15, opacity: 1 }}
                   transition={{ duration: 0.4 }}
                 >
-                  <FlameIcon className="h-12 w-12" />
+                  <motion.div animate={{ scale: [1, 1.1, 1], rotate: [-2, 2, -2] }} transition={{ repeat: Infinity, duration: 1.2 }}><FlameIcon className="h-12 w-12 drop-shadow-[0_0_12px_rgba(255,120,0,0.8)]" /></motion.div>
                 </motion.div>
               )}
               {event.description && (
