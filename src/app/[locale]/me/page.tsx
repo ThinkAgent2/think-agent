@@ -293,77 +293,77 @@ export default function ProfilePage() {
         <div className="container mx-auto px-4">
           <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
             {/* Main content */}
-            <div className="space-y-8">
+                                <div className="space-y-8">
               {/* Profile header */}
               <Card>
                 <CardContent className="pt-6">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                    <div className="flex flex-col items-start gap-3">
-                      <Avatar className="h-20 w-20">
-                        {user.avatar_url && <AvatarImage src={user.avatar_url} alt={displayName} />}
-                        <AvatarFallback className="bg-exalt-blue text-white text-2xl">
-                          {user.nom?.split(' ').map(n => n[0]).join('') || user.email[0].toUpperCase()}
-                        </AvatarFallback>
-                        {featuredBadgeId && (
-                          <AvatarBadge className="text-3xl size-12">
-                            {badgesWithStatus.find((badge) => badge.id === featuredBadgeId)?.emoji || '🏅'}
-                          </AvatarBadge>
-                        )}
-                      </Avatar>
-                      <AvatarUpload
-                        user={user}
-                        onUpdated={(updated) => {
-                          setFeaturedBadgeId(updated.featured_badge_id || null);
-                        }}
-                      />
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                              <div className="flex flex-col items-start gap-3">
+            <Avatar className="h-20 w-20">
+              {user.avatar_url && <AvatarImage src={user.avatar_url} alt={displayName} />}
+              <AvatarFallback className="bg-exalt-blue text-white text-2xl">
+                {user.nom?.split(' ').map(n => n[0]).join('') || user.email[0].toUpperCase()}
+              </AvatarFallback>
+              {featuredBadgeId && (
+                <AvatarBadge className="text-3xl size-12">
+                  {badgesWithStatus.find((badge) => badge.id === featuredBadgeId)?.emoji || '🏅'}
+                </AvatarBadge>
+              )}
+            </Avatar>
+            <AvatarUpload
+              user={user}
+              onUpdated={(updated) => {
+                setFeaturedBadgeId(updated.featured_badge_id || null);
+              }}
+            />
                     </div>
 
-                    <div className="flex-1">
+                              <div className="flex-1">
                       <div className="flex flex-wrap items-center gap-3 mb-2">
-                        <h1 className="text-2xl font-bold">{displayName}</h1>
-                        <Badge className={config.color}>
-                          <LevelIcon className="h-3 w-3 mr-1" />
-                          {user.niveau_actuel}
-                        </Badge>
-                      </div>
-                      
-                      <p className="text-muted-foreground mb-4">{user.email}</p>
-                      
+              <h1 className="text-2xl font-bold">{displayName}</h1>
+              <Badge className={config.color}>
+                <LevelIcon className="h-3 w-3 mr-1" />
+                {user.niveau_actuel}
+              </Badge>
+            </div>
+            
+            <p className="text-muted-foreground mb-4">{user.email}</p>
+            
                       <div className="flex flex-wrap gap-4 text-sm">
                         <div className="flex items-center gap-1">
-                          <Zap className="h-4 w-4 text-accent-jaune" />
-                          <span className="font-semibold">{user.points_totaux} {tCommon('xp')}</span>
-                        </div>
+                <Zap className="h-4 w-4 text-accent-jaune" />
+                <span className="font-semibold">{user.points_totaux} {tCommon('xp')}</span>
+              </div>
                         <div className="flex items-center gap-1 text-muted-foreground">
-                          <CheckCircle className="h-4 w-4" />
-                          <span>{completed.length} {t('challengesCompleted')}</span>
-                        </div>
+                <CheckCircle className="h-4 w-4" />
+                <span>{completed.length} {t('challengesCompleted')}</span>
+              </div>
                         <div className="flex items-center gap-1 text-muted-foreground">
-                          <Target className="h-4 w-4" />
-                          <span>{inProgress.length} {t('inProgress')}</span>
-                        </div>
-                        {rankInfo && (
+                <Target className="h-4 w-4" />
+                <span>{inProgress.length} {t('inProgress')}</span>
+              </div>
+              {rankInfo && (
                           <div className="flex items-center gap-1 text-muted-foreground">
-                            <Trophy className="h-4 w-4 text-accent-jaune" />
-                            <span>{tLeaderboard('globalRank', { rank: rankInfo.rank, total: rankInfo.total })}</span>
-                          </div>
-                        )}
-                      </div>
+                  <Trophy className="h-4 w-4 text-accent-jaune" />
+                  <span>{tLeaderboard('globalRank', { rank: rankInfo.rank, total: rankInfo.total })}</span>
+                </div>
+              )}
+            </div>
                     </div>
                   </div>
 
                   {/* Progression par niveau */}
-                  <div className="mt-6 pt-6 border-t border-border space-y-4">
+                            <div className="mt-6 pt-6 border-t border-border space-y-4">
                     {(Object.keys(levelThresholds) as Array<keyof typeof levelThresholds>).map((level) => (
                       <div key={level} className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">{level}</span>
-                          <span className="font-medium">
-                            {completedByLevel[level]} / {levelThresholds[level]} challenges
-                          </span>
-                        </div>
-                        <Progress value={levelProgress[level]} className="h-2" />
-                      </div>
+                <span className="text-muted-foreground">{level}</span>
+                <span className="font-medium">
+                  {completedByLevel[level]} / {levelThresholds[level]} challenges
+                </span>
+              </div>
+              <Progress value={levelProgress[level]} className="h-2" />
+            </div>
                     ))}
                   </div>
                 </CardContent>
@@ -372,30 +372,30 @@ export default function ProfilePage() {
               {/* Challenges tabs */}
               <Card>
                 <CardHeader>
-                  <div className="flex items-center justify-between gap-4">
+                            <div className="flex items-center justify-between gap-4">
                     <CardTitle>{t('myChallenges')}</CardTitle>
                     {editingIdea && (
-                      <Button variant="outline" size="sm" onClick={() => setEditingIdea(null)}>
-                        {tCommon('cancel')}
-                      </Button>
+            <Button variant="outline" size="sm" onClick={() => setEditingIdea(null)}>
+              {tCommon('cancel')}
+            </Button>
                     )}
                   </div>
                 </CardHeader>
                 <CardContent>
                   {editingIdea ? (
-                    <div className="space-y-4">
-                      <p className="text-sm text-muted-foreground">{tIdeas('editHint')}</p>
-                      <IdeaProposalForm
-                        authorId={user.id}
-                        existingIdea={editingIdea}
-                        onSuccess={handleIdeaUpdated}
-                      />
+                              <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">{tIdeas('editHint')}</p>
+            <IdeaProposalForm
+              authorId={user.id}
+              existingIdea={editingIdea}
+              onSuccess={handleIdeaUpdated}
+            />
                     </div>
                   ) : (
-                    
-          <div className="mt-6 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card>
+                    <>
+                      <div className="mt-6 space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <Card>
                 <CardHeader>
                   <CardTitle>{t('globalXp')}</CardTitle>
                   <CardDescription>{t('levelGlobal')}: {user?.level_global ?? 1}</CardDescription>
@@ -416,8 +416,8 @@ export default function ProfilePage() {
               </Card>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <Card>
                 <CardHeader>
                   <CardTitle>{t('currentStreak')}</CardTitle>
                   <CardDescription>{t('maxStreak')}: {user?.max_streak ?? 0}</CardDescription>
@@ -431,9 +431,9 @@ export default function ProfilePage() {
                   <CardTitle>{t('titles')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  <div className="text-sm">Explorer: {getThemeTitle(user?.explorer_completed_count ?? 0)}</div>
-                  <div className="text-sm">Crafter: {getThemeTitle(user?.crafter_completed_count ?? 0)}</div>
-                  <div className="text-sm">Architecte: {getThemeTitle(user?.architect_completed_count ?? 0)}</div>
+                            <div className="text-sm">Explorer: {getThemeTitle(user?.explorer_completed_count ?? 0)}</div>
+                            <div className="text-sm">Crafter: {getThemeTitle(user?.crafter_completed_count ?? 0)}</div>
+                            <div className="text-sm">Architecte: {getThemeTitle(user?.architect_completed_count ?? 0)}</div>
                 </CardContent>
               </Card>
             </div>
@@ -453,249 +453,251 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
           </div>
-<Tabs value={activeTab} onValueChange={setActiveTab}>
-                      <TabsList className="mb-4">
-                        <TabsTrigger value="en-cours" className="gap-2">
-                          <Clock className="h-4 w-4" />
-                          {t('tabs.inProgress')} ({inProgress.length})
-                        </TabsTrigger>
-                        <TabsTrigger value="termines" className="gap-2">
-                          <CheckCircle className="h-4 w-4" />
-                          {t('tabs.completed')} ({completed.length})
-                        </TabsTrigger>
-                        <TabsTrigger value="proposes" className="gap-2">
-                          <Medal className="h-4 w-4" />
-                          {t('tabs.proposed')} ({proposedChallenges.length})
-                        </TabsTrigger>
-                        <TabsTrigger value="ideas" className="gap-2">
-                          <Brain className="h-4 w-4" />
-                          {t('tabs.ideas')} ({myIdeas.length})
-                        </TabsTrigger>
-                      </TabsList>
 
-                      <TabsContent value="en-cours" className="space-y-3">
-                        {isLoading ? (
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="mb-4">
+              <TabsTrigger value="en-cours" className="gap-2">
+                <Clock className="h-4 w-4" />
+                {t('tabs.inProgress')} ({inProgress.length})
+              </TabsTrigger>
+              <TabsTrigger value="termines" className="gap-2">
+                <CheckCircle className="h-4 w-4" />
+                {t('tabs.completed')} ({completed.length})
+              </TabsTrigger>
+              <TabsTrigger value="proposes" className="gap-2">
+                <Medal className="h-4 w-4" />
+                {t('tabs.proposed')} ({proposedChallenges.length})
+              </TabsTrigger>
+              <TabsTrigger value="ideas" className="gap-2">
+                <Brain className="h-4 w-4" />
+                {t('tabs.ideas')} ({myIdeas.length})
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="en-cours" className="space-y-3">
+              {isLoading ? (
                           <div className="flex justify-center py-8">
-                            <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
-                          </div>
-                        ) : inProgress.length === 0 ? (
+                  <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
+                </div>
+              ) : inProgress.length === 0 ? (
                           <div className="text-center py-8">
-                            <p className="text-muted-foreground mb-4">
-                              {t('empty.inProgress')}
-                            </p>
-                            <Link href="/challenges">
-                              <Button variant="outline">{t('empty.exploreChallenges')}</Button>
-                            </Link>
-                          </div>
-                        ) : (
-                          inProgress.map(({ challenge, ...participation }) => (
-                            <Link
-                              key={participation.challenge_id}
-                              href={"/challenges/" + participation.challenge_id}
-                              className="block"
-                            >
+                  <p className="text-muted-foreground mb-4">
+                    {t('empty.inProgress')}
+                  </p>
+                  <Link href="/challenges">
+                    <Button variant="outline">{t('empty.exploreChallenges')}</Button>
+                  </Link>
+                </div>
+              ) : (
+                inProgress.map(({ challenge, ...participation }) => (
+                  <Link
+                    key={participation.challenge_id}
+                    href={"/challenges/" + participation.challenge_id}
+                    className="block"
+                  >
                               <div className="flex items-center justify-between p-4 rounded-lg border border-border hover:border-accent-cyan transition-colors">
                                 <div>
-                                  <h4 className="font-medium">{challenge?.titre || 'Challenge'}</h4>
+                        <h4 className="font-medium">{challenge?.titre || 'Challenge'}</h4>
                                   <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
-                                    <Badge variant="outline" className="text-xs">
-                                      {challenge?.niveau_associe}
-                                    </Badge>
-                                    <span className="flex items-center gap-1 text-accent-jaune">
-                                      <Zap className="h-3 w-3" />
-                                      {challenge?.xp} {tCommon('xp')}
-                                    </span>
-                                  </div>
-                                </div>
-                                <Button size="sm" className="bg-accent-cyan hover:bg-accent-cyan/80 text-black">
-                                  {tChallenges('continue')}
-                                </Button>
-                              </div>
-                            </Link>
-                          ))
-                        )}
-                      </TabsContent>
+                          <Badge variant="outline" className="text-xs">
+                            {challenge?.niveau_associe}
+                          </Badge>
+                          <span className="flex items-center gap-1 text-accent-jaune">
+                            <Zap className="h-3 w-3" />
+                            {challenge?.xp} {tCommon('xp')}
+                          </span>
+                        </div>
+                      </div>
+                      <Button size="sm" className="bg-accent-cyan hover:bg-accent-cyan/80 text-black">
+                        {tChallenges('continue')}
+                      </Button>
+                    </div>
+                  </Link>
+                ))
+              )}
+            </TabsContent>
 
-                      <TabsContent value="termines" className="space-y-3">
-                        {isLoading ? (
+            <TabsContent value="termines" className="space-y-3">
+              {isLoading ? (
                           <div className="flex justify-center py-8">
-                            <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
-                          </div>
-                        ) : completed.length === 0 ? (
-                          <p className="text-muted-foreground text-center py-8">
-                            {t('empty.completed')}
-                          </p>
-                        ) : (
-                          completed.map(({ challenge, ...participation }) => (
-                            <Link
-                              key={participation.challenge_id}
-                              href={"/challenges/" + participation.challenge_id}
-                              className="block"
-                            >
-                              {(() => {
-                                const solution = solutionsByChallenge.get(participation.challenge_id);
-                                const isPending = solution?.statut === 'Soumise';
-                                const isFailed = solution?.statut === 'Évaluée' && (solution.note ?? 0) < 3;
-                                const isValidated = solution?.statut === 'Évaluée' && (solution.note ?? 0) >= 3;
-                                const borderClass = isFailed
-                                  ? 'border-destructive/60'
-                                  : isPending
-                                  ? 'border-accent-jaune/60'
-                                  : 'border-border';
+                  <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
+                </div>
+              ) : completed.length === 0 ? (
+                <p className="text-muted-foreground text-center py-8">
+                  {t('empty.completed')}
+                </p>
+              ) : (
+                completed.map(({ challenge, ...participation }) => (
+                  <Link
+                    key={participation.challenge_id}
+                    href={"/challenges/" + participation.challenge_id}
+                    className="block"
+                  >
+                    {(() => {
+                      const solution = solutionsByChallenge.get(participation.challenge_id);
+                      const isPending = solution?.statut === 'Soumise';
+                      const isFailed = solution?.statut === 'Évaluée' && (solution.note ?? 0) < 3;
+                      const isValidated = solution?.statut === 'Évaluée' && (solution.note ?? 0) >= 3;
+                      const borderClass = isFailed
+                        ? 'border-destructive/60'
+                        : isPending
+                        ? 'border-accent-jaune/60'
+                        : 'border-border';
 
-                                const icon = isFailed ? (
-                                  <XCircle className="h-5 w-5 text-destructive" />
-                                ) : isPending ? (
-                                  <Clock className="h-5 w-5 text-accent-jaune" />
-                                ) : (
-                                  <CheckCircle className="h-5 w-5 text-accent-vert" />
-                                );
+                      const icon = isFailed ? (
+                        <XCircle className="h-5 w-5 text-destructive" />
+                      ) : isPending ? (
+                        <Clock className="h-5 w-5 text-accent-jaune" />
+                      ) : (
+                        <CheckCircle className="h-5 w-5 text-accent-vert" />
+                      );
 
-                                return (
+                      return (
                                   <div className={`flex items-center justify-between p-4 rounded-lg border ${borderClass} bg-card/50 hover:border-accent-vert transition-colors`}>
                                     <div className="flex items-center gap-3">
-                                      {icon}
+                            {icon}
                                       <div>
-                                        <h4 className="font-medium">{challenge?.titre || 'Challenge'}</h4>
+                              <h4 className="font-medium">{challenge?.titre || 'Challenge'}</h4>
                                         <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
-                                          <Badge variant="outline" className="text-xs">
-                                            {challenge?.niveau_associe}
-                                          </Badge>
-                                          {isFailed ? (
-                                            <span className="text-destructive text-xs">{t('challengeFailed')}</span>
-                                          ) : isValidated ? (
-                                            <span className="text-accent-vert text-xs">{t('challengeCompleted')}</span>
-                                          ) : isPending ? (
-                                            <span className="text-accent-jaune text-xs">{t('challengePending')}</span>
-                                          ) : null}
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <Button variant="ghost" size="sm">
-                                      {tChallenges('review')}
-                                    </Button>
-                                  </div>
-                                );
-                              })()}
-                            </Link>
-                          ))
-                        )}
-                      </TabsContent>
-
-                      <TabsContent value="proposes" className="space-y-3">
-                        {isLoading ? (
-                          <div className="flex justify-center py-8">
-                            <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
-                          </div>
-                        ) : proposedChallenges.length === 0 ? (
-                          <p className="text-muted-foreground text-center py-8">
-                            {t('empty.proposed')}
-                          </p>
-                        ) : (
-                          proposedChallenges.map((challenge) => (
-                            <div
-                              key={challenge.id}
-                              className="flex items-center justify-between p-4 rounded-lg border border-border bg-card/50 hover:border-accent-cyan transition-colors"
-                            >
-                              <Link
-                                href={"/challenges/" + challenge.id}
-                                className="flex-1"
-                              >
-                                <div>
-                                  <h4 className="font-medium">{challenge.titre}</h4>
-                                  <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
-                                    <Badge variant="outline" className="text-xs">
-                                      {challenge.niveau_associe}
-                                    </Badge>
-                                    <span className="text-xs uppercase">{challenge.statut}</span>
-                                  </div>
-                                  {challenge.statut === 'Refuse' && challenge.validation_commentaire && (
-                                    <p className="mt-2 text-xs text-destructive">
-                                      {t('refused')}: {challenge.validation_commentaire}
-                                    </p>
-                                  )}
-                                </div>
-                              </Link>
-                              <div className="flex items-center gap-2">
-                                <Button variant="ghost" size="sm" asChild>
-                                  <Link href={"/challenges/" + challenge.id}>
-                                    {tCommon('view')}
-                                  </Link>
-                                </Button>
-                                {challenge.statut === 'Propose' && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="text-destructive hover:text-destructive"
-                                    onClick={() => handleDeleteProposedChallenge(challenge)}
-                                  >
-                                    {tCommon('delete')}
-                                  </Button>
-                                )}
+                                <Badge variant="outline" className="text-xs">
+                        {challenge?.niveau_associe}
+                                </Badge>
+                                {isFailed ? (
+                        <span className="text-destructive text-xs">{t('challengeFailed')}</span>
+                                ) : isValidated ? (
+                        <span className="text-accent-vert text-xs">{t('challengeCompleted')}</span>
+                                ) : isPending ? (
+                        <span className="text-accent-jaune text-xs">{t('challengePending')}</span>
+                                ) : null}
                               </div>
                             </div>
-                          ))
-                        )}
-                      </TabsContent>
-
-                      <TabsContent value="ideas" className="space-y-3">
-                        {isLoading ? (
-                          <div className="flex justify-center py-8">
-                            <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
                           </div>
-                        ) : myIdeas.length === 0 ? (
-                          <p className="text-muted-foreground text-center py-8">
-                            {t('empty.ideas')}
+                          <Button variant="ghost" size="sm">
+                            {tChallenges('review')}
+                          </Button>
+                        </div>
+                      );
+                    })()}
+                  </Link>
+                ))
+              )}
+            </TabsContent>
+
+            <TabsContent value="proposes" className="space-y-3">
+              {isLoading ? (
+                          <div className="flex justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
+                </div>
+              ) : proposedChallenges.length === 0 ? (
+                <p className="text-muted-foreground text-center py-8">
+                  {t('empty.proposed')}
+                </p>
+              ) : (
+                proposedChallenges.map((challenge) => (
+                            <div
+                    key={challenge.id}
+                    className="flex items-center justify-between p-4 rounded-lg border border-border bg-card/50 hover:border-accent-cyan transition-colors"
+                  >
+                    <Link
+                      href={"/challenges/" + challenge.id}
+                      className="flex-1"
+                    >
+                                <div>
+                        <h4 className="font-medium">{challenge.titre}</h4>
+                                  <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
+                          <Badge variant="outline" className="text-xs">
+                            {challenge.niveau_associe}
+                          </Badge>
+                          <span className="text-xs uppercase">{challenge.statut}</span>
+                        </div>
+                        {challenge.statut === 'Refuse' && challenge.validation_commentaire && (
+                          <p className="mt-2 text-xs text-destructive">
+                            {t('refused')}: {challenge.validation_commentaire}
                           </p>
-                        ) : (
-                          myIdeas.map((idea) => (
+                        )}
+                      </div>
+                    </Link>
+                              <div className="flex items-center gap-2">
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link href={"/challenges/" + challenge.id}>
+                          {tCommon('view')}
+                        </Link>
+                      </Button>
+                      {challenge.statut === 'Propose' && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:text-destructive"
+                          onClick={() => handleDeleteProposedChallenge(challenge)}
+                        >
+                          {tCommon('delete')}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </TabsContent>
+
+            <TabsContent value="ideas" className="space-y-3">
+              {isLoading ? (
+                          <div className="flex justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
+                </div>
+              ) : myIdeas.length === 0 ? (
+                <p className="text-muted-foreground text-center py-8">
+                  {t('empty.ideas')}
+                </p>
+              ) : (
+                myIdeas.map((idea) => (
                             <div key={idea.id} className="rounded-lg border border-border bg-card/50 p-4 space-y-2">
                               <div className="flex items-center gap-2">
-                                <Badge variant="outline" className="text-xs">
-                                  {idea.themes[0] ? tIdeas('ideaThemes.' + idea.themes[0]) : '-'}
-                                </Badge>
-                                <span className="text-xs uppercase text-muted-foreground">
-                                  {tIdeas('ideaStatus.' + idea.statut)}
-                                </span>
-                              </div>
-                              <h4 className="font-medium">{idea.titre}</h4>
-                              <p className="text-sm text-muted-foreground whitespace-pre-wrap">{idea.description}</p>
-                              {idea.statut === 'Refusee' && idea.validation_commentaire && (
-                                <p className="text-xs text-destructive">
-                                  {t('refused')}: {idea.validation_commentaire}
-                                </p>
-                              )}
+                      <Badge variant="outline" className="text-xs">
+                        {idea.themes[0] ? tIdeas('ideaThemes.' + idea.themes[0]) : '-'}
+                      </Badge>
+                      <span className="text-xs uppercase text-muted-foreground">
+                        {tIdeas('ideaStatus.' + idea.statut)}
+                      </span>
+                    </div>
+                    <h4 className="font-medium">{idea.titre}</h4>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">{idea.description}</p>
+                    {idea.statut === 'Refusee' && idea.validation_commentaire && (
+                      <p className="text-xs text-destructive">
+                        {t('refused')}: {idea.validation_commentaire}
+                      </p>
+                    )}
                               <div className="flex items-center gap-2 pt-2">
-                                <Button variant="outline" size="sm" onClick={() => setEditingIdea(idea)}>
-                                  {tIdeas('edit')}
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="text-destructive hover:text-destructive"
-                                  onClick={() => handleDeleteIdea(idea)}
-                                >
-                                  {tCommon('delete')}
-                                </Button>
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </TabsContent>
-                    </Tabs>
+                      <Button variant="outline" size="sm" onClick={() => setEditingIdea(idea)}>
+                        {tIdeas('edit')}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() => handleDeleteIdea(idea)}
+                      >
+                        {tCommon('delete')}
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </TabsContent>
+          </Tabs>
+                    </>
                   )}
                 </CardContent>
               </Card>
 
               {pendingIdeasCount >= 3 && (
-                <div className="rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground">
+                          <div className="rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground">
                   {tIdeas('limitReached')}
                 </div>
               )}
             </div>
 
             {/* Sidebar */}
-            <div className="space-y-6">
+                      <div className="space-y-6">
               {/* Badges */}
               <Card>
                 <CardHeader className="pb-3">
@@ -706,86 +708,86 @@ export default function ProfilePage() {
                 </CardHeader>
                 <CardContent>
                   {isLoading ? (
-                    <div className="flex justify-center py-4">
-                      <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
+                              <div className="flex justify-center py-4">
+            <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
                     </div>
                   ) : (
-                    <div className="space-y-4">
+                              <div className="space-y-4">
                       <div>
-                        <p className="text-sm font-medium mb-2">{t('featuredBadge')}</p>
+              <p className="text-sm font-medium mb-2">{t('featuredBadge')}</p>
                         <div className="grid grid-cols-3 gap-3">
-                          {badgesWithStatus
-                            .filter((badge) => badge.obtained)
-                            .map((badge) => (
-                              <button
-                                key={badge.id}
-                                onClick={() => handleBadgeSelect(badge.id)}
-                                disabled={isUpdatingBadge}
-                                title={badge.description || tBadges('howToEarnDefault')}
-                                className={`flex flex-col items-center p-3 rounded-lg border transition-all ${
-                                  featuredBadgeId === badge.id
-                                    ? 'border-accent-cyan bg-accent-cyan/10'
-                                    : 'border-border'
-                                }`}
-                              >
-                                <span className="text-2xl mb-1">{badge.emoji}</span>
-                                <span className="text-xs text-center text-muted-foreground">
-                                  {badge.nom}
-                                </span>
-                              </button>
-                            ))}
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="mt-2"
-                          onClick={() => handleBadgeSelect(null)}
-                          disabled={isUpdatingBadge}
-                        >
-                          {t('featuredBadgeClear')}
-                        </Button>
-                      </div>
+                {badgesWithStatus
+                  .filter((badge) => badge.obtained)
+                  .map((badge) => (
+                    <button
+                      key={badge.id}
+                      onClick={() => handleBadgeSelect(badge.id)}
+                      disabled={isUpdatingBadge}
+                      title={badge.description || tBadges('howToEarnDefault')}
+                      className={`flex flex-col items-center p-3 rounded-lg border transition-all ${
+                        featuredBadgeId === badge.id
+                          ? 'border-accent-cyan bg-accent-cyan/10'
+                          : 'border-border'
+                      }`}
+                    >
+                      <span className="text-2xl mb-1">{badge.emoji}</span>
+                      <span className="text-xs text-center text-muted-foreground">
+                        {badge.nom}
+                      </span>
+                    </button>
+                  ))}
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="mt-2"
+                onClick={() => handleBadgeSelect(null)}
+                disabled={isUpdatingBadge}
+              >
+                {t('featuredBadgeClear')}
+              </Button>
+            </div>
 
                       <div>
-                        <BadgeSelector
-                          userId={user.id}
-                          badges={badgesWithStatus.filter((badge) => badge.obtained)}
-                          primaryId={selectedPrimaryBadge}
-                          secondaryId={selectedSecondaryBadge}
-                          onChange={handleSelectedBadgeChange}
-                        />
-                      </div>
+              <BadgeSelector
+                userId={user.id}
+                badges={badgesWithStatus.filter((badge) => badge.obtained)}
+                primaryId={selectedPrimaryBadge}
+                secondaryId={selectedSecondaryBadge}
+                onChange={handleSelectedBadgeChange}
+              />
+            </div>
 
                       <div>
-                        <TitleSelector
-                          titles={earnedTitles}
-                          selectedTitle={selectedTitle}
-                          onChange={handleTitleSelect}
-                          isSaving={isUpdatingBadge}
-                        />
-                      </div>
+              <TitleSelector
+                titles={earnedTitles}
+                selectedTitle={selectedTitle}
+                onChange={handleTitleSelect}
+                isSaving={isUpdatingBadge}
+              />
+            </div>
 
                       <div>
-                        <p className="text-sm font-medium mb-2">{t('allBadges')}</p>
+              <p className="text-sm font-medium mb-2">{t('allBadges')}</p>
                         <div className="grid grid-cols-3 gap-3">
-                          {badgesWithStatus.map((badge) => (
+                {badgesWithStatus.map((badge) => (
                             <div
-                              key={badge.id}
-                              className={`flex flex-col items-center p-3 rounded-lg border transition-all ${
-                                badge.obtained
-                                  ? 'border-accent-jaune/50 bg-accent-jaune/10'
-                                  : 'border-border opacity-40'
-                              }`}
-                              title={badge.description || tBadges('howToEarnDefault')}
-                            >
-                              <span className="text-2xl mb-1">{badge.emoji}</span>
-                              <span className="text-xs text-center text-muted-foreground">
-                                {badge.nom}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                    key={badge.id}
+                    className={`flex flex-col items-center p-3 rounded-lg border transition-all ${
+                      badge.obtained
+                        ? 'border-accent-jaune/50 bg-accent-jaune/10'
+                        : 'border-border opacity-40'
+                    }`}
+                    title={badge.description || tBadges('howToEarnDefault')}
+                  >
+                    <span className="text-2xl mb-1">{badge.emoji}</span>
+                    <span className="text-xs text-center text-muted-foreground">
+                      {badge.nom}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
                     </div>
                   )}
                 </CardContent>
@@ -794,111 +796,111 @@ export default function ProfilePage() {
               {/* Leaderboard */}
               <Card>
                 <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <CardTitle className="text-lg flex items-center gap-2">
-                        <Trophy className="h-5 w-5 text-accent-jaune" />
-                        {tLeaderboard('title')}
-                      </CardTitle>
-                      <CardDescription>
-                        {leaderboardScope === 'global'
-                          ? tLeaderboard('global')
-                          : leaderboardScope === 'recent'
-                          ? tLeaderboard('recent')
-                          : leaderboardScope === 'entite'
-                          ? tLeaderboard('entity')
-                          : tLeaderboard('circle')}
-                      </CardDescription>
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-accent-jaune" />
+              {tLeaderboard('title')}
+            </CardTitle>
+            <CardDescription>
+              {leaderboardScope === 'global'
+                ? tLeaderboard('global')
+                : leaderboardScope === 'recent'
+                ? tLeaderboard('recent')
+                : leaderboardScope === 'entite'
+                ? tLeaderboard('entity')
+                : tLeaderboard('circle')}
+            </CardDescription>
                     </div>
                     <select
-                      value={leaderboardScope}
-                      onChange={(event) => setLeaderboardScope(event.target.value as 'global' | 'recent' | 'entite' | 'cercle')}
-                      className="rounded-md border border-border bg-background px-2 py-1 text-xs text-muted-foreground focus:border-accent-cyan focus:outline-none"
+            value={leaderboardScope}
+            onChange={(event) => setLeaderboardScope(event.target.value as 'global' | 'recent' | 'entite' | 'cercle')}
+            className="rounded-md border border-border bg-background px-2 py-1 text-xs text-muted-foreground focus:border-accent-cyan focus:outline-none"
                     >
-                      <option value="global">{tLeaderboard('scope.global')}</option>
-                      <option value="recent">{tLeaderboard('scope.recent')}</option>
-                      <option value="entite">{tLeaderboard('scope.entity')}</option>
-                      <option value="cercle">{tLeaderboard('scope.circle')}</option>
+            <option value="global">{tLeaderboard('scope.global')}</option>
+            <option value="recent">{tLeaderboard('scope.recent')}</option>
+            <option value="entite">{tLeaderboard('scope.entity')}</option>
+            <option value="cercle">{tLeaderboard('scope.circle')}</option>
                     </select>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="mb-4">
+                            <div className="mb-4">
                     <Input
-                      value={userSearchTerm}
-                      onChange={(event) => setUserSearchTerm(event.target.value)}
-                      placeholder={tLeaderboard('searchUser')}
-                      className="bg-background border-border focus:border-accent-cyan"
+            value={userSearchTerm}
+            onChange={(event) => setUserSearchTerm(event.target.value)}
+            placeholder={tLeaderboard('searchUser')}
+            className="bg-background border-border focus:border-accent-cyan"
                     />
                     {userSearchTerm.trim().length > 0 && (
                       <div className="mt-2 rounded-lg border border-border bg-card p-2 space-y-1">
-                        {isSearchingUsers ? (
+              {isSearchingUsers ? (
                           <div className="flex items-center gap-2 text-xs text-muted-foreground px-2 py-1">
-                            <Loader2 className="h-3 w-3 animate-spin" />
-                            {tLeaderboard('searching')}
-                          </div>
-                        ) : userSearchResults.length === 0 ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  {tLeaderboard('searching')}
+                </div>
+              ) : userSearchResults.length === 0 ? (
                           <div className="text-xs text-muted-foreground px-2 py-1">
-                            {tCommon('noResults')}
-                          </div>
-                        ) : (
-                          userSearchResults.map((result) => (
-                            <Link
-                              key={result.id}
-                              href={`/users/${result.id}`}
-                              className="flex items-center justify-between gap-2 rounded-md px-2 py-1 text-sm hover:bg-accent-cyan/10"
-                            >
-                              <span className="font-medium truncate">{result.nom}</span>
-                              <span className="text-xs text-muted-foreground truncate">{result.email}</span>
-                            </Link>
-                          ))
-                        )}
-                      </div>
+                  {tCommon('noResults')}
+                </div>
+              ) : (
+                userSearchResults.map((result) => (
+                  <Link
+                    key={result.id}
+                    href={`/users/${result.id}`}
+                    className="flex items-center justify-between gap-2 rounded-md px-2 py-1 text-sm hover:bg-accent-cyan/10"
+                  >
+                    <span className="font-medium truncate">{result.nom}</span>
+                    <span className="text-xs text-muted-foreground truncate">{result.email}</span>
+                  </Link>
+                ))
+              )}
+            </div>
                     )}
                   </div>
 
                   {isLoading ? (
-                    <div className="flex justify-center py-4">
-                      <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
+                              <div className="flex justify-center py-4">
+            <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
                     </div>
                   ) : (leaderboardScope === 'recent' ? leaderboardRecent : leaderboard).length === 0 ? (
                     <p className="text-sm text-muted-foreground text-center py-4">
-                      {tLeaderboard('noRanking')}
+            {tLeaderboard('noRanking')}
                     </p>
                   ) : (
-                    <div className="space-y-2">
-                      {(leaderboardScope === 'recent' ? leaderboardRecent : leaderboard).map((entry, index) => {
-                        const isCurrentUser = entry.user_id === user.id;
-                        const href = isCurrentUser ? '/me' : `/users/${entry.user_id}`;
-                        return (
-                          <Link
-                            key={entry.user_id}
-                            href={href}
-                            className={`flex items-center gap-3 p-2 rounded-lg transition-colors hover:border hover:border-accent-cyan ${
-                              isCurrentUser ? 'bg-exalt-blue/20 border border-exalt-blue/50' : ''
-                            }`}
-                          >
-                            <span className={`w-6 text-center font-bold ${
-                              index === 0 ? 'text-accent-jaune' :
-                              index === 1 ? 'text-gray-400' :
-                              index === 2 ? 'text-amber-600' :
-                              'text-muted-foreground'
-                            }`}>
-                              {index < 3 ? ['🥇', '🥈', '🥉'][index] : entry.rank}
-                            </span>
+                              <div className="space-y-2">
+            {(leaderboardScope === 'recent' ? leaderboardRecent : leaderboard).map((entry, index) => {
+              const isCurrentUser = entry.user_id === user.id;
+              const href = isCurrentUser ? '/me' : `/users/${entry.user_id}`;
+              return (
+                <Link
+                  key={entry.user_id}
+                  href={href}
+                  className={`flex items-center gap-3 p-2 rounded-lg transition-colors hover:border hover:border-accent-cyan ${
+                    isCurrentUser ? 'bg-exalt-blue/20 border border-exalt-blue/50' : ''
+                  }`}
+                >
+                  <span className={`w-6 text-center font-bold ${
+                    index === 0 ? 'text-accent-jaune' :
+                    index === 1 ? 'text-gray-400' :
+                    index === 2 ? 'text-amber-600' :
+                    'text-muted-foreground'
+                  }`}>
+                    {index < 3 ? ['🥇', '🥈', '🥉'][index] : entry.rank}
+                  </span>
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium truncate text-sm">
-                                {entry.nom}
-                                {isCurrentUser && <span className="text-exalt-blue ml-1">{tLeaderboard('you')}</span>}
-                              </p>
-                              <p className="text-xs text-muted-foreground">{entry.marque || '-'}</p>
-                            </div>
-                            <span className="text-sm font-semibold text-accent-jaune">
-                              {leaderboardScope === 'recent' ? entry.points_30j ?? 0 : entry.points_totaux}
-                            </span>
-                          </Link>
-                        );
-                      })}
+                    <p className="font-medium truncate text-sm">
+                      {entry.nom}
+                      {isCurrentUser && <span className="text-exalt-blue ml-1">{tLeaderboard('you')}</span>}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{entry.marque || '-'}</p>
+                  </div>
+                  <span className="text-sm font-semibold text-accent-jaune">
+                    {leaderboardScope === 'recent' ? entry.points_30j ?? 0 : entry.points_totaux}
+                  </span>
+                </Link>
+              );
+            })}
                     </div>
                   )}
                 </CardContent>
