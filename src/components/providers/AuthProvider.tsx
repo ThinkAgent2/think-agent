@@ -16,8 +16,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const supabase = useMemo(() => createClient(), []);
   const lastAuthIdRef = useRef<string | null>(null);
 
-  const loadUser = useCallback(async (authId: string | null) => {
-    if (authId === lastAuthIdRef.current) {
+  const loadUser = useCallback(async (authId: string | null, force = false) => {
+    if (!force && authId === lastAuthIdRef.current) {
       return;
     }
 
@@ -87,7 +87,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const refreshUser = useCallback(async () => {
     const { data } = await supabase.auth.getSession();
     const authId = data.session?.user?.id ?? null;
-    await loadUser(authId);
+    await loadUser(authId, true);
   }, [supabase, loadUser]);
 
   useEffect(() => {
