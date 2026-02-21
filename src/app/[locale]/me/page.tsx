@@ -280,6 +280,14 @@ export default function ProfilePage() {
                 </CardContent>
               </Card>
 
+              <div className="mb-6">
+                <ThemeProgressCircles
+              explorerCount={user?.explorer_completed_count ?? 0}
+              crafterCount={user?.crafter_completed_count ?? 0}
+              architectCount={user?.architect_completed_count ?? 0}
+                />
+              </div>
+
               {/* Challenges tabs */}
               <Card>
                 <CardHeader>
@@ -349,11 +357,6 @@ export default function ProfilePage() {
               </Card>
             </div>
 
-            <ThemeProgressCircles
-              explorerCount={user?.explorer_completed_count ?? 0}
-              crafterCount={user?.crafter_completed_count ?? 0}
-              architectCount={user?.architect_completed_count ?? 0}
-            />
 
           </div>
 
@@ -628,8 +631,8 @@ export default function ProfilePage() {
                             return (
                               <button
                                 key={badge.id}
-                                onClick={() => {
-                                  if (disabled) return;
+                                onClick={async () => {
+                                  if (disabled || isUpdatingBadge) return;
                                   let nextPrimary = selectedPrimaryBadge;
                                   let nextSecondary = selectedSecondaryBadge;
                                   if (!isPrimary && !isSecondary) {
@@ -646,15 +649,15 @@ export default function ProfilePage() {
                                   } else if (isSecondary) {
                                     nextSecondary = null;
                                   }
-                                  handleSelectedBadgeChange(nextPrimary, nextSecondary);
+                                  await handleSelectedBadgeChange(nextPrimary, nextSecondary);
                                 }}
-                                disabled={isUpdatingBadge}
+                                disabled={isUpdatingBadge || disabled}
                                 title={badge.description || tBadges('howToEarnDefault')}
                                 className={`flex flex-col items-center p-3 rounded-lg border transition-all ${
                                   disabled
                                     ? 'border-border opacity-40'
                                     : isPrimary || isSecondary
-                                    ? 'border-accent-cyan bg-accent-cyan/10'
+                                    ? 'border-accent-cyan ring-1 ring-accent-cyan/40'
                                     : 'border-border'
                                 }`}
                               >
