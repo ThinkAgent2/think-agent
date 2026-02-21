@@ -224,4 +224,8 @@ export interface LeaderboardEntry {
   marque: string | null;
   rank: number;
   points_30j?: number;
+  league?: string | null;
+  selected_badge_primary?: string | null;
+  selected_badge_secondary?: string | null;
+  selected_title?: string | null;
 }
