@@ -9,7 +9,6 @@ import { Footer } from '@/components/layout/Footer';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from '@/components/ui/avatar';
 import { 
@@ -25,8 +24,6 @@ import type { Badge as BadgeType, Challenge, Participation, IdeaProposal, Soluti
 import { IdeaProposalForm } from '@/components/ideas/IdeaProposalForm';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
 import { ThemeProgressCircles } from '@/components/gamification/ThemeProgressCircles';
-import { BadgeGrid } from '@/components/gamification/BadgeGrid';
-import { BadgeSelector } from '@/components/gamification/BadgeSelector';
 import { TitleSelector } from '@/components/gamification/TitleSelector';
 import { LeagueBanner } from '@/components/gamification/LeagueBanner';
 
@@ -150,25 +147,6 @@ export default function ProfilePage() {
 
   const solutionsByChallenge = new Map(solutions.map((solution) => [solution.challenge_id, solution]));
   const completed = participations.filter((p) => p.statut === 'Terminé');
-
-  // Progression par niveau (basée sur challenges terminés)
-  const levelThresholds: Record<'Explorer' | 'Crafter' | 'Architecte', number> = {
-    Explorer: 2,
-    Crafter: 5,
-    Architecte: 2,
-  };
-
-  const completedByLevel = {
-    Explorer: participations.filter(p => p.statut === 'Terminé' && p.challenge?.niveau_associe === 'Explorer').length,
-    Crafter: participations.filter(p => p.statut === 'Terminé' && p.challenge?.niveau_associe === 'Crafter').length,
-    Architecte: participations.filter(p => p.statut === 'Terminé' && p.challenge?.niveau_associe === 'Architecte').length,
-  };
-
-  const levelProgress = {
-    Explorer: Math.min(100, Math.round((completedByLevel.Explorer / levelThresholds.Explorer) * 100)),
-    Crafter: Math.min(100, Math.round((completedByLevel.Crafter / levelThresholds.Crafter) * 100)),
-    Architecte: Math.min(100, Math.round((completedByLevel.Architecte / levelThresholds.Architecte) * 100)),
-  };
 
   // Badges avec statut obtained
   const badgesWithStatus = allBadges.map(badge => ({
@@ -299,20 +277,6 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
-                  {/* Progression par niveau */}
-                            <div className="mt-6 pt-6 border-t border-border space-y-4">
-                    {(Object.keys(levelThresholds) as Array<keyof typeof levelThresholds>).map((level) => (
-                      <div key={level} className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">{level}</span>
-                <span className="font-medium">
-                  {completedByLevel[level]} / {levelThresholds[level]} challenges
-                </span>
-              </div>
-              <Progress value={levelProgress[level]} className="h-2" />
-            </div>
-                    ))}
-                  </div>
                 </CardContent>
               </Card>
 
@@ -391,14 +355,6 @@ export default function ProfilePage() {
               architectCount={user?.architect_completed_count ?? 0}
             />
 
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('badgesUnlocked')}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <BadgeGrid badges={userBadges} />
-              </CardContent>
-            </Card>
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -646,6 +602,7 @@ export default function ProfilePage() {
             {/* Sidebar */}
                       <div className="space-y-6">
               {/* Badges */}
+                            {/* Badges */}
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg flex items-center gap-2">
@@ -655,90 +612,77 @@ export default function ProfilePage() {
                 </CardHeader>
                 <CardContent>
                   {isLoading ? (
-                              <div className="flex justify-center py-4">
-            <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
+                    <div className="flex justify-center py-4">
+                      <Loader2 className="h-6 w-6 animate-spin text-exalt-blue" />
                     </div>
                   ) : (
-                              <div className="space-y-4">
+                    <div className="space-y-4">
                       <div>
-              <p className="text-sm font-medium mb-2">{t('featuredBadge')}</p>
+                        <p className="text-sm font-medium mb-2">{t('badgeSelect')}</p>
+                        <p className="text-xs text-muted-foreground mb-3">{t('badgeSelectHint')}</p>
                         <div className="grid grid-cols-3 gap-3">
-                {badgesWithStatus
-                  .filter((badge) => badge.obtained)
-                  .map((badge) => (
-                    <button
-                      key={badge.id}
-                      onClick={() => handleBadgeSelect(badge.id)}
-                      disabled={isUpdatingBadge}
-                      title={badge.description || tBadges('howToEarnDefault')}
-                      className={`flex flex-col items-center p-3 rounded-lg border transition-all ${
-                        featuredBadgeId === badge.id
-                          ? 'border-accent-cyan bg-accent-cyan/10'
-                          : 'border-border'
-                      }`}
-                    >
-                      <span className="text-2xl mb-1">{badge.emoji}</span>
-                      <span className="text-xs text-center text-muted-foreground">
-                        {badge.nom}
-                      </span>
-                    </button>
-                  ))}
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="mt-2"
-                onClick={() => handleBadgeSelect(null)}
-                disabled={isUpdatingBadge}
-              >
-                {t('featuredBadgeClear')}
-              </Button>
-            </div>
-
-                      <div>
-              <BadgeSelector
-                userId={user.id}
-                badges={badgesWithStatus.filter((badge) => badge.obtained)}
-                primaryId={selectedPrimaryBadge}
-                secondaryId={selectedSecondaryBadge}
-                onChange={handleSelectedBadgeChange}
-              />
-            </div>
-
-                      <div>
-              <TitleSelector
-                titles={earnedTitles}
-                selectedTitle={selectedTitle}
-                onChange={handleTitleSelect}
-                isSaving={isUpdatingBadge}
-              />
-            </div>
-
-                      <div>
-              <p className="text-sm font-medium mb-2">{t('allBadges')}</p>
-                        <div className="grid grid-cols-3 gap-3">
-                {badgesWithStatus.map((badge) => (
-                            <div
-                    key={badge.id}
-                    className={`flex flex-col items-center p-3 rounded-lg border transition-all ${
-                      badge.obtained
-                        ? 'border-accent-jaune/50 bg-accent-jaune/10'
-                        : 'border-border opacity-40'
-                    }`}
-                    title={badge.description || tBadges('howToEarnDefault')}
-                  >
-                    <span className="text-2xl mb-1">{badge.emoji}</span>
-                    <span className="text-xs text-center text-muted-foreground">
-                      {badge.nom}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+                          {badgesWithStatus.map((badge) => {
+                            const isPrimary = selectedPrimaryBadge === badge.id;
+                            const isSecondary = selectedSecondaryBadge === badge.id;
+                            const disabled = !badge.obtained;
+                            return (
+                              <button
+                                key={badge.id}
+                                onClick={() => {
+                                  if (disabled) return;
+                                  let nextPrimary = selectedPrimaryBadge;
+                                  let nextSecondary = selectedSecondaryBadge;
+                                  if (!isPrimary && !isSecondary) {
+                                    if (!nextPrimary) {
+                                      nextPrimary = badge.id;
+                                    } else if (!nextSecondary) {
+                                      nextSecondary = badge.id;
+                                    } else {
+                                      nextPrimary = badge.id;
+                                      nextSecondary = null;
+                                    }
+                                  } else if (isPrimary) {
+                                    nextPrimary = null;
+                                  } else if (isSecondary) {
+                                    nextSecondary = null;
+                                  }
+                                  handleSelectedBadgeChange(nextPrimary, nextSecondary);
+                                }}
+                                disabled={isUpdatingBadge}
+                                title={badge.description || tBadges('howToEarnDefault')}
+                                className={`flex flex-col items-center p-3 rounded-lg border transition-all ${
+                                  disabled
+                                    ? 'border-border opacity-40'
+                                    : isPrimary || isSecondary
+                                    ? 'border-accent-cyan bg-accent-cyan/10'
+                                    : 'border-border'
+                                }`}
+                              >
+                                <span className="text-2xl mb-1">{badge.icon || badge.emoji}</span>
+                                <span className="text-xs text-center text-muted-foreground">
+                                  {badge.nom}
+                                </span>
+                                {isPrimary && <span className="text-[10px] mt-1">(1)</span>}
+                                {isSecondary && <span className="text-[10px] mt-1">(2)</span>}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="mt-2"
+                          onClick={() => handleSelectedBadgeChange(null, null)}
+                          disabled={isUpdatingBadge}
+                        >
+                          {t('clearBadge')}
+                        </Button>
+                      </div>
                     </div>
                   )}
                 </CardContent>
               </Card>
+
 
               
             </div>
