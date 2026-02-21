@@ -123,20 +123,24 @@ export function Header() {
               </div>
               <Link href="/me">
                 <div className="flex items-center gap-2">
-                  {selectedSecondaryBadgeEmoji && (
-                    <span className="text-sm" title="Badge secondaire">{selectedSecondaryBadgeEmoji}</span>
-                  )}
-                  <Avatar className="h-8 w-8 cursor-pointer transition-glow hover:glow-cyan">
-                    {user.avatar_url && <AvatarImage src={user.avatar_url} alt={user.nom || user.email} />}
-                    <AvatarFallback className="bg-exalt-blue text-white text-xs">
-                      {user.nom?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
-                    </AvatarFallback>
-                    {selectedPrimaryBadgeEmoji && (
-                      <AvatarBadge className="text-xs translate-x-0.5 translate-y-0.5">
-                        {selectedPrimaryBadgeEmoji}
-                      </AvatarBadge>
+                  <div className="relative">
+                    <Avatar className="h-8 w-8 cursor-pointer transition-glow hover:glow-cyan">
+                      {user.avatar_url && <AvatarImage src={user.avatar_url} alt={user.nom || user.email} />}
+                      <AvatarFallback className="bg-exalt-blue text-white text-xs">
+                        {user.nom?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
+                      </AvatarFallback>
+                      {selectedPrimaryBadgeEmoji && (
+                        <AvatarBadge className="text-xs translate-x-0.5 translate-y-0.5">
+                          {selectedPrimaryBadgeEmoji}
+                        </AvatarBadge>
+                      )}
+                    </Avatar>
+                    {selectedSecondaryBadgeEmoji && (
+                      <span className="absolute -bottom-1 -left-1 h-4 w-4 rounded-full bg-background border border-border flex items-center justify-center text-[10px]" title="Badge secondaire">
+                        {selectedSecondaryBadgeEmoji}
+                      </span>
                     )}
-                  </Avatar>
+                  </div>
                   {selectedTitle && (
                     <span className="text-xs text-muted-foreground">{selectedTitle}</span>
                   )}

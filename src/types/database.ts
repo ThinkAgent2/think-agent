@@ -228,4 +228,5 @@ export interface LeaderboardEntry {
   selected_badge_primary?: string | null;
   selected_badge_secondary?: string | null;
   selected_title?: string | null;
+  avatar_url?: string | null;
 }

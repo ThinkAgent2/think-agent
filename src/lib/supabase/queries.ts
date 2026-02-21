@@ -601,7 +601,8 @@ export async function getLeaderboard(limit: number = 10): Promise<LeaderboardEnt
       league,
       selected_badge_primary,
       selected_badge_secondary,
-      selected_title
+      selected_title,
+      avatar_url
     `)
     .order('points_totaux', { ascending: false })
     .limit(limit);
@@ -629,6 +630,7 @@ export async function getLeaderboard(limit: number = 10): Promise<LeaderboardEnt
       selected_badge_primary: (user as { selected_badge_primary?: string | null }).selected_badge_primary || null,
       selected_badge_secondary: (user as { selected_badge_secondary?: string | null }).selected_badge_secondary || null,
       selected_title: (user as { selected_title?: string | null }).selected_title || null,
+      avatar_url: (user as { avatar_url?: string | null }).avatar_url || null,
     };
   });
 }
@@ -643,7 +645,7 @@ export async function getLeaderboardRecent(limit: number = 10): Promise<Leaderbo
     .select(`
       user_id,
       challenge:challenges!solutions_challenge_id_fkey(xp),
-      user:users!solutions_user_id_fkey(id, nom, email, niveau_actuel, points_totaux, league, selected_badge_primary, selected_badge_secondary, selected_title)
+      user:users!solutions_user_id_fkey(id, nom, email, niveau_actuel, points_totaux, league, selected_badge_primary, selected_badge_secondary, selected_title, avatar_url)
     `)
     .eq('statut', 'Évaluée')
     .gte('updated_at', since.toISOString())
@@ -668,7 +670,7 @@ export async function getLeaderboardRecent(limit: number = 10): Promise<Leaderbo
     const xpToAdd = (challenge as { xp: number }).xp || 0;
     totals.set((user as { id: string }).id, {
       xp: (existing?.xp || 0) + xpToAdd,
-      user: user as { id: string; nom: string | null; email: string; niveau_actuel: UserLevel; points_totaux: number; league?: string | null; selected_badge_primary?: string | null; selected_badge_secondary?: string | null; selected_title?: string | null },
+      user: user as { id: string; nom: string | null; email: string; niveau_actuel: UserLevel; points_totaux: number; league?: string | null; selected_badge_primary?: string | null; selected_badge_secondary?: string | null; selected_title?: string | null; avatar_url?: string | null },
     });
   });
 

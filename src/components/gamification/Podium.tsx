@@ -1,6 +1,7 @@
 'use client';
 
 import type { LeaderboardEntry } from '@/types/database';
+import { AvatarWithLeagueBorder } from '@/components/gamification/AvatarWithLeagueBorder';
 
 interface PodiumProps {
   entries: LeaderboardEntry[];
@@ -26,9 +27,12 @@ export function Podium({ entries }: PodiumProps) {
       {ordered.map((entry, index) => (
         <div key={entry.user_id} className={`rounded-xl border p-4 ${podiumColors[index]} ${podiumHeights[index]}`}>
           <div className="flex flex-col items-center text-center">
-            <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-lg font-bold">
-              #{index === 1 ? 1 : index === 0 ? 2 : 3}
-            </div>
+            <AvatarWithLeagueBorder
+              league={(entry as { league?: string }).league}
+              size={56}
+              src={(entry as { avatar_url?: string | null }).avatar_url || null}
+              alt={entry.nom}
+            />
             <div className="mt-3 text-lg font-semibold">{entry.nom}</div>
             <div className="text-xs text-muted-foreground">{entry.niveau_actuel}</div>
             <div className="mt-2 text-sm font-semibold">{entry.points_totaux} XP</div>
