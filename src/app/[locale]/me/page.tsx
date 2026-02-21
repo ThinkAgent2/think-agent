@@ -214,6 +214,13 @@ export default function ProfilePage() {
       setSelectedSecondaryBadge(prevSecondary);
     } else {
       await refreshUser();
+      if (typeof window !== 'undefined') {
+        (window as unknown as { __pushProgressionEvent?: (event: { type: string; title: string; description?: string }) => void }).__pushProgressionEvent?.({
+          type: 'badge',
+          title: 'Badge affiché',
+          description: 'Mise à jour du profil',
+        });
+      }
     }
     setIsUpdatingBadge(false);
   };

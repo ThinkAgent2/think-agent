@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useMemo, useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 export type ProgressionEventType = 'xp' | 'level' | 'title' | 'badge' | 'streak' | 'league';
@@ -38,6 +38,14 @@ export function ProgressionOverlayProvider({ children }: { children: React.React
   };
 
   const value = useMemo(() => ({ pushEvent }), []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    (window as unknown as { __pushProgressionEvent?: (event: Omit<ProgressionEvent, 'id'>) => void }).__pushProgressionEvent = pushEvent;
+    return () => {
+      (window as unknown as { __pushProgressionEvent?: (event: Omit<ProgressionEvent, 'id'>) => void }).__pushProgressionEvent = undefined;
+    };
+  }, [pushEvent]);
 
   return (
     <ProgressionOverlayContext.Provider value={value}>

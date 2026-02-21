@@ -11,6 +11,14 @@ const LEVEL_TITLE_THRESHOLDS = [
 
 export type ThemeTitle = 'I' | 'II' | 'III' | 'IV' | 'Maître' | '—';
 
+export type ProgressionEventType = 'xp' | 'level' | 'title' | 'badge' | 'streak' | 'league';
+
+export interface ProgressionEvent {
+  type: ProgressionEventType;
+  title: string;
+  description?: string;
+}
+
 export function getThemeTitle(completedCount: number): ThemeTitle {
   const eligible = LEVEL_TITLE_THRESHOLDS.filter((t) => completedCount >= t.min);
   if (eligible.length === 0) return '—';
@@ -32,7 +40,7 @@ export function getThemeProgress(completedCount: number) {
 }
 
 export function getRequiredXp(level: number) {
-  return Math.round(100 * Math.pow(1.3, Math.max(0, level - 1)));
+  return Math.round(150 * Math.pow(level, 1.25));
 }
 
 export function calculateLevel(xp: number) {
@@ -46,7 +54,7 @@ export function calculateLevel(xp: number) {
   return level;
 }
 
-export async function handleChallengeValidated(userId: string, challenge: Challenge) {
+export async function handleChallengeValidated(userId: string, challenge: Challenge): Promise<ProgressionEvent[]> {
   const supabase = createClient();
 
   const { data: user } = await supabase
@@ -55,15 +63,23 @@ export async function handleChallengeValidated(userId: string, challenge: Challe
     .eq('id', userId)
     .single();
 
-  if (!user) return;
+  if (!user) return [];
 
+  const events: ProgressionEvent[] = [];
   const xpGlobal = (user.xp_global || 0) + challenge.xp;
   const xpWeekly = (user.xp_weekly || 0) + challenge.xp;
   const levelGlobal = calculateLevel(xpGlobal);
 
+  events.push({ type: 'xp', title: `+${challenge.xp} XP`, description: challenge.titre });
+
   const explorerCompleted = (user.explorer_completed_count || 0) + (challenge.niveau_associe === 'Explorer' ? 1 : 0);
   const crafterCompleted = (user.crafter_completed_count || 0) + (challenge.niveau_associe === 'Crafter' ? 1 : 0);
   const architectCompleted = (user.architect_completed_count || 0) + (challenge.niveau_associe === 'Architecte' ? 1 : 0);
+
+  const previousLevel = user.level_global || 1;
+  if (levelGlobal > previousLevel) {
+    events.push({ type: 'level', title: `Niveau ${levelGlobal}`, description: 'Niveau global atteint' });
+  }
 
   const updates = {
     xp_global: xpGlobal,
@@ -76,11 +92,21 @@ export async function handleChallengeValidated(userId: string, challenge: Challe
 
   await supabase.from('users').update(updates).eq('id', userId);
 
-  await updateStreak(userId);
-  await checkAndUnlockBadges(userId);
+  const streakResult = await updateStreak(userId);
+  if (streakResult && streakResult.current > (user.current_streak || 0)) {
+    events.push({ type: 'streak', title: `Série ${streakResult.current} jours`, description: 'Continue comme ça !' });
+  }
+
+  const newBadges = await checkAndUnlockBadges(userId);
+  newBadges.forEach((badge) => {
+    events.push({ type: 'badge', title: badge.nom, description: 'Nouveau badge débloqué' });
+  });
+
+  return events;
 }
 
-export async function updateStreak(userId: string) {
+
+export async function updateStreak(userId: string): Promise<{ current: number; max: number } | null> {
   const supabase = createClient();
   const { data: user } = await supabase
     .from('users')
@@ -88,7 +114,7 @@ export async function updateStreak(userId: string) {
     .eq('id', userId)
     .single();
 
-  if (!user) return;
+  if (!user) return null;
 
   const today = new Date().toISOString().slice(0, 10);
   const lastActive = user.last_active_date;
@@ -114,12 +140,14 @@ export async function updateStreak(userId: string) {
     .from('users')
     .update({ current_streak: current, max_streak: maxStreak, last_active_date: today })
     .eq('id', userId);
+
+  return { current, max: maxStreak };
 }
 
-export async function checkAndUnlockBadges(userId: string) {
+export async function checkAndUnlockBadges(userId: string): Promise<Badge[]> {
   const supabase = createClient();
   const { data: allBadges } = await supabase.from('badges').select('*');
-  if (!allBadges) return;
+  if (!allBadges) return [];
 
   const { data: user } = await supabase
     .from('users')
@@ -127,7 +155,7 @@ export async function checkAndUnlockBadges(userId: string) {
     .eq('id', userId)
     .single();
 
-  if (!user) return;
+  if (!user) return null;
 
   const shouldAward = (badge: Badge) => {
     const conditions = (badge.condition_json || badge.conditions) as Record<string, unknown> | null;
@@ -138,11 +166,14 @@ export async function checkAndUnlockBadges(userId: string) {
     return false;
   };
 
+  const unlocked: Badge[] = [];
   for (const badge of allBadges) {
     if (shouldAward(badge)) {
       await supabase.from('user_badges').insert({ user_id: userId, badge_id: badge.id });
+      unlocked.push(badge);
     }
   }
+  return unlocked;
 }
 
 export async function updateThemeProgression(userId: string) {
@@ -171,3 +202,44 @@ export async function updateThemeProgression(userId: string) {
     })
     .eq('id', userId);
 }
+export async function updateLeagueWeekly() {
+  const supabase = createClient();
+  const { data: users } = await supabase
+    .from('users')
+    .select('id, xp_weekly, league');
+
+  if (!users || users.length === 0) return;
+
+  const grouped = users.reduce((acc, user) => {
+    const league = (user.league || 'Bronze') as string;
+    acc[league] = acc[league] || [];
+    acc[league].push(user);
+    return acc;
+  }, {} as Record<string, Array<{ id: string; xp_weekly: number | null; league: string | null }>>);
+
+  const order = ['Bronze', 'Argent', 'Or', 'Platine', 'Diamant', 'Master'] as const;
+
+  for (const league of Object.keys(grouped)) {
+    const group = grouped[league];
+    const sorted = [...group].sort((a, b) => (b.xp_weekly || 0) - (a.xp_weekly || 0));
+    const total = sorted.length;
+    if (total === 0) continue;
+
+    const topCut = Math.ceil(total * 0.2);
+    const bottomCut = Math.ceil(total * 0.2);
+
+    for (let i = 0; i < sorted.length; i += 1) {
+      const user = sorted[i];
+      const idx = order.indexOf((user.league || 'Bronze') as typeof order[number]);
+      let nextLeague = order[idx];
+      if (i < topCut && idx < order.length - 1) nextLeague = order[idx + 1];
+      if (i >= total - bottomCut && idx > 0) nextLeague = order[idx - 1];
+
+      await supabase
+        .from('users')
+        .update({ league: nextLeague, xp_weekly: 0 })
+        .eq('id', user.id);
+    }
+  }
+}
+

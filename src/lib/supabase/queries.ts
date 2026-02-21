@@ -460,7 +460,8 @@ export async function evaluateSolution(
     const challenge = await getChallengeById(challengeId);
     if (challenge) {
       await addUserXP(userId, challenge.xp);
-      await handleChallengeValidated(userId, challenge);
+      const events = await handleChallengeValidated(userId, challenge);
+      // TODO: wire events to overlay in UI (client)
     }
     await checkAndUpdateLevelAndBadges(userId);
   }
